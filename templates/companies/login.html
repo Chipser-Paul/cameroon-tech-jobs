@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Company Login — CameroonTechJobs{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+    <div class="container text-center">
+        <h1>Company Login</h1>
+        <p style="color:rgba(255,255,255,0.75);">Welcome back! Log in to manage your job listings.</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+                <div class="form-card">
+                    <h4 style="font-weight:800;margin-bottom:1.5rem;">Login to Your Account</h4>
+
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        {% if form.errors %}
+                        <div class="alert alert-danger border-0" style="border-radius:10px;">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            Invalid email or password. Please try again.
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label class="form-label">Work Email</label>
+                            <input type="email" name="username" class="form-control"
+                                placeholder="hr@yourcompany.com" autofocus>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Password</label>
+                            <input type="password" name="password" class="form-control"
+                                placeholder="Your password">
+                        </div>
+
+                        <button type="submit" class="btn-green w-100" style="padding:0.9rem;">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </button>
+
+                        <div class="text-center mt-3">
+                            <span style="color:var(--gray);font-size:0.9rem;">
+                                Don't have an account?
+                                <a href="{% url 'register' %}" style="color:var(--green);font-weight:600;">Register free</a>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

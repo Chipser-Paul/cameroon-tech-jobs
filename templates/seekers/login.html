@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Job Seeker Login — CameroonTechJobs{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+    <div class="container text-center">
+        <h1>Welcome Back</h1>
+        <p style="color:rgba(255,255,255,0.75);">Login to your job seeker account.</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+                <div class="form-card">
+                    <h4 style="font-weight:800;margin-bottom:1.5rem;">Login to Your Account</h4>
+
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-danger border-0" style="border-radius:10px;">
+                        <i class="fas fa-exclamation-circle me-2"></i>{{ message }}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control"
+                                placeholder="your@email.com" autofocus>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Password</label>
+                            <input type="password" name="password" class="form-control"
+                                placeholder="Your password">
+                        </div>
+                        <button type="submit" class="btn-green w-100" style="padding:0.9rem;">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </button>
+                        <div class="text-center mt-3">
+                            <span style="color:var(--gray);font-size:0.9rem;">
+                                Don't have an account?
+                                <a href="{% url 'seeker_register' %}" style="color:var(--green);font-weight:600;">Register free</a>
+                            </span>
+                        </div>
+                        <div class="text-center mt-2">
+                            <span style="color:var(--gray);font-size:0.9rem;">
+                                Are you a company?
+                                <a href="{% url 'login' %}" style="color:var(--green);font-weight:600;">Company login</a>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

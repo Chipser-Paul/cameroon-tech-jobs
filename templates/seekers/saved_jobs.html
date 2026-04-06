@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Saved Jobs — CameroonTechJobs{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+    <div class="container">
+        <h1>Saved Jobs</h1>
+        <p style="color:rgba(255,255,255,0.75);">{{ jobs.count }} job{{ jobs.count|pluralize }} saved</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                {% if jobs %}
+                <div class="row g-3">
+                    {% for job in jobs %}
+                    <div class="col-12">
+                        <a href="{% url 'job_detail' job.pk %}" class="job-card {% if job.is_featured %}featured{% endif %}" style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+                            {% if job.company.logo %}
+                                <img src="{{ job.company.logo.url }}" class="company-logo" alt="">
+                            {% else %}
+                                <div class="company-logo">{{ job.company.company_name|first }}</div>
+                            {% endif %}
+                            <div style="flex:1;min-width:150px;">
+                                <div class="job-title">{{ job.title }}</div>
+                                <div class="company-name mb-1">
+                                    {{ job.company.company_name }}
+                                    {% if job.company.is_verified %}
+                                    <span style="color:var(--gold);font-size:0.8rem;">✓ Verified</span>
+                                    {% endif %}
+                                </div>
+                                <div class="job-meta">
+                                    <span><i class="fas fa-map-marker-alt"></i>{{ job.get_location_display }}</span>
+                                    <span><i class="fas fa-clock"></i>{{ job.days_ago }}</span>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <span class="job-type-badge">{{ job.get_job_type_display }}</span>
+                                <div class="mt-2">
+                                    <a href="{% url 'save_job' job.pk %}" style="font-size:0.8rem;color:red;text-decoration:none;" onclick="event.stopPropagation();">
+                                        <i class="fas fa-trash me-1"></i>Remove
+                                    </a>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-bookmark fa-3x mb-3" style="color:var(--green);opacity:0.3;"></i>
+                    <h5 class="text-muted">No saved jobs yet</h5>
+                    <p class="text-muted">Browse jobs and click the save button to keep track of opportunities.</p>
+                    <a href="{% url 'job_list' %}" class="btn-green mt-2">Browse Jobs</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

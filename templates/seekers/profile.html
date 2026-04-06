@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ seeker.full_name }} — CameroonTechJobs{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+    <div class="container">
+        <div class="d-flex align-items-center gap-4 flex-wrap">
+            {% if seeker.profile_photo %}
+                <img src="{{ seeker.profile_photo.url }}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,0.3);" alt="">
+            {% else %}
+                <div style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.15);color:white;font-size:2rem;font-weight:800;display:flex;align-items:center;justify-content:center;">
+                    {{ seeker.full_name|first }}
+                </div>
+            {% endif %}
+            <div>
+                <h1 style="font-size:1.8rem;margin:0;">{{ seeker.full_name }}</h1>
+                <p style="color:rgba(255,255,255,0.75);margin:0;">
+                    {{ seeker.get_experience_level_display|default:"" }}
+                    {% if seeker.location %} · {{ seeker.location }}{% endif %}
+                </p>
+                <p style="color:rgba(255,255,255,0.6);margin:0;font-size:0.9rem;">
+                    {{ seeker.get_availability_display|default:"" }}
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+
+            <!-- Main -->
+            <div class="col-lg-8">
+
+                {% if seeker.bio %}
+                <div class="form-card mb-4">
+                    <h5 style="font-weight:800;margin-bottom:1rem;">About Me</h5>
+                    <p style="color:#555;line-height:1.8;">{{ seeker.bio }}</p>
+                </div>
+                {% endif %}
+
+                {% if seeker.skills.count %}
+                <div class="form-card mb-4">
+                    <h5 style="font-weight:800;margin-bottom:1rem;">Technical Skills</h5>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+                        {% for skill in seeker.skills.all %}
+                        <span style="background:var(--green-light);color:var(--green);padding:0.4rem 1rem;border-radius:20px;font-size:0.9rem;font-weight:600;">
+                            {{ skill.name }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if seeker.preferred_categories.count %}
+                <div class="form-card mb-4">
+                    <h5 style="font-weight:800;margin-bottom:1rem;">Looking For</h5>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+                        {% for cat in seeker.preferred_categories.all %}
+                        <span style="background:var(--light-gray);color:var(--dark);padding:0.4rem 1rem;border-radius:20px;font-size:0.9rem;font-weight:600;">
+                            {{ cat.name }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% if seeker.preferred_locations %}
+                    <div style="margin-top:0.75rem;font-size:0.9rem;color:var(--gray);">
+                        <i class="fas fa-map-marker-alt me-1" style="color:var(--green);"></i>
+                        Preferred locations: {{ seeker.preferred_locations }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="form-card mb-4">
+                    <h6 style="font-weight:800;margin-bottom:1rem;">Contact & Links</h6>
+                    <div style="display:flex;flex-direction:column;gap:0.75rem;">
+                        {% if seeker.email %}
+                        <div style="font-size:0.9rem;">
+                            <i class="fas fa-envelope me-2" style="color:var(--green);"></i>
+                            {{ seeker.email }}
+                        </div>
+                        {% endif %}
+                        {% if seeker.phone %}
+                        <div style="font-size:0.9rem;">
+                            <i class="fas fa-phone me-2" style="color:var(--green);"></i>
+                            {{ seeker.phone }}
+                        </div>
+                        {% endif %}
+                        {% if seeker.github %}
+                        <a href="{{ seeker.github }}" target="_blank" style="font-size:0.9rem;color:var(--dark);text-decoration:none;">
+                            <i class="fab fa-github me-2"></i>GitHub
+                        </a>
+                        {% endif %}
+                        {% if seeker.portfolio %}
+                        <a href="{{ seeker.portfolio }}" target="_blank" style="font-size:0.9rem;color:var(--green);text-decoration:none;">
+                            <i class="fas fa-globe me-2"></i>Portfolio
+                        </a>
+                        {% endif %}
+                        {% if seeker.linkedin %}
+                        <a href="{{ seeker.linkedin }}" target="_blank" style="font-size:0.9rem;color:#0077b5;text-decoration:none;">
+                            <i class="fab fa-linkedin me-2"></i>LinkedIn
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if request.user == seeker %}
+                <a href="{% url 'edit_profile' %}" class="btn-green w-100 text-center">
+                    <i class="fas fa-edit me-2"></i>Edit My Profile
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

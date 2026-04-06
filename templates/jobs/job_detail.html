@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ job.title }} — {{ job.company.company_name }} | CameroonTechJobs{% endblock %}
+
+{% block content %}
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+    <div class="container">
+        <div class="d-flex align-items-center gap-4 flex-wrap">
+            {% if job.company.logo %}
+                <img src="{{ job.company.logo.url }}" style="width:70px;height:70px;border-radius:12px;object-fit:cover;" alt="{{ job.company.company_name }}">
+            {% else %}
+                <div class="company-logo" style="width:70px;height:70px;font-size:1.8rem;background:rgba(255,255,255,0.15);color:white;">
+                    {{ job.company.company_name|first }}
+                </div>
+            {% endif %}
+            <div>
+                <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                    <h1 style="font-size:1.8rem;margin:0;">{{ job.title }}</h1>
+                    {% if job.is_featured %}<span class="featured-badge">Featured</span>{% endif %}
+                </div>
+                <p style="color:rgba(255,255,255,0.75);margin:0;">
+                    {{ job.company.company_name }}
+                    {% if job.company.location %} · {{ job.company.location }}{% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+
+            <!-- MAIN CONTENT -->
+            <div class="col-lg-8">
+
+                <!-- Job Meta Bar -->
+                <div class="form-card mb-4 p-3">
+                    <div class="row g-3 text-center">
+                        <div class="col-6 col-md-3">
+                            <div style="color:var(--gray);font-size:0.8rem;">Location</div>
+                            <div style="font-weight:700;">
+                                <i class="fas fa-map-marker-alt me-1" style="color:var(--green);"></i>
+                                {{ job.get_location_display }}
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div style="color:var(--gray);font-size:0.8rem;">Job Type</div>
+                            <div style="font-weight:700;">
+                                <i class="fas fa-briefcase me-1" style="color:var(--green);"></i>
+                                {{ job.get_job_type_display }}
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div style="color:var(--gray);font-size:0.8rem;">Category</div>
+                            <div style="font-weight:700;">
+                                <i class="fas fa-tag me-1" style="color:var(--green);"></i>
+                                {{ job.category.name|default:"General" }}
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div style="color:var(--gray);font-size:0.8rem;">Posted</div>
+                            <div style="font-weight:700;">
+                                <i class="fas fa-clock me-1" style="color:var(--green);"></i>
+                                {{ job.days_ago }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tech Stacks -->
+                {% if job.tech_stacks.count %}
+                <div class="form-card mb-4 p-3">
+                    <div style="font-weight:700;font-size:0.9rem;margin-bottom:0.75rem;">
+                        <i class="fas fa-code me-2" style="color:var(--green);"></i>Tech Stack
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">
+                        {% for tech in job.tech_stacks.all %}
+                        <a href="{% url 'job_list' %}?tech={{ tech.name }}"
+                           style="background:var(--green-light);color:var(--green);padding:0.3rem 0.8rem;border-radius:20px;font-size:0.82rem;font-weight:600;text-decoration:none;">
+                            {{ tech.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if job.salary_range %}
+                <div class="alert" style="background:var(--green-light);border:1.5px solid var(--green);border-radius:10px;color:var(--green-dark);">
+                    <i class="fas fa-money-bill-wave me-2"></i>
+                    <strong>Salary:</strong> {{ job.salary_range }}
+                </div>
+                {% endif %}
+
+                <!-- Description -->
+                <div class="form-card mb-4">
+                    <h5 style="font-weight:800;margin-bottom:1rem;">Job Description</h5>
+                    <div style="line-height:1.8;color:#444;">
+                        {{ job.description|linebreaks }}
+                    </div>
+                </div>
+
+                <!-- Requirements -->
+                <div class="form-card mb-4">
+                    <h5 style="font-weight:800;margin-bottom:1rem;">Requirements</h5>
+                    <div style="line-height:1.8;color:#444;">
+                        {{ job.requirements|linebreaks }}
+                    </div>
+                </div>
+
+                <!-- How to Apply -->
+                <div class="form-card mb-4" style="border:2px solid var(--green);">
+                    <h5 style="font-weight:800;margin-bottom:1rem;">How to Apply</h5>
+                    {% if job.apply_link %}
+                    <p style="color:#444;">Click the button below to apply through the company's official application page.</p>
+                    <a href="{{ job.apply_link }}" target="_blank" class="btn-green">
+                        <i class="fas fa-external-link-alt me-2"></i>Apply Now
+                    </a>
+                    {% elif job.apply_email %}
+                    <p style="color:#444;">Send your CV and cover letter to the email address below.</p>
+                    <a href="mailto:{{ job.apply_email }}" class="btn-green">
+                        <i class="fas fa-envelope me-2"></i>Apply via Email
+                    </a>
+                    <div class="mt-2" style="font-size:0.9rem;color:var(--gray);">{{ job.apply_email }}</div>
+                    {% else %}
+                    <p style="color:#444;">Contact the company directly to apply for this position.</p>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <!-- SIDEBAR -->
+            <div class="col-lg-4">
+
+                <!-- Company Info -->
+                <div class="form-card mb-4">
+                    <h6 style="font-weight:800;margin-bottom:1rem;">About the Company</h6>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        {% if job.company.logo %}
+                            <img src="{{ job.company.logo.url }}" style="width:52px;height:52px;border-radius:10px;object-fit:cover;" alt="">
+                        {% else %}
+                            <div class="company-logo">{{ job.company.company_name|first }}</div>
+                        {% endif %}
+                        <div>
+                            <div style="font-weight:700;">{{ job.company.company_name }}</div>
+                            {% if job.company.location %}
+                            <div style="font-size:0.85rem;color:var(--gray);">
+                                <i class="fas fa-map-marker-alt me-1"></i>{{ job.company.location }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if job.company.description %}
+                    <p style="font-size:0.9rem;color:#555;line-height:1.6;">{{ job.company.description|truncatewords:30 }}</p>
+                    {% endif %}
+                    {% if job.company.website %}
+                    <a href="{{ job.company.website }}" target="_blank" style="font-size:0.9rem;color:var(--green);text-decoration:none;">
+                        <i class="fas fa-globe me-1"></i>Visit Website
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Job Stats -->
+                <div class="form-card mb-4">
+                    <h6 style="font-weight:800;margin-bottom:1rem;">Job Stats</h6>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span style="color:var(--gray);font-size:0.9rem;">Views</span>
+                        <span style="font-weight:700;">{{ job.views_count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span style="color:var(--gray);font-size:0.9rem;">Posted</span>
+                        <span style="font-weight:700;">{{ job.date_posted|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span style="color:var(--gray);font-size:0.9rem;">Expires</span>
+                        <span style="font-weight:700;">{{ job.date_expires|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+
+                <!-- Save Job -->
+                <div class="form-card mb-4">
+                    <h6 style="font-weight:800;margin-bottom:1rem;">
+                        <i class="fas fa-bookmark me-2" style="color:var(--green);"></i>Save This Job
+                    </h6>
+                    {% if user.is_authenticated and not user.company_name %}
+                        {% if job in user.saved_jobs.all %}
+                        <a href="{% url 'save_job' job.pk %}" class="btn-outline-green w-100 text-center" style="padding:0.5rem;color:red;border-color:red;">
+                            <i class="fas fa-bookmark me-2"></i>Saved — Click to Remove
+                        </a>
+                        {% else %}
+                        <a href="{% url 'save_job' job.pk %}" class="btn-green w-100 text-center" style="padding:0.5rem;">
+                            <i class="far fa-bookmark me-2"></i>Save Job
+                        </a>
+                        {% endif %}
+                    {% else %}
+                    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.75rem;">
+                        Login as a job seeker to save this job.
+                    </p>
+                    <a href="{% url 'seeker_login' %}" class="btn-outline-green w-100 text-center" style="padding:0.5rem;">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login to Save
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Share -->
+                <div class="form-card mb-4">
+                    <h6 style="font-weight:800;margin-bottom:1rem;">Share this Job</h6>
+                    <div class="d-flex gap-2">
+                        <a href="https://wa.me/?text=Check this job: {{ request.build_absolute_uri }}" target="_blank"
+                           style="background:#25D366;color:white;padding:0.5rem 1rem;border-radius:8px;text-decoration:none;font-size:0.9rem;">
+                            <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}" target="_blank"
+                           style="background:#0077b5;color:white;padding:0.5rem 1rem;border-radius:8px;text-decoration:none;font-size:0.9rem;">
+                            <i class="fab fa-linkedin me-1"></i>LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- RELATED JOBS -->
+        {% if related_jobs %}
+        <div class="mt-4">
+            <h4 style="font-weight:800;margin-bottom:1.5rem;">Related Jobs</h4>
+            <div class="row g-3">
+                {% for related in related_jobs %}
+                <div class="col-lg-4">
+                    <a href="{% url 'job_detail' related.pk %}" class="job-card">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            {% if related.company.logo %}
+                                <img src="{{ related.company.logo.url }}" class="company-logo" alt="">
+                            {% else %}
+                                <div class="company-logo">{{ related.company.company_name|first }}</div>
+                            {% endif %}
+                            <div>
+                                <div class="job-title">{{ related.title }}</div>
+                                <div class="company-name">{{ related.company.company_name }}</div>
+                            </div>
+                        </div>
+                        <div class="job-meta">
+                            <span><i class="fas fa-map-marker-alt"></i>{{ related.get_location_display }}</span>
+                            <span><i class="fas fa-clock"></i>{{ related.days_ago }}</span>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+
+{% endblock %}

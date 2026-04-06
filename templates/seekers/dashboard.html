@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block title %}My Dashboard — CameroonTechJobs{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1>Welcome, {{ seeker.full_name }} 👋</h1>
+                <p style="color:rgba(255,255,255,0.75);margin:0;">
+                    {% if seeker.availability %}
+                        {{ seeker.get_availability_display }}
+                    {% else %}
+                        Complete your profile to get discovered!
+                    {% endif %}
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'edit_profile' %}" class="btn-outline-green" style="border-color:white;color:white;">
+                    <i class="fas fa-edit me-2"></i>Edit Profile
+                </a>
+                <a href="{% url 'job_list' %}" class="btn-post">
+                    <i class="fas fa-search me-2"></i>Browse Jobs
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+
+        <!-- STATS -->
+        <div class="row g-4 mb-5">
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-number">{{ saved_count }}</div>
+                    <div class="stat-label">Saved Jobs</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card" style="border-left-color:#0d6efd;">
+                    <div class="stat-number" style="color:#0d6efd;">{{ skills_count }}</div>
+                    <div class="stat-label">Skills Listed</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card" style="border-left-color:var(--gold);">
+                    <div class="stat-number" style="color:var(--gold);">
+                        {{ seeker.preferred_categories.count }}
+                    </div>
+                    <div class="stat-label">Job Preferences</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card" style="border-left-color:#6f42c1;">
+                    <div class="stat-number" style="color:#6f42c1;">
+                        {% if seeker.job_alerts_enabled %}ON{% else %}OFF{% endif %}
+                    </div>
+                    <div class="stat-label">Job Alerts</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFILE COMPLETION WARNING -->
+        {% if not seeker.experience_level or not seeker.skills.count or not seeker.bio %}
+        <div class="alert mb-4" style="background:var(--gold-light);border:1.5px solid var(--gold);border-radius:12px;color:#856404;">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Complete your profile!</strong> Companies search for candidates by skills and experience.
+            <a href="{% url 'edit_profile' %}" style="color:#856404;font-weight:700;margin-left:0.5rem;">Complete now →</a>
+        </div>
+        {% endif %}
+
+        <div class="row g-4">
+
+            <!-- RECOMMENDED JOBS -->
+            <div class="col-lg-8">
+                <div class="form-card">
+                    <h5 style="font-weight:800;margin-bottom:1.5rem;">
+                        <i class="fas fa-star me-2" style="color:var(--gold);"></i>
+                        Recommended For You
+                    </h5>
+                    {% if recommended_jobs %}
+                    <div class="row g-3">
+                        {% for job in recommended_jobs %}
+                        <div class="col-12">
+                            <a href="{% url 'job_detail' job.pk %}" class="job-card {% if job.is_featured %}featured{% endif %}" style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+                                {% if job.company.logo %}
+                                    <img src="{{ job.company.logo.url }}" class="company-logo" alt="">
+                                {% else %}
+                                    <div class="company-logo">{{ job.company.company_name|first }}</div>
+                                {% endif %}
+                                <div style="flex:1;min-width:150px;">
+                                    <div class="job-title">{{ job.title }}</div>
+                                    <div class="company-name mb-1">
+                                        {{ job.company.company_name }}
+                                        {% if job.company.is_verified %}
+                                        <span style="color:var(--gold);font-size:0.8rem;" title="Verified Company">✓ Verified</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="job-meta">
+                                        <span><i class="fas fa-map-marker-alt"></i>{{ job.get_location_display }}</span>
+                                        <span><i class="fas fa-clock"></i>{{ job.days_ago }}</span>
+                                    </div>
+                                </div>
+                                <span class="job-type-badge">{{ job.get_job_type_display }}</span>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-search fa-2x mb-3" style="color:var(--green);opacity:0.3;"></i>
+                        <p class="text-muted">Set your job preferences to get personalized recommendations.</p>
+                        <a href="{% url 'edit_profile' %}" class="btn-green">Set Preferences</a>
+                    </div>
+                    {% endif %}
+                    <div class="text-center mt-3">
+                        <a href="{% url 'job_list' %}" class="btn-outline-green">View All Jobs</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIDEBAR -->
+            <div class="col-lg-4">
+
+                <!-- Profile Card -->
+                <div class="form-card mb-4">
+                    <div class="text-center mb-3">
+                        {% if seeker.profile_photo %}
+                            <img src="{{ seeker.profile_photo.url }}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--green);" alt="">
+                        {% else %}
+                            <div style="width:80px;height:80px;border-radius:50%;background:var(--green-light);color:var(--green);font-size:2rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto;border:3px solid var(--green);">
+                                {{ seeker.full_name|first }}
+                            </div>
+                        {% endif %}
+                        <h6 style="font-weight:800;margin-top:0.75rem;">{{ seeker.full_name }}</h6>
+                        <div style="color:var(--gray);font-size:0.85rem;">{{ seeker.get_experience_level_display|default:"Experience not set" }}</div>
+                    </div>
+
+                    {% if seeker.skills.count %}
+                    <div class="mb-3">
+                        <div style="font-weight:700;font-size:0.85rem;margin-bottom:0.5rem;">Skills</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:0.3rem;">
+                            {% for skill in seeker.skills.all|slice:":6" %}
+                            <span style="background:var(--green-light);color:var(--green);padding:0.2rem 0.6rem;border-radius:20px;font-size:0.78rem;font-weight:600;">{{ skill.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                        {% if seeker.github %}
+                        <a href="{{ seeker.github }}" target="_blank" style="font-size:0.85rem;color:var(--dark);text-decoration:none;">
+                            <i class="fab fa-github me-2"></i>GitHub Profile
+                        </a>
+                        {% endif %}
+                        {% if seeker.portfolio %}
+                        <a href="{{ seeker.portfolio }}" target="_blank" style="font-size:0.85rem;color:var(--green);text-decoration:none;">
+                            <i class="fas fa-globe me-2"></i>Portfolio
+                        </a>
+                        {% endif %}
+                        {% if seeker.linkedin %}
+                        <a href="{{ seeker.linkedin }}" target="_blank" style="font-size:0.85rem;color:#0077b5;text-decoration:none;">
+                            <i class="fab fa-linkedin me-2"></i>LinkedIn
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <a href="{% url 'edit_profile' %}" class="btn-outline-green w-100 text-center mt-3" style="padding:0.5rem;">
+                        <i class="fas fa-edit me-2"></i>Edit Profile
+                    </a>
+                </div>
+
+                <!-- Saved Jobs -->
+                <div class="form-card">
+                    <h6 style="font-weight:800;margin-bottom:1rem;">
+                        <i class="fas fa-bookmark me-2" style="color:var(--green);"></i>
+                        Saved Jobs ({{ saved_count }})
+                    </h6>
+                    {% if saved_jobs %}
+                        {% for job in saved_jobs|slice:":3" %}
+                        <div class="mb-2 pb-2" style="border-bottom:1px solid #f0f0f0;">
+                            <a href="{% url 'job_detail' job.pk %}" style="font-weight:600;font-size:0.9rem;color:var(--dark);text-decoration:none;">{{ job.title }}</a>
+                            <div style="font-size:0.8rem;color:var(--gray);">{{ job.company.company_name }}</div>
+                        </div>
+                        {% endfor %}
+                        <a href="{% url 'saved_jobs' %}" style="font-size:0.85rem;color:var(--green);font-weight:600;">View all saved jobs →</a>
+                    {% else %}
+                        <p style="color:var(--gray);font-size:0.85rem;">No saved jobs yet. Browse jobs and save the ones you like!</p>
+                        <a href="{% url 'job_list' %}" class="btn-green" style="font-size:0.85rem;padding:0.4rem 1rem;">Browse Jobs</a>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

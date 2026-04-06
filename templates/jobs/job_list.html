@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse IT Jobs in Cameroon — CameroonTechJobs{% endblock %}
+
+{% block content %}
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+    <div class="container">
+        <h1>Browse Jobs</h1>
+        <p style="color:rgba(255,255,255,0.75);">{{ total_jobs }} active job{{ total_jobs|pluralize }} available</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+
+            <!-- FILTERS SIDEBAR -->
+            <div class="col-lg-3">
+                <div class="form-card p-3">
+                    <h6 class="fw-700 mb-3" style="font-weight:700;">Filter Jobs</h6>
+                    <form method="GET">
+                        <!-- Search -->
+                        <div class="mb-3">
+                            <label class="form-label">Keyword</label>
+                            <input type="text" name="q" class="form-control" placeholder="Job title, skill..." value="{{ request.GET.q }}">
+                        </div>
+                        <!-- Category -->
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <select name="category" class="form-select">
+                                <option value="">All Categories</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat.slug }}" {% if request.GET.category == cat.slug %}selected{% endif %}>
+                                    {{ cat.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <!-- Location -->
+                        <div class="mb-3">
+                            <label class="form-label">Location</label>
+                            <select name="location" class="form-select">
+                                <option value="">All Locations</option>
+                                <option value="douala" {% if request.GET.location == 'douala' %}selected{% endif %}>Douala</option>
+                                <option value="yaounde" {% if request.GET.location == 'yaounde' %}selected{% endif %}>Yaoundé</option>
+                                <option value="bafoussam" {% if request.GET.location == 'bafoussam' %}selected{% endif %}>Bafoussam</option>
+                                <option value="bamenda" {% if request.GET.location == 'bamenda' %}selected{% endif %}>Bamenda</option>
+                                <option value="remote" {% if request.GET.location == 'remote' %}selected{% endif %}>Remote</option>
+                                <option value="other" {% if request.GET.location == 'other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        <!-- Job Type -->
+                        <div class="mb-3">
+                            <label class="form-label">Job Type</label>
+                            <select name="job_type" class="form-select">
+                                <option value="">All Types</option>
+                                <option value="full_time" {% if request.GET.job_type == 'full_time' %}selected{% endif %}>Full Time</option>
+                                <option value="part_time" {% if request.GET.job_type == 'part_time' %}selected{% endif %}>Part Time</option>
+                                <option value="contract" {% if request.GET.job_type == 'contract' %}selected{% endif %}>Contract</option>
+                                <option value="internship" {% if request.GET.job_type == 'internship' %}selected{% endif %}>Internship</option>
+                                <option value="remote" {% if request.GET.job_type == 'remote' %}selected{% endif %}>Remote</option>
+                            </select>
+                        </div>
+                        <!-- Tech Stack -->
+                        <div class="mb-3">
+                            <label class="form-label">Tech Stack</label>
+                            <input type="text" name="tech" class="form-control"
+                                placeholder="e.g. Python, React..."
+                                value="{{ request.GET.tech }}">
+                        </div>
+
+                        <!-- Experience Level -->
+                        <div class="mb-3">
+                            <label class="form-label">Experience Level</label>
+                            <select name="experience" class="form-select">
+                                <option value="">All Levels</option>
+                                <option value="entry" {% if request.GET.experience == 'entry' %}selected{% endif %}>Entry Level</option>
+                                <option value="mid" {% if request.GET.experience == 'mid' %}selected{% endif %}>Mid Level</option>
+                                <option value="senior" {% if request.GET.experience == 'senior' %}selected{% endif %}>Senior Level</option>
+                                <option value="any" {% if request.GET.experience == 'any' %}selected{% endif %}>Any Level</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-green w-100">Apply Filters</button>
+                        {% if request.GET.q or request.GET.category or request.GET.location or request.GET.job_type or request.GET.tech or request.GET.experience %}
+                        <a href="{% url 'job_list' %}" class="btn-outline-green w-100 text-center mt-2">Clear Filters</a>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+
+            <!-- JOB LISTINGS -->
+            <div class="col-lg-9">
+                {% if jobs %}
+                <div class="row g-3">
+                    {% for job in jobs %}
+                    <div class="col-12">
+                        <a href="{% url 'job_detail' job.pk %}" class="job-card {% if job.is_featured %}featured{% endif %}" style="display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;">
+                            <!-- Logo -->
+                            {% if job.company.logo %}
+                                <img src="{{ job.company.logo.url }}" class="company-logo" alt="{{ job.company.company_name }}">
+                            {% else %}
+                                <div class="company-logo">{{ job.company.company_name|first }}</div>
+                            {% endif %}
+                            <!-- Info -->
+                            <div style="flex:1; min-width:200px;">
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <div class="job-title mb-0">{{ job.title }}</div>
+                                    {% if job.is_featured %}<span class="featured-badge">Featured</span>{% endif %}
+                                </div>
+                                <div class="company-name mb-2">{{ job.company.company_name }}</div>
+                                <div class="job-meta">
+                                    <span><i class="fas fa-map-marker-alt"></i>{{ job.get_location_display }}</span>
+                                    <span><i class="fas fa-clock"></i>{{ job.days_ago }}</span>
+                                    {% if job.salary_range %}
+                                    <span><i class="fas fa-money-bill"></i>{{ job.salary_range }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <!-- Right side -->
+                            <div class="text-end">
+                                <span class="job-type-badge">{{ job.get_job_type_display }}</span>
+                                {% if job.category %}
+                                <div class="mt-2" style="font-size:0.8rem; color:var(--gray);">{{ job.category.name }}</div>
+                                {% endif %}
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-3x mb-3" style="color:var(--green); opacity:0.3;"></i>
+                    <h5 class="text-muted">No jobs found</h5>
+                    <p class="text-muted">Try adjusting your filters or search terms</p>
+                    <a href="{% url 'job_list' %}" class="btn-green">Clear Filters</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

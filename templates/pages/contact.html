@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us â€” CameroonTechJobs{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+    <div class="container text-center">
+        <h1>Contact Us</h1>
+        <p style="color:rgba(255,255,255,0.75);">We're based in Douala and always happy to help.</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center g-4">
+
+            <!-- Contact Info -->
+            <div class="col-lg-4">
+                <div class="form-card mb-4">
+                    <h5 style="font-weight:800;margin-bottom:1.5rem;">Get In Touch</h5>
+
+                    <div class="d-flex gap-3 mb-4">
+                        <div style="width:42px;height:42px;background:var(--green-light);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fab fa-whatsapp" style="color:var(--green);font-size:1.2rem;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight:700;font-size:0.9rem;">WhatsApp</div>
+                            <a href="https://wa.me/237675952537" target="_blank" style="color:var(--gray);font-size:0.9rem;text-decoration:none;">+237 675 952 537</a>
+                            <div style="font-size:0.8rem;color:var(--gray);">Mon–Fri, 8am–6pm</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3 mb-4">
+                        <div style="width:42px;height:42px;background:var(--green-light);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas fa-envelope" style="color:var(--green);font-size:1.2rem;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight:700;font-size:0.9rem;">Email</div>
+                            <a href="mailto:chipseremmanuel@gmail.com" style="color:var(--gray);font-size:0.9rem;text-decoration:none;">chipseremmanuel@gmail.com</a>
+                            <div style="font-size:0.8rem;color:var(--gray);">Reply within 24 hours</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3 mb-4">
+                        <div style="width:42px;height:42px;background:var(--green-light);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas fa-map-marker-alt" style="color:var(--green);font-size:1.2rem;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight:700;font-size:0.9rem;">Location</div>
+                            <div style="color:var(--gray);font-size:0.9rem;">Douala, Cameroon</div>
+                            <div style="font-size:0.8rem;color:var(--gray);">Bonamoussadi</div>
+                        </div>
+                    </div>
+
+                    <!-- Social -->
+                    <div style="border-top:1px solid #f0f0f0;padding-top:1.5rem;margin-top:0.5rem;">
+                        <div style="font-weight:700;font-size:0.9rem;margin-bottom:1rem;">Follow Us</div>
+                        <div class="d-flex gap-3">
+                            <a href="https://www.linkedin.com/in/chipsér-emmanuel-402559307" target="_blank"
+                               style="width:38px;height:38px;background:#0077b5;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;text-decoration:none;">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="https://www.facebook.com/share/18htEkDGM5/" target="_blank"
+                               style="width:38px;height:38px;background:#1877f2;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;text-decoration:none;">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                            <a href="https://x.com/Chipserx" target="_blank"
+                               style="width:38px;height:38px;background:#000;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;text-decoration:none;">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="https://wa.me/237675952537" target="_blank"
+                               style="width:38px;height:38px;background:#25D366;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;text-decoration:none;">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ -->
+                <div class="form-card">
+                    <h6 style="font-weight:800;margin-bottom:1rem;">Quick FAQ</h6>
+                    <div class="mb-3">
+                        <div style="font-weight:600;font-size:0.9rem;">Is the first listing really free?</div>
+                        <div style="color:var(--gray);font-size:0.85rem;margin-top:0.3rem;">Yes! Every company gets one completely free job post. No payment info required.</div>
+                    </div>
+                    <div class="mb-3">
+                        <div style="font-weight:600;font-size:0.9rem;">How long does activation take?</div>
+                        <div style="color:var(--gray);font-size:0.85rem;margin-top:0.3rem;">Within 24 hours of submission or payment confirmation.</div>
+                    </div>
+                    <div class="mb-3">
+                        <div style="font-weight:600;font-size:0.9rem;">What payment methods do you accept?</div>
+                        <div style="color:var(--gray);font-size:0.85rem;margin-top:0.3rem;">MTN Mobile Money, Orange Money, and UBA bank transfer.</div>
+                    </div>
+                    <div>
+                        <div style="font-weight:600;font-size:0.9rem;">How long is a listing active?</div>
+                        <div style="color:var(--gray);font-size:0.85rem;margin-top:0.3rem;">All listings stay active for 30 days from activation date.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="col-lg-6">
+                <div class="form-card">
+                    <h5 style="font-weight:800;margin-bottom:1.5rem;">Send Us a Message</h5>
+
+                    {% if sent %}
+                    <div class="alert" style="background:var(--green-light);border:1.5px solid var(--green);border-radius:10px;color:var(--green-dark);">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Message sent!</strong> We'll get back to you within 24 hours.
+                    </div>
+                    {% else %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Your Name *</label>
+                                <input type="text" name="name" class="form-control" placeholder="John Doe" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email *</label>
+                                <input type="email" name="email" class="form-control" placeholder="you@example.com" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Subject *</label>
+                                <select name="subject" class="form-select" required>
+                                    <option value="">Select a subject</option>
+                                    <option value="job_posting">Job Posting Question</option>
+                                    <option value="payment">Payment Issue</option>
+                                    <option value="technical">Technical Problem</option>
+                                    <option value="partnership">Partnership</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Message *</label>
+                                <textarea name="message" class="form-control" rows="6"
+                                    placeholder="Tell us how we can help you..." required></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn-green w-100" style="padding:0.9rem;">
+                                    <i class="fas fa-paper-plane me-2"></i>Send Message
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}

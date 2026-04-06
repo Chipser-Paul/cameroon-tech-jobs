@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard — CameroonTechJobs{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1>Welcome, {{ user.company_name }} 👋</h1>
+                <p style="color:rgba(255,255,255,0.75);margin:0;">Manage your job listings from here.</p>
+            </div>
+            <a href="{% url 'post_job' %}" class="btn-outline-green" style="border-color:white;color:white;">
+                <i class="fas fa-plus me-2"></i>Post a New Job
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+
+        <!-- STATS -->
+        <div class="row g-4 mb-5">
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_jobs }}</div>
+                    <div class="stat-label">Total Listings</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card" style="border-left-color:#0f5132;">
+                    <div class="stat-number" style="color:#0f5132;">{{ active_jobs }}</div>
+                    <div class="stat-label">Active Jobs</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card" style="border-left-color:#856404;">
+                    <div class="stat-number" style="color:#856404;">{{ pending_jobs }}</div>
+                    <div class="stat-label">Pending Approval</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card" style="border-left-color:#0d6efd;">
+                    <div class="stat-number" style="color:#0d6efd;">{{ total_views }}</div>
+                    <div class="stat-label">Total Views</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FREE LISTING NOTICE -->
+        {% if not user.has_used_free_listing %}
+        <div class="alert mb-4" style="background:var(--green-light);border:1.5px solid var(--green);border-radius:12px;color:var(--green-dark);">
+            <i class="fas fa-gift me-2"></i>
+            <strong>You have a free job listing available!</strong>
+            <a href="{% url 'post_job' %}" style="color:var(--green-dark);font-weight:700;margin-left:0.5rem;">Post it now →</a>
+        </div>
+        {% else %}
+        <div class="alert mb-4" style="background:var(--gold-light);border:1.5px solid var(--gold);border-radius:12px;color:#856404;">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Your free listing has been used.</strong>
+            Future listings cost 5,000 XAF (Basic) or 15,000 XAF (Featured).
+            <a href="{% url 'payment_info' %}" style="color:#856404;font-weight:700;margin-left:0.5rem;">See payment info →</a>
+        </div>
+        {% endif %}
+
+        <!-- JOB LISTINGS TABLE -->
+        <div class="form-card">
+            <h5 style="font-weight:800;margin-bottom:1.5rem;">Your Job Listings</h5>
+
+            {% if jobs %}
+            <div class="table-responsive">
+                <table class="table" style="font-size:0.9rem;">
+                    <thead style="background:var(--light-gray);">
+                        <tr>
+                            <th style="padding:1rem;font-weight:700;">Job Title</th>
+                            <th style="padding:1rem;font-weight:700;">Category</th>
+                            <th style="padding:1rem;font-weight:700;">Location</th>
+                            <th style="padding:1rem;font-weight:700;">Plan</th>
+                            <th style="padding:1rem;font-weight:700;">Status</th>
+                            <th style="padding:1rem;font-weight:700;">Views</th>
+                            <th style="padding:1rem;font-weight:700;">Posted</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for job in jobs %}
+                        <tr style="border-bottom:1px solid #f0f0f0;">
+                            <td style="padding:1rem;">
+                                <a href="{% url 'job_detail' job.pk %}" style="color:var(--dark);font-weight:600;text-decoration:none;">
+                                    {{ job.title }}
+                                </a>
+                                {% if job.is_featured %}
+                                <span class="featured-badge ms-1">Featured</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding:1rem;color:var(--gray);">{{ job.category.name|default:"—" }}</td>
+                            <td style="padding:1rem;color:var(--gray);">{{ job.get_location_display }}</td>
+                            <td style="padding:1rem;">
+                                <span style="font-size:0.8rem;font-weight:600;color:var(--green);">
+                                    {{ job.get_plan_display }}
+                                </span>
+                            </td>
+                            <td style="padding:1rem;">
+                                <span class="status-badge status-{{ job.status }}">
+                                    {{ job.get_status_display }}
+                                </span>
+                            </td>
+                            <td style="padding:1rem;color:var(--gray);">{{ job.views_count }}</td>
+                            <td style="padding:1rem;color:var(--gray);">{{ job.date_posted|date:"M d, Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-briefcase fa-3x mb-3" style="color:var(--green);opacity:0.3;"></i>
+                <h5 class="text-muted">No job listings yet</h5>
+                <p class="text-muted">Post your first job for free and start finding talent!</p>
+                <a href="{% url 'post_job' %}" class="btn-green mt-2">
+                    <i class="fas fa-plus me-2"></i>Post Your First Job
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- COMPANY PROFILE CARD -->
+        <div class="row g-4 mt-2">
+            <div class="col-lg-6">
+                <div class="form-card">
+                    <h6 style="font-weight:800;margin-bottom:1rem;">Company Profile</h6>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        {% if user.logo %}
+                            <img src="{{ user.logo.url }}" style="width:60px;height:60px;border-radius:10px;object-fit:cover;" alt="">
+                        {% else %}
+                            <div class="company-logo" style="width:60px;height:60px;font-size:1.5rem;">
+                                {{ user.company_name|first }}
+                            </div>
+                        {% endif %}
+                        <div>
+                            <div style="font-weight:700;font-size:1.1rem;">{{ user.company_name }}</div>
+                            <div style="color:var(--gray);font-size:0.9rem;">{{ user.email }}</div>
+                        </div>
+                    </div>
+                    {% if user.phone %}
+                    <div style="font-size:0.9rem;color:var(--gray);margin-bottom:0.5rem;">
+                        <i class="fas fa-phone me-2"></i>{{ user.phone }}
+                    </div>
+                    {% endif %}
+                    {% if user.location %}
+                    <div style="font-size:0.9rem;color:var(--gray);margin-bottom:0.5rem;">
+                        <i class="fas fa-map-marker-alt me-2"></i>{{ user.location }}
+                    </div>
+                    {% endif %}
+                    {% if user.website %}
+                    <div style="font-size:0.9rem;margin-bottom:0.5rem;">
+                        <i class="fas fa-globe me-2" style="color:var(--green);"></i>
+                        <a href="{{ user.website }}" target="_blank" style="color:var(--green);">{{ user.website }}</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="form-card">
+                    <h6 style="font-weight:800;margin-bottom:1rem;">Payment Information</h6>
+                    <p style="font-size:0.9rem;color:var(--gray);">
+                        After your free listing, pay for future job posts using Mobile Money or bank transfer.
+                    </p>
+                    <a href="{% url 'payment_info' %}" class="btn-outline-green" style="font-size:0.9rem;padding:0.5rem 1.2rem;">
+                        <i class="fas fa-money-bill me-2"></i>View Payment Details
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

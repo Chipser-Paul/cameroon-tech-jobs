@@ -1,0 +1,78 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <span class="brand-text">Cameroon<span class="brand-highlight">Tech</span>Jobs</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'job_list' %}">
+                        <i class="fas fa-briefcase me-1"></i> Browse Jobs
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'seeker_list' %}">
+                        <i class="fas fa-users me-1"></i>Browse Talent
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'about' %}">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'contact' %}">Contact</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                    {% if user.company_name %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'dashboard' %}">
+                                <i class="fas fa-building me-1"></i>{{ user.company_name }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-post ms-2" href="{% url 'post_job' %}">
+                                <i class="fas fa-plus me-1"></i>Post a Job
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt me-1"></i>Logout
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'seeker_dashboard' %}">
+                                <i class="fas fa-user me-1"></i>{{ user.full_name }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'seeker_logout' %}">
+                                <i class="fas fa-sign-out-alt me-1"></i>Logout
+                            </a>
+                        </li>
+                    {% endif %}
+                {% else %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Login</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'login' %}"><i class="fas fa-building me-2"></i>Company Login</a></li>
+                            <li><a class="dropdown-item" href="{% url 'seeker_login' %}"><i class="fas fa-user me-2"></i>Job Seeker Login</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown ms-2">
+                        <a class="btn btn-post dropdown-toggle" href="#" data-bs-toggle="dropdown">Register</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'register' %}"><i class="fas fa-building me-2"></i>Post Jobs (Company)</a></li>
+                            <li><a class="dropdown-item" href="{% url 'seeker_register' %}"><i class="fas fa-user me-2"></i>Find Jobs (Seeker)</a></li>
+                        </ul>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

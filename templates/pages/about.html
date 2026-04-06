@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us — CameroonTechJobs{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+    <div class="container text-center">
+        <h1>About CameroonTechJobs</h1>
+        <p style="color:rgba(255,255,255,0.75);">Built in Douala, for Cameroon's growing tech community.</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <!-- Mission -->
+                <div class="form-card mb-4">
+                    <div style="font-size:2.5rem;margin-bottom:1rem;">🎯</div>
+                    <h4 style="font-weight:800;margin-bottom:1rem;">Our Mission</h4>
+                    <p style="color:#555;line-height:1.8;font-size:1.05rem;">
+                        CameroonTechJobs exists to bridge the gap between talented IT professionals
+                        and the companies that need them — right here in Cameroon. We believe that
+                        local tech talent deserves a dedicated platform built specifically for our
+                        market, our culture, and our payment methods.
+                    </p>
+                </div>
+
+                <!-- Story -->
+                <div class="form-card mb-4">
+                    <div style="font-size:2.5rem;margin-bottom:1rem;">🇨🇲</div>
+                    <h4 style="font-weight:800;margin-bottom:1rem;">Our Story</h4>
+                    <p style="color:#555;line-height:1.8;">
+                        We are a team of software engineers based in Douala who experienced
+                        firsthand how difficult it was to find quality IT jobs and tech talent
+                        in Cameroon. Generic job boards weren't built for us — they don't
+                        understand our cities, our payment systems, or our tech ecosystem.
+                    </p>
+                    <p style="color:#555;line-height:1.8;margin-top:1rem;">
+                        So we built CameroonTechJobs — a platform that speaks our language,
+                        accepts Mobile Money, and focuses 100% on the tech sector across
+                        Douala, Yaoundé, Bamenda, Bafoussam and beyond.
+                    </p>
+                </div>
+
+                <!-- Stats -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="form-card text-center">
+                            <div style="font-size:2.5rem;font-weight:800;color:var(--green);">10</div>
+                            <div style="color:var(--gray);">Job Categories</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-card text-center">
+                            <div style="font-size:2.5rem;font-weight:800;color:var(--green);">Free</div>
+                            <div style="color:var(--gray);">First Job Listing</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-card text-center">
+                            <div style="font-size:2.5rem;font-weight:800;color:var(--green);">24h</div>
+                            <div style="color:var(--gray);">Listing Activation</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- For seekers & companies -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="form-card" style="border-top:4px solid var(--green);">
+                            <h5 style="font-weight:800;margin-bottom:1rem;">For Job Seekers</h5>
+                            <ul style="list-style:none;padding:0;">
+                                <li class="mb-2" style="font-size:0.95rem;">
+                                    <i class="fas fa-check-circle me-2" style="color:var(--green);"></i>
+                                    Browse jobs completely free
+                                </li>
+                                <li class="mb-2" style="font-size:0.95rem;">
+                                    <i class="fas fa-check-circle me-2" style="color:var(--green);"></i>
+                                    Filter by city, category, job type
+                                </li>
+                                <li class="mb-2" style="font-size:0.95rem;">
+                                    <i class="fas fa-check-circle me-2" style="color:var(--green);"></i>
+                                    Apply directly to companies
+                                </li>
+                                <li class="mb-2" style="font-size:0.95rem;">
+                                    <i class="fas fa-check-circle me-2" style="color:var(--green);"></i>
+                                    Share jobs on WhatsApp & LinkedIn
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-card" style="border-top:4px solid var(--gold);">
+                            <h5 style="font-weight:800;margin-bottom:1rem;">For Companies</h5>
+                            <ul style="list-style:none;padding:0;">
+                                <li class="mb-2" style="font-size:0.95rem;">
+                                    <i class="fas fa-check-circle me-2" style="color:var(--gold);"></i>
+                                    First listing always free
+                                </li>
+                                <li class="mb-2" style="font-size:0.95rem;">
+                                    <i class="fas fa-check-circle me-2" style="color:var(--gold);"></i>
+                                    Pay with MTN MoMo or Orange Money
+                                </li>
+                                <li class="mb-2" style="font-size:0.95rem;">
+                                    <i class="fas fa-check-circle me-2" style="color:var(--gold);"></i>
+                                    Listings active for 30 days
+                                </li>
+                                <li class="mb-2" style="font-size:0.95rem;">
+                                    <i class="fas fa-check-circle me-2" style="color:var(--gold);"></i>
+                                    Featured placement available
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                <div class="text-center">
+                    <a href="{% url 'job_list' %}" class="btn-green me-3">
+                        <i class="fas fa-search me-2"></i>Browse Jobs
+                    </a>
+                    <a href="{% url 'register' %}" class="btn-outline-green">
+                        <i class="fas fa-building me-2"></i>Post a Job
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

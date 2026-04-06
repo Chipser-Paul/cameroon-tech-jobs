@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Join as Job Seeker — CameroonTechJobs{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+    <div class="container text-center">
+        <h1>Create Your Profile</h1>
+        <p style="color:rgba(255,255,255,0.75);">Join thousands of IT professionals finding jobs in Cameroon.</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+
+                <div class="alert mb-4" style="background:var(--green-light);border:1.5px solid var(--green);border-radius:12px;color:var(--green-dark);">
+                    <i class="fas fa-user-check me-2"></i>
+                    <strong>Free forever for job seekers!</strong> Create your profile and get discovered by top companies.
+                </div>
+
+                <div class="form-card">
+                    <h4 style="font-weight:800;margin-bottom:1.5rem;">Your Information</h4>
+
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        {% if form.errors %}
+                        <div class="alert alert-danger border-0" style="border-radius:10px;">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <strong>Please fix the following:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                    <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">Full Name *</label>
+                                {{ form.full_name }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Email *</label>
+                                {{ form.email }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone</label>
+                                {{ form.phone }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Location</label>
+                                {{ form.location }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Password *</label>
+                                {{ form.password1 }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Confirm Password *</label>
+                                {{ form.password2 }}
+                            </div>
+                            <div class="col-12 mt-2">
+                                <button type="submit" class="btn-green w-100" style="padding:0.9rem;">
+                                    <i class="fas fa-user-plus me-2"></i>Create My Profile
+                                </button>
+                            </div>
+                            <div class="col-12 text-center">
+                                <span style="color:var(--gray);font-size:0.9rem;">
+                                    Already have an account?
+                                    <a href="{% url 'seeker_login' %}" style="color:var(--green);font-weight:600;">Login here</a>
+                                </span>
+                            </div>
+                            <div class="col-12 text-center">
+                                <span style="color:var(--gray);font-size:0.9rem;">
+                                    Are you a company?
+                                    <a href="{% url 'register' %}" style="color:var(--green);font-weight:600;">Register your company</a>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Side Info -->
+            <div class="col-lg-4 d-none d-lg-block">
+                <div class="form-card" style="background:var(--light-gray);border:none;">
+                    <h6 style="font-weight:800;margin-bottom:1rem;">Why Join?</h6>
+                    <ul style="list-style:none;padding:0;">
+                        <li class="mb-3" style="font-size:0.9rem;">
+                            <i class="fas fa-check-circle me-2" style="color:var(--green);"></i>
+                            Get discovered by <strong>top companies</strong>
+                        </li>
+                        <li class="mb-3" style="font-size:0.9rem;">
+                            <i class="fas fa-check-circle me-2" style="color:var(--green);"></i>
+                            Show your <strong>GitHub & portfolio</strong>
+                        </li>
+                        <li class="mb-3" style="font-size:0.9rem;">
+                            <i class="fas fa-check-circle me-2" style="color:var(--green);"></i>
+                            Get <strong>job alerts</strong> matching your skills
+                        </li>
+                        <li class="mb-3" style="font-size:0.9rem;">
+                            <i class="fas fa-check-circle me-2" style="color:var(--green);"></i>
+                            Save jobs and <strong>apply later</strong>
+                        </li>
+                        <li class="mb-3" style="font-size:0.9rem;">
+                            <i class="fas fa-check-circle me-2" style="color:var(--green);"></i>
+                            100% <strong>free</strong> for job seekers
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

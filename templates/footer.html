@@ -1,0 +1,68 @@
+{% load static %}
+<footer class="footer mt-5">
+    <div class="container">
+        <div class="row py-5">
+            <div class="col-lg-4 mb-4">
+                <h5 class="mb-3">
+                    <span style="color:white;font-weight:800;font-size:1.3rem;">Cameroon<span style="color:var(--gold);">Tech</span>Jobs</span>
+                </h5>
+                <p class="footer-desc">The #1 job board for IT & tech professionals in Cameroon. Connecting talent with opportunity.</p>
+                <div class="social-links mt-3">
+                    <a href="https://www.linkedin.com/in/chipsér-emmanuel-402559307" target="_blank" title="LinkedIn">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                    <a href="https://x.com/Chipserx" target="_blank" title="Twitter/X">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="https://www.facebook.com/share/18htEkDGM5/" target="_blank" title="Facebook">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="https://wa.me/237675952537" target="_blank" title="WhatsApp">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-6 mb-4">
+                <h6 class="footer-heading">For Job Seekers</h6>
+                <ul class="footer-links">
+                    <li><a href="{% url 'job_list' %}">Browse Jobs</a></li>
+                    <li><a href="{% url 'seeker_register' %}">Create Profile</a></li>
+                    <li><a href="{% url 'about' %}">About Us</a></li>
+                    <li><a href="{% url 'contact' %}">Contact</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2 col-6 mb-4">
+                <h6 class="footer-heading">For Companies</h6>
+                <ul class="footer-links">
+                    <li><a href="{% url 'post_job' %}">Post a Job</a></li>
+                    <li><a href="{% url 'register' %}">Register</a></li>
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li><a href="{% url 'payment_info' %}">Pricing</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <h6 class="footer-heading">Contact Us</h6>
+                <ul class="footer-links">
+                    <li>
+                        <i class="fas fa-map-marker-alt me-2"></i>Douala, Cameroon
+                    </li>
+                    <li>
+                        <i class="fas fa-envelope me-2"></i>
+                        <a href="mailto:chipseremmanuel@gmail.com">chipseremmanuel@gmail.com</a>
+                    </li>
+                    <li>
+                        <i class="fab fa-whatsapp me-2"></i>
+                        <a href="https://wa.me/237675952537" target="_blank">+237 675 952 537</a>
+                    </li>
+                    <li>
+                        <i class="fab fa-linkedin me-2"></i>
+                        <a href="https://www.linkedin.com/in/chipsér-emmanuel-402559307" target="_blank">LinkedIn</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom text-center py-3">
+            <p class="mb-0">© 2026 CameroonTechJobs. Built with ❤️ in Douala by Fokoua Paul Emmanuel.</p>
+        </div>
+    </div>
+</footer>

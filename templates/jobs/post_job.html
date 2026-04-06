@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block title %}Post a Job — CameroonTechJobs{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+    <div class="container">
+        <h1>Post a Job</h1>
+        <p style="color:rgba(255,255,255,0.75);">
+            {% if is_free %}
+            🎉 This is your <strong>free listing</strong> — no payment required!
+            {% else %}
+            Fill in the details below. Activate with payment after submission.
+            {% endif %}
+        </p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                {% if is_free %}
+                <div class="alert mb-4" style="background:var(--green-light);border:1.5px solid var(--green);border-radius:12px;color:var(--green-dark);">
+                    <i class="fas fa-gift me-2"></i>
+                    <strong>Free listing!</strong> Your job will be reviewed and activated within 24 hours at no cost.
+                </div>
+                {% else %}
+                <div class="alert mb-4" style="background:var(--gold-light);border:1.5px solid var(--gold);border-radius:12px;color:#856404;">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Paid listing.</strong> After submitting, send payment via MoMo/Orange/UBA to activate.
+                    <a href="{% url 'payment_info' %}" style="color:#856404;font-weight:700;margin-left:0.5rem;">View payment details →</a>
+                </div>
+                {% endif %}
+
+                <div class="form-card">
+                    <h4 style="font-weight:800;margin-bottom:1.5rem;">Job Details</h4>
+
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        {% if form.errors %}
+                        <div class="alert alert-danger border-0" style="border-radius:10px;">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <strong>Please fix the following errors:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                    <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        <div class="row g-3">
+
+                            <!-- Job Title -->
+                            <div class="col-12">
+                                <label class="form-label">Job Title *</label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                <div style="color:red;font-size:0.85rem;">{{ form.title.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Category -->
+                            <div class="col-md-6">
+                                <label class="form-label">Category *</label>
+                                {{ form.category }}
+                            </div>
+
+                            <!-- Location, Experience & Salary -->
+                            <div class="col-md-6">
+                                <label class="form-label">Location *</label>
+                                {{ form.location }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Experience Level</label>
+                                {{ form.experience_level }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Salary Range</label>
+                                {{ form.salary_range }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Job Type *</label>
+                                {{ form.job_type }}
+                            </div>
+
+                            <!-- Description -->
+                            <div class="col-12">
+                                <label class="form-label">Job Description *</label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                <div style="color:red;font-size:0.85rem;">{{ form.description.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Requirements -->
+                            <div class="col-12">
+                                <label class="form-label">Requirements *</label>
+                                {{ form.requirements }}
+                                {% if form.requirements.errors %}
+                                <div style="color:red;font-size:0.85rem;">{{ form.requirements.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Tech Stack -->
+                            <div class="col-12">
+                                <label class="form-label">
+                                    <i class="fas fa-code me-1" style="color:var(--green);"></i>
+                                    Tech Stack
+                                </label>
+                                <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));gap:0.4rem;padding:1rem;border:1.5px solid #dee2e6;border-radius:8px;max-height:200px;overflow-y:auto;">
+                                    {% for checkbox in form.tech_stacks %}
+                                    <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.88rem;font-weight:500;cursor:pointer;">
+                                        {{ checkbox.tag }}
+                                        {{ checkbox.choice_label }}
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Custom Tech -->
+                            <div class="col-12">
+                                <label class="form-label">Custom Technologies</label>
+                                {{ form.custom_tech }}
+                                <div style="font-size:0.82rem;color:var(--gray);margin-top:0.3rem;">
+                                    Add technologies not in the list above, separated by commas.
+                                </div>
+                            </div>
+
+                            <!-- Apply Method -->
+                            <div class="col-12">
+                                <label class="form-label">How should candidates apply?</label>
+                                <div style="color:var(--gray);font-size:0.85rem;margin-bottom:0.75rem;">
+                                    Fill in at least one — email or application link.
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Apply via Email</label>
+                                {{ form.apply_email }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Apply via Link</label>
+                                {{ form.apply_link }}
+                            </div>
+
+                            <!-- Plan (only show if not free) -->
+                            {% if not is_free %}
+                            <div class="col-12">
+                                <label class="form-label">Listing Plan</label>
+                                {{ form.plan }}
+                                <div style="font-size:0.82rem;color:var(--gray);margin-top:0.3rem;">
+                                    Basic = 5,000 XAF | Featured = 15,000 XAF (top placement + gold highlight)
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Submit -->
+                            <div class="col-12 mt-3">
+                                <button type="submit" class="btn-green w-100" style="padding:0.9rem;font-size:1rem;">
+                                    <i class="fas fa-paper-plane me-2"></i>
+                                    {% if is_free %}Submit Free Listing{% else %}Submit Job Listing{% endif %}
+                                </button>
+                            </div>
+
+                            <div class="col-12 text-center">
+                                <a href="{% url 'dashboard' %}" style="color:var(--gray);font-size:0.9rem;">
+                                    ← Back to Dashboard
+                                </a>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
