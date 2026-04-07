@@ -49,13 +49,15 @@ class JobForm(forms.ModelForm):
         self.fields['experience_level'].required = False
 
     def save(self, commit=True):
-        job = super().save(commit=commit)
-        # Handle custom tech stacks
+        return super().save(commit=commit)
+
+    def save_custom_tech(self, job):
         custom = self.cleaned_data.get('custom_tech', '')
-        if custom:
-            for tech_name in custom.split(','):
-                tech_name = tech_name.strip()
-                if tech_name:
-                    tech, _ = TechStack.objects.get_or_create(name=tech_name)
-                    job.tech_stacks.add(tech)
-        return job
+        if not custom:
+            return
+
+        for tech_name in custom.split(','):
+            tech_name = tech_name.strip()
+            if tech_name:
+                tech, _ = TechStack.objects.get_or_create(name=tech_name)
+                job.tech_stacks.add(tech)

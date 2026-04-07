@@ -90,7 +90,8 @@ def saved_jobs(request):
 @login_required
 def save_job(request, pk):
     if not isinstance(request.user, Seeker):
-        return redirect('login')
+        messages.error(request, 'Please log in as a job seeker to save jobs.')
+        return redirect('seeker_login')
     job = get_object_or_404(Job, pk=pk)
     seeker = request.user
     if job in seeker.saved_jobs.all():

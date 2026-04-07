@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.contrib import messages
+from django.conf import settings
+from django.core.mail import send_mail
 from jobs.models import Job, Category
 from companies.models import Company
 
@@ -35,5 +37,26 @@ def contact(request):
         subject = request.POST.get('subject')
         message = request.POST.get('message')
         if name and email and message:
+            subject_labels = {
+                'job_posting': 'Job Posting Question',
+                'payment': 'Payment Issue',
+                'technical': 'Technical Problem',
+                'partnership': 'Partnership',
+                'other': 'Other',
+            }
+            subject_label = subject_labels.get(subject, 'General Inquiry')
+            recipient = settings.EMAIL_HOST_USER or 'chipseremmanuel@gmail.com'
+            send_mail(
+                subject=f'CameroonTechJobs Contact: {subject_label}',
+                message=(
+                    f'Name: {name}\n'
+                    f'Email: {email}\n'
+                    f'Subject: {subject_label}\n\n'
+                    f'{message}'
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[recipient],
+                fail_silently=False,
+            )
             sent = True
     return render(request, 'pages/contact.html', {'sent': sent})

@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Job, Category, TechStack
 from .forms import JobForm
+from companies.models import Company
 
 
 def job_list(request):
@@ -60,6 +61,10 @@ def job_detail(request, pk):
 
 @login_required
 def post_job(request):
+    if not isinstance(request.user, Company):
+        messages.error(request, 'Only company accounts can post jobs.')
+        return redirect('seeker_dashboard')
+
     company = request.user
     is_free = not company.has_used_free_listing
 
@@ -80,6 +85,8 @@ def post_job(request):
                 messages.success(request, '✅ Job submitted! Please complete your payment to activate the listing.')
 
             job.save()
+            form.save_m2m()
+            form.save_custom_tech(job)
             return redirect('dashboard')
     else:
         form = JobForm()

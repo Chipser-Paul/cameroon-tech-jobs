@@ -5,6 +5,7 @@ from django.contrib import messages
 from .models import Company
 from .forms import CompanyRegistrationForm
 from jobs.models import Job
+from seekers.models import Seeker
 
 
 def register(request):
@@ -39,6 +40,9 @@ def company_logout(request):
 
 @login_required
 def dashboard(request):
+    if isinstance(request.user, Seeker):
+        return redirect('seeker_dashboard')
+
     jobs = Job.objects.filter(company=request.user).order_by('-date_posted')
     total_views = sum(job.views_count for job in jobs)
     context = {
@@ -60,4 +64,7 @@ def company_profile(request, pk):
 
 @login_required
 def payment_info(request):
+    if isinstance(request.user, Seeker):
+        return redirect('seeker_dashboard')
+
     return render(request, 'companies/payment_info.html')
