@@ -46,8 +46,8 @@
                 <a href="{% url 'seeker_detail' seeker.pk %}" style="text-decoration:none;">
                     <div class="form-card h-100" style="transition:all 0.25s;cursor:pointer;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 30px rgba(0,0,0,0.12)';" onmouseout="this.style.transform='';this.style.boxShadow='';">
                         <div class="d-flex align-items-center gap-3 mb-3">
-                            {% if seeker.profile_photo %}
-                                <img src="{{ seeker.profile_photo.url }}" style="width:55px;height:55px;border-radius:50%;object-fit:cover;border:2px solid var(--green);" alt="">
+                            {% if seeker.profile_photo_url %}
+                                <img src="{{ seeker.profile_photo_url }}" style="width:55px;height:55px;border-radius:50%;object-fit:cover;border:2px solid var(--green);" alt="">
                             {% else %}
                                 <div style="width:55px;height:55px;border-radius:50%;background:var(--green-light);color:var(--green);font-size:1.3rem;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid var(--green);">
                                     {{ seeker.full_name|first }}

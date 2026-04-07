@@ -7,8 +7,8 @@
 <section class="page-hero">
     <div class="container">
         <div class="d-flex align-items-center gap-4 flex-wrap">
-            {% if seeker.profile_photo %}
-                <img src="{{ seeker.profile_photo.url }}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,0.3);" alt="">
+            {% if seeker.profile_photo_url %}
+                <img src="{{ seeker.profile_photo_url }}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,0.3);" alt="">
             {% else %}
                 <div style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.15);color:white;font-size:2rem;font-weight:800;display:flex;align-items:center;justify-content:center;">
                     {{ seeker.full_name|first }}

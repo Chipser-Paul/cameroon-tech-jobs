@@ -80,6 +80,25 @@ class Seeker(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['full_name']
 
+    @property
+    def profile_photo_url(self):
+        photo = self.profile_photo
+        if not photo:
+            return ''
+
+        try:
+            return photo.url
+        except Exception:
+            raw_value = self.__dict__.get('profile_photo')
+            if isinstance(raw_value, str):
+                if raw_value.startswith('http://') or raw_value.startswith('https://'):
+                    return raw_value
+                if raw_value.startswith('/media/'):
+                    return raw_value
+                if raw_value:
+                    return f'/media/{raw_value.lstrip("/")}'
+            return ''
+
     def __str__(self):
         return self.full_name
 
