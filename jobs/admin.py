@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib import messages
-from .models import Job, Category, TechStack, JobApplication
+
 from .alerts import send_job_alerts
+from .models import Category, Job, JobApplication, TechStack
 
 
 @admin.register(Category)
@@ -26,7 +27,6 @@ class JobAdmin(admin.ModelAdmin):
     ordering = ['-date_posted']
 
     def save_model(self, request, obj, form, change):
-        # Check if job is being activated for first time
         is_newly_activated = False
         if change:
             try:
@@ -35,17 +35,23 @@ class JobAdmin(admin.ModelAdmin):
                     is_newly_activated = True
             except Job.DoesNotExist:
                 pass
-        
+
         super().save_model(request, obj, form, change)
 
-        # Send alerts if job just got activated
         if is_newly_activated:
-            count = send_job_alerts(obj)
-            if count > 0:
+            try:
+                count = send_job_alerts(obj)
+                if count > 0:
+                    self.message_user(
+                        request,
+                        f'Job activated successfully. Job alerts were attempted for {count} matching seeker(s).',
+                        messages.SUCCESS,
+                    )
+            except Exception:
                 self.message_user(
                     request,
-                    f'✅ Job activated! Job alerts sent to {count} matching seeker(s).',
-                    messages.SUCCESS
+                    'Job activated successfully, but job alert emails could not be sent right now.',
+                    messages.WARNING,
                 )
 
 
