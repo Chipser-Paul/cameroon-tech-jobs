@@ -47,6 +47,12 @@
                     <div class="stat-label">Total Views</div>
                 </div>
             </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card" style="border-left-color:#6f42c1;">
+                    <div class="stat-number" style="color:#6f42c1;">{{ total_applicants }}</div>
+                    <div class="stat-label">Applicants</div>
+                </div>
+            </div>
         </div>
 
         <!-- FREE LISTING NOTICE -->
@@ -80,6 +86,7 @@
                             <th style="padding:1rem;font-weight:700;">Plan</th>
                             <th style="padding:1rem;font-weight:700;">Status</th>
                             <th style="padding:1rem;font-weight:700;">Views</th>
+                            <th style="padding:1rem;font-weight:700;">Applicants</th>
                             <th style="padding:1rem;font-weight:700;">Posted</th>
                         </tr>
                     </thead>
@@ -107,6 +114,11 @@
                                 </span>
                             </td>
                             <td style="padding:1rem;color:var(--gray);">{{ job.views_count }}</td>
+                            <td style="padding:1rem;">
+                                <a href="{% url 'job_applicants' job.pk %}" style="color:var(--green);font-weight:700;text-decoration:none;">
+                                    {{ job.applicant_count }} applicant{{ job.applicant_count|pluralize }}
+                                </a>
+                            </td>
                             <td style="padding:1rem;color:var(--gray);">{{ job.date_posted|date:"M d, Y" }}</td>
                         </tr>
                         {% endfor %}

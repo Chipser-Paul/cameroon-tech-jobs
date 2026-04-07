@@ -36,7 +36,7 @@ class SeekerRegistrationForm(forms.ModelForm):
 
 
 class SeekerProfileForm(forms.ModelForm):
-    profile_photo = forms.ImageField(
+    upload_photo = forms.ImageField(
         required=False,
         widget=forms.FileInput(attrs={'class': 'form-control'}),
     )
@@ -55,7 +55,7 @@ class SeekerProfileForm(forms.ModelForm):
         model = Seeker
         fields = [
             'full_name', 'phone', 'location', 'bio',
-            'profile_photo', 'experience_level', 'availability',
+            'experience_level', 'availability',
             'github', 'portfolio', 'linkedin',
             'skills', 'preferred_categories', 'preferred_locations',
             'job_alerts_enabled'

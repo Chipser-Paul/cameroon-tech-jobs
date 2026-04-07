@@ -79,7 +79,7 @@ def edit_profile(request):
         if form.is_valid():
             try:
                 seeker = form.save(commit=False)
-                uploaded_photo = request.FILES.get('profile_photo')
+                uploaded_photo = request.FILES.get('upload_photo')
                 if uploaded_photo:
                     upload_result = cloudinary.uploader.upload(
                         uploaded_photo,

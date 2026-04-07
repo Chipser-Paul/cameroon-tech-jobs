@@ -1,7 +1,8 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
+from django.db.models import Count
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Company
 from .forms import CompanyRegistrationForm
 from jobs.models import Job
@@ -43,14 +44,18 @@ def dashboard(request):
     if isinstance(request.user, Seeker):
         return redirect('seeker_dashboard')
 
-    jobs = Job.objects.filter(company=request.user).order_by('-date_posted')
+    jobs = Job.objects.filter(company=request.user).annotate(
+        applicant_count=Count('applications', distinct=True)
+    ).order_by('-date_posted')
     total_views = sum(job.views_count for job in jobs)
+    total_applicants = sum(job.applicant_count for job in jobs)
     context = {
         'jobs': jobs,
         'total_jobs': jobs.count(),
         'active_jobs': jobs.filter(status='active').count(),
         'pending_jobs': jobs.filter(status='pending').count(),
         'total_views': total_views,
+        'total_applicants': total_applicants,
     }
     return render(request, 'companies/dashboard.html', context)
 

@@ -122,3 +122,38 @@ class Job(models.Model):
 
     class Meta:
         ordering = ['-is_featured', '-date_posted']
+
+
+class JobApplication(models.Model):
+    STATUS_CHOICES = [
+        ('submitted', 'Submitted'),
+        ('reviewing', 'Reviewing'),
+        ('shortlisted', 'Shortlisted'),
+        ('rejected', 'Rejected'),
+    ]
+
+    job = models.ForeignKey(
+        Job,
+        on_delete=models.CASCADE,
+        related_name='applications',
+    )
+    seeker = models.ForeignKey(
+        'seekers.Seeker',
+        on_delete=models.CASCADE,
+        related_name='applications',
+    )
+    cover_note = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='submitted')
+    date_applied = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.seeker.full_name} -> {self.job.title}'
+
+    class Meta:
+        ordering = ['-date_applied']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['job', 'seeker'],
+                name='unique_job_application_per_seeker',
+            )
+        ]

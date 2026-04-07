@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib import messages
-from .models import Job, Category, TechStack
+from .models import Job, Category, TechStack, JobApplication
 from .alerts import send_job_alerts
 
 
@@ -47,3 +47,12 @@ class JobAdmin(admin.ModelAdmin):
                     f'✅ Job activated! Job alerts sent to {count} matching seeker(s).',
                     messages.SUCCESS
                 )
+
+
+@admin.register(JobApplication)
+class JobApplicationAdmin(admin.ModelAdmin):
+    list_display = ['job', 'seeker', 'status', 'date_applied']
+    list_filter = ['status', 'date_applied', 'job__company']
+    search_fields = ['job__title', 'seeker__full_name', 'seeker__email']
+    autocomplete_fields = ['job', 'seeker']
+    ordering = ['-date_applied']

@@ -1,9 +1,11 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Job, Category, TechStack
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404, redirect
+
 from .forms import JobForm
+from .models import Job, Category, TechStack, JobApplication
 from companies.models import Company
+from seekers.models import Seeker
 
 
 def job_list(request):
@@ -48,6 +50,13 @@ def job_detail(request, pk):
     job = get_object_or_404(Job, pk=pk, status='active')
     job.views_count += 1
     job.save()
+    has_applied = False
+    can_apply = False
+
+    if request.user.is_authenticated and isinstance(request.user, Seeker):
+        can_apply = True
+        has_applied = JobApplication.objects.filter(job=job, seeker=request.user).exists()
+
     related_jobs = Job.objects.filter(
         status='active',
         category=job.category
@@ -55,6 +64,8 @@ def job_detail(request, pk):
     context = {
         'job': job,
         'related_jobs': related_jobs,
+        'has_applied': has_applied,
+        'can_apply': can_apply,
     }
     return render(request, 'jobs/job_detail.html', context)
 
@@ -101,3 +112,50 @@ def post_job(request):
         'is_free': is_free,
     }
     return render(request, 'jobs/post_job.html', context)
+
+
+@login_required
+def apply_job(request, pk):
+    if request.method != 'POST':
+        return redirect('job_detail', pk=pk)
+
+    if not isinstance(request.user, Seeker):
+        messages.error(request, 'Only job seeker accounts can apply for jobs.')
+        return redirect('seeker_login')
+
+    job = get_object_or_404(Job, pk=pk, status='active')
+
+    if JobApplication.objects.filter(job=job, seeker=request.user).exists():
+        messages.info(request, 'You already applied for this job.')
+        return redirect('job_detail', pk=job.pk)
+
+    JobApplication.objects.create(
+        job=job,
+        seeker=request.user,
+        cover_note=request.POST.get('cover_note', '').strip(),
+    )
+    messages.success(request, 'Application submitted successfully. The employer can now review your profile.')
+    return redirect('job_detail', pk=job.pk)
+
+
+@login_required
+def job_applicants(request, pk):
+    if not isinstance(request.user, Company):
+        messages.error(request, 'Only company accounts can view applicants.')
+        return redirect('seeker_dashboard')
+
+    job = get_object_or_404(
+        Job.objects.select_related('company', 'category').prefetch_related(
+            'applications__seeker__skills',
+        ),
+        pk=pk,
+        company=request.user,
+    )
+    applications = job.applications.select_related('seeker').all()
+
+    context = {
+        'job': job,
+        'applications': applications,
+        'total_applications': applications.count(),
+    }
+    return render(request, 'jobs/job_applicants.html', context)
