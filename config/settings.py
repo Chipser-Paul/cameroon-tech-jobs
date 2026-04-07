@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+import cloudinary
 import dj_database_url
 from dotenv import load_dotenv
 
@@ -15,6 +16,9 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 SITE_URL = os.getenv('SITE_URL', 'http://127.0.0.1:8000')
 CLOUDINARY_URL = os.getenv('CLOUDINARY_URL', '')
+CLOUDINARY_CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME', '')
+CLOUDINARY_API_KEY = os.getenv('CLOUDINARY_API_KEY', '')
+CLOUDINARY_API_SECRET = os.getenv('CLOUDINARY_API_SECRET', '')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -119,3 +123,13 @@ if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+if CLOUDINARY_URL:
+    cloudinary.config(cloudinary_url=CLOUDINARY_URL, secure=True)
+elif CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
+    cloudinary.config(
+        cloud_name=CLOUDINARY_CLOUD_NAME,
+        api_key=CLOUDINARY_API_KEY,
+        api_secret=CLOUDINARY_API_SECRET,
+        secure=True,
+    )
