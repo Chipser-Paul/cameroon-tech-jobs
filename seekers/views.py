@@ -6,7 +6,7 @@ import logging
 import cloudinary.uploader
 from .models import Seeker
 from .forms import SeekerRegistrationForm, SeekerProfileForm
-from jobs.models import Job
+from jobs.models import Job, JobApplication
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +55,8 @@ def seeker_dashboard(request):
         'seeker': seeker,
         'saved_jobs': saved,
         'recommended_jobs': recommended,
+        'recent_applications': seeker.applications.select_related('job', 'job__company').all()[:5],
+        'applications_count': seeker.applications.count(),
         'saved_count': saved.count(),
         'skills_count': seeker.skills.count(),
     }
@@ -102,6 +104,15 @@ def saved_jobs(request):
         return redirect('dashboard')
     jobs = request.user.saved_jobs.filter(status='active')
     return render(request, 'seekers/saved_jobs.html', {'jobs': jobs})
+
+
+@login_required
+def my_applications(request):
+    if not isinstance(request.user, Seeker):
+        return redirect('dashboard')
+
+    applications = request.user.applications.select_related('job', 'job__company').all()
+    return render(request, 'seekers/my_applications.html', {'applications': applications})
 
 
 @login_required

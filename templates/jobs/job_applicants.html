@@ -61,6 +61,25 @@
                         </div>
                     </div>
 
+                    <form method="post" action="{% url 'update_application_status' application.pk %}" class="mb-3">
+                        {% csrf_token %}
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-6 col-lg-4">
+                                <label class="form-label" style="font-weight:700;font-size:0.9rem;">Application Status</label>
+                                <select name="status" class="form-select">
+                                    {% for value, label in application.STATUS_CHOICES %}
+                                    <option value="{{ value }}" {% if application.status == value %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4 col-lg-3">
+                                <button type="submit" class="btn-outline-green w-100" style="padding:0.6rem 1rem;">
+                                    <i class="fas fa-save me-2"></i>Update Status
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
                     {% if application.cover_note %}
                     <div class="mb-3">
                         <div style="font-weight:700;font-size:0.9rem;margin-bottom:0.4rem;">Cover Note</div>

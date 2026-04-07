@@ -125,8 +125,12 @@ def apply_job(request, pk):
 
     job = get_object_or_404(Job, pk=pk, status='active')
 
-    if JobApplication.objects.filter(job=job, seeker=request.user).exists():
-        messages.info(request, 'You already applied for this job.')
+    existing_application = JobApplication.objects.filter(job=job, seeker=request.user).first()
+    if existing_application:
+        messages.info(
+            request,
+            f'You already applied for this job. Current status: {existing_application.get_status_display()}.',
+        )
         return redirect('job_detail', pk=job.pk)
 
     JobApplication.objects.create(
@@ -159,3 +163,30 @@ def job_applicants(request, pk):
         'total_applications': applications.count(),
     }
     return render(request, 'jobs/job_applicants.html', context)
+
+
+@login_required
+def update_application_status(request, pk):
+    if request.method != 'POST':
+        return redirect('dashboard')
+
+    if not isinstance(request.user, Company):
+        messages.error(request, 'Only company accounts can manage applications.')
+        return redirect('seeker_dashboard')
+
+    application = get_object_or_404(
+        JobApplication.objects.select_related('job'),
+        pk=pk,
+        job__company=request.user,
+    )
+    new_status = request.POST.get('status', '').strip()
+    valid_statuses = {choice[0] for choice in JobApplication.STATUS_CHOICES}
+
+    if new_status not in valid_statuses:
+        messages.error(request, 'Invalid application status selected.')
+        return redirect('job_applicants', pk=application.job.pk)
+
+    application.status = new_status
+    application.save(update_fields=['status'])
+    messages.success(request, 'Application status updated successfully.')
+    return redirect('job_applicants', pk=application.job.pk)

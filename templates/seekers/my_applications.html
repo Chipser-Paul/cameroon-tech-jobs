@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}My Applications | CameroonTechJobs{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1>My Applications</h1>
+                <p style="color:rgba(255,255,255,0.78);margin:0;">Track the jobs you applied for and see where each one stands.</p>
+            </div>
+            <a href="{% url 'job_list' %}" class="btn-outline-green" style="border-color:white;color:white;">
+                <i class="fas fa-search me-2"></i>Browse More Jobs
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="form-card">
+            {% if applications %}
+            <div class="table-responsive">
+                <table class="table" style="font-size:0.95rem;">
+                    <thead style="background:var(--light-gray);">
+                        <tr>
+                            <th style="padding:1rem;font-weight:700;">Job</th>
+                            <th style="padding:1rem;font-weight:700;">Company</th>
+                            <th style="padding:1rem;font-weight:700;">Status</th>
+                            <th style="padding:1rem;font-weight:700;">Applied</th>
+                            <th style="padding:1rem;font-weight:700;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for application in applications %}
+                        <tr>
+                            <td style="padding:1rem;font-weight:600;">{{ application.job.title }}</td>
+                            <td style="padding:1rem;color:var(--gray);">{{ application.job.company.company_name }}</td>
+                            <td style="padding:1rem;">
+                                <span class="status-badge status-active">{{ application.get_status_display }}</span>
+                            </td>
+                            <td style="padding:1rem;color:var(--gray);">{{ application.date_applied|date:"M d, Y" }}</td>
+                            <td style="padding:1rem;">
+                                <a href="{% url 'job_detail' application.job.pk %}" style="color:var(--green);font-weight:700;text-decoration:none;">
+                                    View Job
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-paper-plane fa-3x mb-3" style="color:var(--green);opacity:0.25;"></i>
+                <h5 style="font-weight:800;">No applications yet</h5>
+                <p style="color:var(--gray);">Once you apply for jobs, this page will show your current pipeline.</p>
+                <a href="{% url 'job_list' %}" class="btn-green">
+                    <i class="fas fa-search me-2"></i>Browse Jobs
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
