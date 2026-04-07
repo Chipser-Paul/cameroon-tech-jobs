@@ -1,3 +1,4 @@
+from cloudinary.models import CloudinaryField
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
@@ -59,7 +60,7 @@ class Seeker(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=20, blank=True)
     location = models.CharField(max_length=100, blank=True)
     bio = models.TextField(blank=True)
-    profile_photo = models.ImageField(upload_to='seeker_photos/', blank=True, null=True)
+    profile_photo = CloudinaryField('image', blank=True, null=True, folder='cameroon_tech_jobs/seekers')
     experience_level = models.CharField(max_length=20, choices=EXPERIENCE_CHOICES, blank=True)
     availability = models.CharField(max_length=20, choices=AVAILABILITY_CHOICES, blank=True)
 
