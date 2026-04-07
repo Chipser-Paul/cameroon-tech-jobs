@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import logging
+import cloudinary.uploader
 from .models import Seeker
 from .forms import SeekerRegistrationForm, SeekerProfileForm
 from jobs.models import Job
@@ -77,7 +78,16 @@ def edit_profile(request):
         form = SeekerProfileForm(request.POST, request.FILES, instance=seeker)
         if form.is_valid():
             try:
-                form.save()
+                seeker = form.save(commit=False)
+                uploaded_photo = request.FILES.get('profile_photo')
+                if uploaded_photo:
+                    upload_result = cloudinary.uploader.upload(
+                        uploaded_photo,
+                        folder='cameroon_tech_jobs/seekers',
+                    )
+                    seeker.profile_photo = upload_result.get('public_id')
+                seeker.save()
+                form.save_m2m()
                 messages.success(request, 'Profile updated successfully!')
                 return redirect('seeker_profile')
             except Exception:

@@ -36,6 +36,10 @@ class SeekerRegistrationForm(forms.ModelForm):
 
 
 class SeekerProfileForm(forms.ModelForm):
+    profile_photo = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'form-control'}),
+    )
     skills = forms.ModelMultipleChoiceField(
         queryset=TechStack.objects.all(),
         widget=forms.CheckboxSelectMultiple,
