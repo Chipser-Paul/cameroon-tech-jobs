@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Post a Job — CameroonTechJobs{% endblock %}
+{% block title %}Post a Job - CameroonTechJobs{% endblock %}
 
 {% block content %}
 
@@ -9,7 +9,7 @@
         <h1>Post a Job</h1>
         <p style="color:rgba(255,255,255,0.75);">
             {% if is_free %}
-            🎉 This is your <strong>free listing</strong> — no payment required!
+            This is your <strong>free listing</strong> - no payment required!
             {% else %}
             Fill in the details below. Activate with payment after submission.
             {% endif %}
@@ -31,7 +31,7 @@
                 <div class="alert mb-4" style="background:var(--gold-light);border:1.5px solid var(--gold);border-radius:12px;color:#856404;">
                     <i class="fas fa-info-circle me-2"></i>
                     <strong>Paid listing.</strong> After submitting, send payment via MoMo/Orange/UBA to activate.
-                    <a href="{% url 'payment_info' %}" style="color:#856404;font-weight:700;margin-left:0.5rem;">View payment details →</a>
+                    <a href="{% url 'payment_info' %}" style="color:#856404;font-weight:700;margin-left:0.5rem;">View payment details -></a>
                 </div>
                 {% endif %}
 
@@ -59,8 +59,6 @@
                         {% endif %}
 
                         <div class="row g-3">
-
-                            <!-- Job Title -->
                             <div class="col-12">
                                 <label class="form-label">Job Title *</label>
                                 {{ form.title }}
@@ -69,13 +67,11 @@
                                 {% endif %}
                             </div>
 
-                            <!-- Category -->
                             <div class="col-md-6">
                                 <label class="form-label">Category *</label>
                                 {{ form.category }}
                             </div>
 
-                            <!-- Location, Experience & Salary -->
                             <div class="col-md-6">
                                 <label class="form-label">Location *</label>
                                 {{ form.location }}
@@ -93,7 +89,6 @@
                                 {{ form.job_type }}
                             </div>
 
-                            <!-- Description -->
                             <div class="col-12">
                                 <label class="form-label">Job Description *</label>
                                 {{ form.description }}
@@ -102,7 +97,6 @@
                                 {% endif %}
                             </div>
 
-                            <!-- Requirements -->
                             <div class="col-12">
                                 <label class="form-label">Requirements *</label>
                                 {{ form.requirements }}
@@ -111,7 +105,6 @@
                                 {% endif %}
                             </div>
 
-                            <!-- Tech Stack -->
                             <div class="col-12">
                                 <label class="form-label">
                                     <i class="fas fa-code me-1" style="color:var(--green);"></i>
@@ -127,7 +120,6 @@
                                 </div>
                             </div>
 
-                            <!-- Custom Tech -->
                             <div class="col-12">
                                 <label class="form-label">Custom Technologies</label>
                                 {{ form.custom_tech }}
@@ -136,11 +128,10 @@
                                 </div>
                             </div>
 
-                            <!-- Apply Method -->
                             <div class="col-12">
                                 <label class="form-label">How should candidates apply?</label>
                                 <div style="color:var(--gray);font-size:0.85rem;margin-bottom:0.75rem;">
-                                    Fill in at least one — email or application link.
+                                    Fill in at least one - email or application link.
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -152,7 +143,6 @@
                                 {{ form.apply_link }}
                             </div>
 
-                            <!-- Plan (only show if not free) -->
                             {% if not is_free %}
                             <div class="col-12">
                                 <label class="form-label">Listing Plan</label>
@@ -163,7 +153,6 @@
                             </div>
                             {% endif %}
 
-                            <!-- Submit -->
                             <div class="col-12 mt-3">
                                 <button type="submit" class="btn-green w-100" style="padding:0.9rem;font-size:1rem;">
                                     <i class="fas fa-paper-plane me-2"></i>
@@ -173,10 +162,9 @@
 
                             <div class="col-12 text-center">
                                 <a href="{% url 'dashboard' %}" style="color:var(--gray);font-size:0.9rem;">
-                                    ← Back to Dashboard
+                                    <- Back to Dashboard
                                 </a>
                             </div>
-
                         </div>
                     </form>
                 </div>

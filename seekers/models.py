@@ -1,6 +1,7 @@
-from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from jobs.models import Job, TechStack, Category
+from django.db import models
+
+from jobs.models import Category, Job, TechStack
 
 
 class SeekerManager(BaseUserManager):
@@ -20,10 +21,9 @@ class SeekerManager(BaseUserManager):
 
 
 class Seeker(AbstractBaseUser, PermissionsMixin):
-
     EXPERIENCE_CHOICES = [
-        ('entry', 'Entry Level (0–2 years)'),
-        ('mid', 'Mid Level (2–5 years)'),
+        ('entry', 'Entry Level (0-2 years)'),
+        ('mid', 'Mid Level (2-5 years)'),
         ('senior', 'Senior Level (5+ years)'),
     ]
 
@@ -34,7 +34,6 @@ class Seeker(AbstractBaseUser, PermissionsMixin):
         ('not_looking', 'Not Actively Looking'),
     ]
 
-    # Auth
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=200)
     is_active = models.BooleanField(default=True)
@@ -57,7 +56,6 @@ class Seeker(AbstractBaseUser, PermissionsMixin):
         verbose_name='user permissions',
     )
 
-    # Profile
     phone = models.CharField(max_length=20, blank=True)
     location = models.CharField(max_length=100, blank=True)
     bio = models.TextField(blank=True)
@@ -65,18 +63,15 @@ class Seeker(AbstractBaseUser, PermissionsMixin):
     experience_level = models.CharField(max_length=20, choices=EXPERIENCE_CHOICES, blank=True)
     availability = models.CharField(max_length=20, choices=AVAILABILITY_CHOICES, blank=True)
 
-    # Links
     github = models.URLField(blank=True)
     portfolio = models.URLField(blank=True)
     linkedin = models.URLField(blank=True)
 
-    # Skills & Preferences
     skills = models.ManyToManyField(TechStack, blank=True, related_name='seekers')
     preferred_categories = models.ManyToManyField(Category, blank=True, related_name='seekers')
     preferred_locations = models.CharField(max_length=200, blank=True)
     saved_jobs = models.ManyToManyField(Job, blank=True, related_name='saved_by')
 
-    # Job Alerts
     job_alerts_enabled = models.BooleanField(default=True)
 
     objects = SeekerManager()

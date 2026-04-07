@@ -24,7 +24,6 @@ class TechStack(models.Model):
 
 
 class Job(models.Model):
-
     JOB_TYPE_CHOICES = [
         ('full_time', 'Full Time'),
         ('part_time', 'Part Time'),
@@ -35,7 +34,7 @@ class Job(models.Model):
 
     LOCATION_CHOICES = [
         ('douala', 'Douala'),
-        ('yaounde', 'Yaoundé'),
+        ('yaounde', 'Yaounde'),
         ('bafoussam', 'Bafoussam'),
         ('bamenda', 'Bamenda'),
         ('buea', 'Buea'),
@@ -57,8 +56,8 @@ class Job(models.Model):
     ]
 
     EXPERIENCE_CHOICES = [
-        ('entry', 'Entry Level (0–2 years)'),
-        ('mid', 'Mid Level (2–5 years)'),
+        ('entry', 'Entry Level (0-2 years)'),
+        ('mid', 'Mid Level (2-5 years)'),
         ('senior', 'Senior Level (5+ years)'),
         ('any', 'Any Level'),
     ]
@@ -66,18 +65,18 @@ class Job(models.Model):
     company = models.ForeignKey(
         'companies.Company',
         on_delete=models.CASCADE,
-        related_name='jobs'
+        related_name='jobs',
     )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
         null=True,
-        related_name='jobs'
+        related_name='jobs',
     )
     tech_stacks = models.ManyToManyField(
         TechStack,
         blank=True,
-        related_name='jobs'
+        related_name='jobs',
     )
 
     title = models.CharField(max_length=200)
@@ -86,7 +85,7 @@ class Job(models.Model):
     experience_level = models.CharField(
         max_length=20,
         choices=EXPERIENCE_CHOICES,
-        default='any'
+        default='any',
     )
     location = models.CharField(max_length=50, choices=LOCATION_CHOICES)
     job_type = models.CharField(max_length=20, choices=JOB_TYPE_CHOICES)
@@ -114,13 +113,12 @@ class Job(models.Model):
         delta = timezone.now() - self.date_posted
         if delta.days == 0:
             return 'Today'
-        elif delta.days == 1:
+        if delta.days == 1:
             return '1 day ago'
-        else:
-            return f'{delta.days} days ago'
+        return f'{delta.days} days ago'
 
     def __str__(self):
-        return f'{self.title} — {self.company.company_name}'
+        return f'{self.title} - {self.company.company_name}'
 
     class Meta:
         ordering = ['-is_featured', '-date_posted']

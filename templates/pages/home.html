@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}CameroonTechJobs — Find IT Jobs in Cameroon{% endblock %}
+{% block title %}CameroonTechJobs - Find IT Jobs in Cameroon{% endblock %}
 
 {% block content %}
 
@@ -14,10 +14,9 @@
                 </h1>
                 <p class="hero-subtitle">
                     The #1 job board for IT & tech professionals in Cameroon.<br>
-                    Connect with top companies in Douala, Yaoundé and beyond.
+                    Connect with top companies in Douala, Yaounde and beyond.
                 </p>
 
-                <!-- SEARCH BAR -->
                 <form class="hero-search" method="GET" action="{% url 'job_list' %}">
                     <input
                         type="text"
@@ -30,7 +29,6 @@
                     </button>
                 </form>
 
-                <!-- STATS -->
                 <div class="hero-stats">
                     <div class="hero-stat">
                         <strong>{{ total_jobs }}</strong>
@@ -50,11 +48,10 @@
     </div>
 </section>
 
-<!-- FEATURED JOBS -->
 {% if featured_jobs %}
 <section class="py-5" style="background: var(--gold-light);">
     <div class="container">
-        <h2 class="section-title">⭐ Featured Jobs</h2>
+        <h2 class="section-title">Featured Jobs</h2>
         <p class="section-subtitle">Top opportunities from premium companies</p>
         <div class="row g-4">
             {% for job in featured_jobs %}
@@ -90,7 +87,6 @@
 </section>
 {% endif %}
 
-<!-- LATEST JOBS -->
 <section class="py-5">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -137,7 +133,6 @@
     </div>
 </section>
 
-<!-- CATEGORIES -->
 <section class="py-5" style="background: var(--light-gray);">
     <div class="container">
         <h2 class="section-title text-center">Browse by Category</h2>
@@ -147,16 +142,16 @@
             <div class="col-lg-2 col-md-3 col-6">
                 <a href="{% url 'job_list' %}?category={{ category.slug }}" class="category-card">
                     <div class="category-icon">
-                        {% if category.slug == 'web-development' %}💻
-                        {% elif category.slug == 'mobile-development' %}📱
-                        {% elif category.slug == 'networking-infrastructure' %}🌐
-                        {% elif category.slug == 'data-analytics' %}📊
-                        {% elif category.slug == 'it-support' %}🛠️
-                        {% elif category.slug == 'cybersecurity' %}🔐
-                        {% elif category.slug == 'software-engineering' %}⚙️
-                        {% elif category.slug == 'ui-ux-design' %}🎨
-                        {% elif category.slug == 'database-administration' %}🗄️
-                        {% else %}💼
+                        {% if category.slug == 'web-development' %}[Web]
+                        {% elif category.slug == 'mobile-development' %}[Mobile]
+                        {% elif category.slug == 'networking-infrastructure' %}[Network]
+                        {% elif category.slug == 'data-analytics' %}[Data]
+                        {% elif category.slug == 'it-support' %}[Support]
+                        {% elif category.slug == 'cybersecurity' %}[Security]
+                        {% elif category.slug == 'software-engineering' %}[Code]
+                        {% elif category.slug == 'ui-ux-design' %}[Design]
+                        {% elif category.slug == 'database-administration' %}[DB]
+                        {% else %}[Tech]
                         {% endif %}
                     </div>
                     <div class="category-name">{{ category.name }}</div>
@@ -168,7 +163,6 @@
     </div>
 </section>
 
-<!-- CTA FOR COMPANIES -->
 <section class="py-5" style="background: var(--green);">
     <div class="container text-center">
         <h2 style="color:white; font-weight:800; font-size:2rem;">
@@ -178,7 +172,7 @@
             Post your first job for free. Reach thousands of qualified tech professionals.
         </p>
         <a href="{% url 'register' %}" class="btn-outline-green" style="border-color:white; color:white;">
-            <i class="fas fa-building me-2"></i>Post a Job — First One Free
+            <i class="fas fa-building me-2"></i>Post a Job - First One Free
         </a>
     </div>
 </section>
