@@ -157,3 +157,49 @@ class JobApplication(models.Model):
                 name='unique_job_application_per_seeker',
             )
         ]
+
+
+class ApplicationMessage(models.Model):
+    application = models.ForeignKey(
+        JobApplication,
+        on_delete=models.CASCADE,
+        related_name='messages',
+    )
+    sender_company = models.ForeignKey(
+        'companies.Company',
+        on_delete=models.CASCADE,
+        related_name='sent_application_messages',
+        blank=True,
+        null=True,
+    )
+    sender_seeker = models.ForeignKey(
+        'seekers.Seeker',
+        on_delete=models.CASCADE,
+        related_name='sent_application_messages',
+        blank=True,
+        null=True,
+    )
+    body = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def sender_name(self):
+        if self.sender_company:
+            return self.sender_company.company_name
+        if self.sender_seeker:
+            return self.sender_seeker.full_name
+        return 'Unknown'
+
+    @property
+    def sender_role(self):
+        if self.sender_company:
+            return 'company'
+        if self.sender_seeker:
+            return 'seeker'
+        return 'unknown'
+
+    def __str__(self):
+        return f'Message on {self.application.job.title} by {self.sender_name}'
+
+    class Meta:
+        ordering = ['created_at']

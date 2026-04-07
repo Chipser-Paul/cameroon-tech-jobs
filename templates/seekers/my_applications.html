@@ -29,6 +29,7 @@
                             <th style="padding:1rem;font-weight:700;">Company</th>
                             <th style="padding:1rem;font-weight:700;">Status</th>
                             <th style="padding:1rem;font-weight:700;">Applied</th>
+                            <th style="padding:1rem;font-weight:700;">Conversation</th>
                             <th style="padding:1rem;font-weight:700;">Action</th>
                         </tr>
                     </thead>
@@ -41,6 +42,11 @@
                                 <span class="status-badge status-active">{{ application.get_status_display }}</span>
                             </td>
                             <td style="padding:1rem;color:var(--gray);">{{ application.date_applied|date:"M d, Y" }}</td>
+                            <td style="padding:1rem;">
+                                <a href="{% url 'application_conversation' application.pk %}" style="color:var(--green);font-weight:700;text-decoration:none;">
+                                    Messages
+                                </a>
+                            </td>
                             <td style="padding:1rem;">
                                 <a href="{% url 'job_detail' application.job.pk %}" style="color:var(--green);font-weight:700;text-decoration:none;">
                                     View Job

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib import messages
 
 from .alerts import send_job_alerts
-from .models import Category, Job, JobApplication, TechStack
+from .models import ApplicationMessage, Category, Job, JobApplication, TechStack
 
 
 @admin.register(Category)
@@ -62,3 +62,12 @@ class JobApplicationAdmin(admin.ModelAdmin):
     search_fields = ['job__title', 'seeker__full_name', 'seeker__email']
     autocomplete_fields = ['job', 'seeker']
     ordering = ['-date_applied']
+
+
+@admin.register(ApplicationMessage)
+class ApplicationMessageAdmin(admin.ModelAdmin):
+    list_display = ['application', 'sender_name', 'created_at']
+    list_filter = ['created_at']
+    search_fields = ['application__job__title', 'application__seeker__full_name', 'body']
+    autocomplete_fields = ['application', 'sender_company', 'sender_seeker']
+    ordering = ['-created_at']

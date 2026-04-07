@@ -220,6 +220,7 @@
                             <th style="padding:0.9rem;font-weight:700;">Company</th>
                             <th style="padding:0.9rem;font-weight:700;">Status</th>
                             <th style="padding:0.9rem;font-weight:700;">Applied</th>
+                            <th style="padding:0.9rem;font-weight:700;">Messages</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -235,6 +236,11 @@
                                 <span class="status-badge status-active">{{ application.get_status_display }}</span>
                             </td>
                             <td style="padding:0.9rem;color:var(--gray);">{{ application.date_applied|date:"M d, Y" }}</td>
+                            <td style="padding:0.9rem;">
+                                <a href="{% url 'application_conversation' application.pk %}" style="color:var(--green);font-weight:700;text-decoration:none;">
+                                    Open Chat
+                                </a>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>

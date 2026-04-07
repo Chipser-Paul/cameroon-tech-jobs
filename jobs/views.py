@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 
 from .forms import JobForm
-from .models import Job, Category, TechStack, JobApplication
+from .models import ApplicationMessage, Job, Category, TechStack, JobApplication
 from companies.models import Company
 from seekers.models import Seeker
 
@@ -190,3 +190,42 @@ def update_application_status(request, pk):
     application.save(update_fields=['status'])
     messages.success(request, 'Application status updated successfully.')
     return redirect('job_applicants', pk=application.job.pk)
+
+
+@login_required
+def application_conversation(request, pk):
+    application = get_object_or_404(
+        JobApplication.objects.select_related('job', 'job__company', 'seeker').prefetch_related('messages'),
+        pk=pk,
+    )
+
+    is_company = isinstance(request.user, Company) and application.job.company_id == request.user.id
+    is_seeker = isinstance(request.user, Seeker) and application.seeker_id == request.user.id
+
+    if not (is_company or is_seeker):
+        messages.error(request, 'You do not have permission to access this conversation.')
+        return redirect('home')
+
+    if request.method == 'POST':
+        body = request.POST.get('body', '').strip()
+        if body:
+            message_kwargs = {
+                'application': application,
+                'body': body,
+            }
+            if is_company:
+                message_kwargs['sender_company'] = request.user
+            else:
+                message_kwargs['sender_seeker'] = request.user
+            ApplicationMessage.objects.create(**message_kwargs)
+            messages.success(request, 'Message sent successfully.')
+            return redirect('application_conversation', pk=application.pk)
+        messages.error(request, 'Please enter a message before sending.')
+
+    context = {
+        'application': application,
+        'conversation_messages': application.messages.select_related('sender_company', 'sender_seeker').all(),
+        'is_company_participant': is_company,
+        'is_seeker_participant': is_seeker,
+    }
+    return render(request, 'jobs/application_conversation.html', context)

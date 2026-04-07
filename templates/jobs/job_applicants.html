@@ -58,6 +58,11 @@
                         <div class="text-end">
                             <div class="status-badge status-active" style="display:inline-block;">{{ application.get_status_display }}</div>
                             <div style="font-size:0.85rem;color:var(--gray);margin-top:0.4rem;">Applied {{ application.date_applied|date:"M d, Y H:i" }}</div>
+                            <div style="margin-top:0.6rem;">
+                                <a href="{% url 'application_conversation' application.pk %}" style="color:var(--green);font-weight:700;text-decoration:none;">
+                                    <i class="fas fa-comments me-1"></i>Open Conversation
+                                </a>
+                            </div>
                         </div>
                     </div>
 
