@@ -2,9 +2,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+import logging
 from .models import Seeker
 from .forms import SeekerRegistrationForm, SeekerProfileForm
 from jobs.models import Job
+
+logger = logging.getLogger(__name__)
 
 
 def seeker_register(request):
@@ -73,9 +76,13 @@ def edit_profile(request):
     if request.method == 'POST':
         form = SeekerProfileForm(request.POST, request.FILES, instance=seeker)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Profile updated successfully!')
-            return redirect('seeker_profile')
+            try:
+                form.save()
+                messages.success(request, 'Profile updated successfully!')
+                return redirect('seeker_profile')
+            except Exception:
+                logger.exception('Failed to update seeker profile')
+                messages.error(request, 'We could not upload your profile photo right now. Please try again.')
     return render(request, 'seekers/edit_profile.html', {'form': form})
 
 

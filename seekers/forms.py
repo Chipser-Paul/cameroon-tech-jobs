@@ -61,7 +61,6 @@ class SeekerProfileForm(forms.ModelForm):
             'phone': forms.TextInput(attrs={'class': 'form-control'}),
             'location': forms.TextInput(attrs={'class': 'form-control'}),
             'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Tell companies about yourself...'}),
-            'profile_photo': forms.FileInput(attrs={'class': 'form-control'}),
             'experience_level': forms.Select(attrs={'class': 'form-select'}),
             'availability': forms.Select(attrs={'class': 'form-select'}),
             'github': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://github.com/username'}),
