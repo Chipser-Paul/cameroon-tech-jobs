@@ -203,3 +203,36 @@ class ApplicationMessage(models.Model):
 
     class Meta:
         ordering = ['created_at']
+
+
+class ApplicationInterview(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending Response'),
+        ('accepted', 'Accepted'),
+        ('declined', 'Declined'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    application = models.ForeignKey(
+        JobApplication,
+        on_delete=models.CASCADE,
+        related_name='interviews',
+    )
+    scheduled_for = models.DateTimeField()
+    meeting_type = models.CharField(max_length=20, choices=[
+        ('video', 'Video Call'),
+        ('phone', 'Phone Call'),
+        ('in_person', 'In Person'),
+    ], default='video')
+    meeting_link = models.URLField(blank=True)
+    location = models.CharField(max_length=255, blank=True)
+    notes = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Interview for {self.application.job.title} with {self.application.seeker.full_name}'
+
+    class Meta:
+        ordering = ['-scheduled_for']

@@ -1,9 +1,12 @@
+from datetime import datetime
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
+from django.utils import timezone
 
 from .forms import JobForm
-from .models import ApplicationMessage, Job, Category, TechStack, JobApplication
+from .models import ApplicationInterview, ApplicationMessage, Job, Category, TechStack, JobApplication
 from companies.models import Company
 from seekers.models import Seeker
 
@@ -195,7 +198,7 @@ def update_application_status(request, pk):
 @login_required
 def application_conversation(request, pk):
     application = get_object_or_404(
-        JobApplication.objects.select_related('job', 'job__company', 'seeker').prefetch_related('messages'),
+        JobApplication.objects.select_related('job', 'job__company', 'seeker').prefetch_related('messages', 'interviews'),
         pk=pk,
     )
 
@@ -225,7 +228,97 @@ def application_conversation(request, pk):
     context = {
         'application': application,
         'conversation_messages': application.messages.select_related('sender_company', 'sender_seeker').all(),
+        'interviews': application.interviews.all(),
         'is_company_participant': is_company,
         'is_seeker_participant': is_seeker,
     }
     return render(request, 'jobs/application_conversation.html', context)
+
+
+@login_required
+def schedule_interview(request, pk):
+    if request.method != 'POST':
+        return redirect('dashboard')
+
+    application = get_object_or_404(
+        JobApplication.objects.select_related('job', 'job__company', 'seeker'),
+        pk=pk,
+    )
+
+    if not isinstance(request.user, Company) or application.job.company_id != request.user.id:
+        messages.error(request, 'Only the hiring company can schedule interviews for this application.')
+        return redirect('home')
+
+    scheduled_for_raw = request.POST.get('scheduled_for', '').strip()
+    meeting_type = request.POST.get('meeting_type', 'video').strip()
+    meeting_link = request.POST.get('meeting_link', '').strip()
+    location = request.POST.get('location', '').strip()
+    notes = request.POST.get('notes', '').strip()
+
+    try:
+        scheduled_for = datetime.strptime(scheduled_for_raw, '%Y-%m-%dT%H:%M')
+        scheduled_for = timezone.make_aware(scheduled_for, timezone.get_current_timezone())
+    except ValueError:
+        messages.error(request, 'Please provide a valid interview date and time.')
+        return redirect('application_conversation', pk=application.pk)
+
+    if scheduled_for <= timezone.now():
+        messages.error(request, 'Interview time must be in the future.')
+        return redirect('application_conversation', pk=application.pk)
+
+    if meeting_type == 'video' and not meeting_link:
+        messages.error(request, 'Please add a meeting link for video interviews.')
+        return redirect('application_conversation', pk=application.pk)
+
+    if meeting_type == 'in_person' and not location:
+        messages.error(request, 'Please add a location for in-person interviews.')
+        return redirect('application_conversation', pk=application.pk)
+
+    interview = ApplicationInterview.objects.create(
+        application=application,
+        scheduled_for=scheduled_for,
+        meeting_type=meeting_type,
+        meeting_link=meeting_link,
+        location=location,
+        notes=notes,
+    )
+    ApplicationMessage.objects.create(
+        application=application,
+        sender_company=request.user,
+        body=(
+            f'Interview invitation sent for {timezone.localtime(interview.scheduled_for).strftime("%b %d, %Y at %I:%M %p")} '
+            f'via {interview.get_meeting_type_display()}.'
+        ),
+    )
+    messages.success(request, 'Interview invitation sent successfully.')
+    return redirect('application_conversation', pk=application.pk)
+
+
+@login_required
+def respond_to_interview(request, pk):
+    if request.method != 'POST':
+        return redirect('home')
+
+    interview = get_object_or_404(
+        ApplicationInterview.objects.select_related('application', 'application__job', 'application__job__company', 'application__seeker'),
+        pk=pk,
+    )
+
+    if not isinstance(request.user, Seeker) or interview.application.seeker_id != request.user.id:
+        messages.error(request, 'Only the invited seeker can respond to this interview.')
+        return redirect('home')
+
+    decision = request.POST.get('decision', '').strip()
+    if decision not in {'accepted', 'declined'}:
+        messages.error(request, 'Invalid interview response.')
+        return redirect('application_conversation', pk=interview.application.pk)
+
+    interview.status = decision
+    interview.save(update_fields=['status'])
+    ApplicationMessage.objects.create(
+        application=interview.application,
+        sender_seeker=request.user,
+        body=f'Interview invitation {interview.get_status_display().lower()}.',
+    )
+    messages.success(request, f'Interview invitation {interview.get_status_display().lower()}.')
+    return redirect('application_conversation', pk=interview.application.pk)

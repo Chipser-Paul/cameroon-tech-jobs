@@ -8,5 +8,7 @@ urlpatterns = [
     path('jobs/<int:pk>/applicants/', views.job_applicants, name='job_applicants'),
     path('applications/<int:pk>/status/', views.update_application_status, name='update_application_status'),
     path('applications/<int:pk>/conversation/', views.application_conversation, name='application_conversation'),
+    path('applications/<int:pk>/schedule-interview/', views.schedule_interview, name='schedule_interview'),
+    path('interviews/<int:pk>/respond/', views.respond_to_interview, name='respond_to_interview'),
     path('post-job/', views.post_job, name='post_job'),
 ]
