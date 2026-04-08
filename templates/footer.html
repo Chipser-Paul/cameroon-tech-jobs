@@ -1,68 +1,101 @@
-{% load static %}
-<footer class="footer mt-5">
+<style>
+    .site-footer-pro {
+        background:
+            radial-gradient(circle at top left, rgba(26, 122, 74, 0.16), transparent 20%),
+            linear-gradient(135deg, #0f1728 0%, #18213a 58%, #132e24 100%);
+        color: rgba(255,255,255,0.82);
+        margin-top: 4rem;
+        padding: 3.25rem 0 1.2rem;
+    }
+
+    .footer-brand {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: #fff;
+    }
+
+    .footer-brand span {
+        color: #9fe2b9;
+    }
+
+    .footer-copy {
+        color: rgba(255,255,255,0.72);
+        line-height: 1.8;
+        margin-top: 0.9rem;
+        max-width: 34rem;
+    }
+
+    .footer-heading {
+        color: #fff;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 800;
+        margin-bottom: 1rem;
+    }
+
+    .footer-links {
+        display: grid;
+        gap: 0.7rem;
+    }
+
+    .footer-links a {
+        color: rgba(255,255,255,0.78);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .footer-links a:hover {
+        color: #9fe2b9;
+    }
+
+    .footer-note-bar {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255,255,255,0.09);
+        color: rgba(255,255,255,0.56);
+        font-size: 0.92rem;
+    }
+</style>
+
+<footer class="site-footer-pro">
     <div class="container">
-        <div class="row py-5">
-            <div class="col-lg-4 mb-4">
-                <h5 class="mb-3">
-                    <span style="color:white;font-weight:800;font-size:1.3rem;">Cameroon<span style="color:var(--gold);">Tech</span>Jobs</span>
-                </h5>
-                <p class="footer-desc">The #1 job board for IT & tech professionals in Cameroon. Connecting talent with opportunity.</p>
-                <div class="social-links mt-3">
-                    <a href="https://www.linkedin.com/in/chipsér-emmanuel-402559307" target="_blank" title="LinkedIn">
-                        <i class="fab fa-linkedin"></i>
-                    </a>
-                    <a href="https://x.com/Chipserx" target="_blank" title="Twitter/X">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a href="https://www.facebook.com/share/18htEkDGM5/" target="_blank" title="Facebook">
-                        <i class="fab fa-facebook"></i>
-                    </a>
-                    <a href="https://wa.me/237675952537" target="_blank" title="WhatsApp">
-                        <i class="fab fa-whatsapp"></i>
-                    </a>
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="footer-brand">Cameroon<span>Tech</span>Jobs</div>
+                <p class="footer-copy">
+                    A focused hiring platform for Cameroon tech. Post jobs, review applicants, message talent, schedule interviews, and build trust with a cleaner recruiting workflow.
+                </p>
+            </div>
+            <div class="col-6 col-lg-2">
+                <div class="footer-heading">Platform</div>
+                <div class="footer-links">
+                    <a href="{% url 'job_list' %}">Browse Jobs</a>
+                    <a href="{% url 'seeker_list' %}">Browse Talent</a>
+                    <a href="{% url 'register' %}">For Employers</a>
                 </div>
             </div>
-            <div class="col-lg-2 col-6 mb-4">
-                <h6 class="footer-heading">For Job Seekers</h6>
-                <ul class="footer-links">
-                    <li><a href="{% url 'job_list' %}">Browse Jobs</a></li>
-                    <li><a href="{% url 'seeker_register' %}">Create Profile</a></li>
-                    <li><a href="{% url 'about' %}">About Us</a></li>
-                    <li><a href="{% url 'contact' %}">Contact</a></li>
-                </ul>
+            <div class="col-6 col-lg-2">
+                <div class="footer-heading">Company</div>
+                <div class="footer-links">
+                    <a href="{% url 'about' %}">About</a>
+                    <a href="{% url 'contact' %}">Contact</a>
+                    <a href="{% url 'payment_info' %}">Pricing</a>
+                </div>
             </div>
-            <div class="col-lg-2 col-6 mb-4">
-                <h6 class="footer-heading">For Companies</h6>
-                <ul class="footer-links">
-                    <li><a href="{% url 'post_job' %}">Post a Job</a></li>
-                    <li><a href="{% url 'register' %}">Register</a></li>
-                    <li><a href="{% url 'login' %}">Login</a></li>
-                    <li><a href="{% url 'payment_info' %}">Pricing</a></li>
-                </ul>
-            </div>
-            <div class="col-lg-4 mb-4">
-                <h6 class="footer-heading">Contact Us</h6>
-                <ul class="footer-links">
-                    <li>
-                        <i class="fas fa-map-marker-alt me-2"></i>Douala, Cameroon
-                    </li>
-                    <li>
-                        <i class="fas fa-envelope me-2"></i>
-                        <a href="mailto:chipseremmanuel@gmail.com">chipseremmanuel@gmail.com</a>
-                    </li>
-                    <li>
-                        <i class="fab fa-whatsapp me-2"></i>
-                        <a href="https://wa.me/237675952537" target="_blank">+237 675 952 537</a>
-                    </li>
-                    <li>
-                        <i class="fab fa-linkedin me-2"></i>
-                        <a href="https://www.linkedin.com/in/chipsér-emmanuel-402559307" target="_blank">LinkedIn</a>
-                    </li>
-                </ul>
+            <div class="col-lg-3">
+                <div class="footer-heading">Why It Works</div>
+                <div class="footer-links">
+                    <a href="{% url 'notifications' %}">Live hiring updates</a>
+                    <a href="{% url 'job_list' %}?location=remote">Remote-friendly roles</a>
+                    <a href="{% url 'job_list' %}?experience=mid">Mid-level opportunities</a>
+                </div>
             </div>
         </div>
-        <div class="footer-bottom text-center py-3">
-            <p class="mb-0">© 2026 CameroonTechJobs. Built with ❤️ in Douala by Fokoua Paul Emmanuel.</p>
+        <div class="footer-note-bar d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>&copy; 2026 CameroonTechJobs. Built for serious hiring in Cameroon tech.</div>
+            <div>Designed to help employers trust the process from post to interview.</div>
         </div>
     </div>
 </footer>

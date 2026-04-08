@@ -1,4 +1,98 @@
 {% load static %}
+<style>
+    .navbar.sticky-top {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(14px);
+        border-bottom: 1px solid rgba(18, 30, 48, 0.06);
+        box-shadow: 0 12px 28px rgba(17, 29, 45, 0.05);
+        padding: 0.9rem 0;
+    }
+
+    .brand-text {
+        font-size: 1.9rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: #172133;
+    }
+
+    .brand-highlight {
+        color: var(--green);
+    }
+
+    .navbar .nav-link {
+        color: #314356;
+        font-weight: 700;
+        padding: 0.72rem 0.95rem !important;
+        border-radius: 12px;
+        transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+    }
+
+    .navbar .nav-link:hover,
+    .navbar .nav-link:focus {
+        background: rgba(26, 122, 74, 0.08);
+        color: var(--green);
+        transform: translateY(-1px);
+    }
+
+    .navbar .dropdown-menu {
+        border: 1px solid rgba(17, 29, 45, 0.06);
+        border-radius: 16px;
+        box-shadow: 0 18px 44px rgba(12, 28, 45, 0.12);
+        padding: 0.55rem;
+    }
+
+    .navbar .dropdown-item {
+        border-radius: 10px;
+        font-weight: 600;
+        padding: 0.7rem 0.85rem;
+    }
+
+    .navbar .dropdown-item:hover {
+        background: rgba(26, 122, 74, 0.08);
+        color: var(--green);
+    }
+
+    .nav-cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+        padding: 0.8rem 1rem;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #1a7a4a 0%, #135d39 100%);
+        color: #fff !important;
+        font-weight: 800;
+        box-shadow: 0 12px 24px rgba(26, 122, 74, 0.2);
+    }
+
+    .nav-cta:hover {
+        background: linear-gradient(135deg, #15653e 0%, #104d2f 100%);
+        color: #fff !important;
+    }
+
+    .notify-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .notify-pill .badge {
+        font-size: 0.7rem;
+    }
+
+    @media (max-width: 991px) {
+        .navbar .nav-link {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
+
+        .nav-cta {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+    }
+</style>
+
 <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container">
         <a class="navbar-brand" href="{% url 'home' %}">
@@ -11,7 +105,7 @@
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'job_list' %}">
-                        <i class="fas fa-briefcase me-1"></i> Browse Jobs
+                        <i class="fas fa-briefcase me-1"></i>Browse Jobs
                     </a>
                 </li>
                 <li class="nav-item">
@@ -26,25 +120,27 @@
                     <a class="nav-link" href="{% url 'contact' %}">Contact</a>
                 </li>
             </ul>
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto align-items-lg-center">
                 {% if user.is_authenticated %}
-                    {% if user.company_name %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'notifications' %}">
-                                <i class="fas fa-bell me-1"></i>Alerts
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'notifications' %}">
+                            <span class="notify-pill">
+                                <i class="fas fa-bell"></i>Alerts
                                 {% if navbar_unread_notifications %}
-                                <span class="badge rounded-pill bg-danger ms-1">{{ navbar_unread_notifications }}</span>
+                                <span class="badge rounded-pill bg-danger">{{ navbar_unread_notifications }}</span>
                                 {% endif %}
-                            </a>
-                        </li>
+                            </span>
+                        </a>
+                    </li>
+                    {% if user.company_name %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'dashboard' %}">
                                 <i class="fas fa-building me-1"></i>{{ user.company_name }}
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="btn btn-post ms-2" href="{% url 'post_job' %}">
-                                <i class="fas fa-plus me-1"></i>Post a Job
+                        <li class="nav-item ms-lg-2">
+                            <a class="nav-link nav-cta" href="{% url 'post_job' %}">
+                                <i class="fas fa-plus"></i>Post a Job
                             </a>
                         </li>
                         <li class="nav-item">
@@ -53,14 +149,6 @@
                             </a>
                         </li>
                     {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'notifications' %}">
-                                <i class="fas fa-bell me-1"></i>Alerts
-                                {% if navbar_unread_notifications %}
-                                <span class="badge rounded-pill bg-danger ms-1">{{ navbar_unread_notifications }}</span>
-                                {% endif %}
-                            </a>
-                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'seeker_dashboard' %}">
                                 <i class="fas fa-user me-1"></i>{{ user.full_name }}
@@ -80,8 +168,8 @@
                             <li><a class="dropdown-item" href="{% url 'seeker_login' %}"><i class="fas fa-user me-2"></i>Job Seeker Login</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item dropdown ms-2">
-                        <a class="btn btn-post dropdown-toggle" href="#" data-bs-toggle="dropdown">Register</a>
+                    <li class="nav-item dropdown ms-lg-2">
+                        <a class="nav-link nav-cta dropdown-toggle" href="#" data-bs-toggle="dropdown">Register</a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{% url 'register' %}"><i class="fas fa-building me-2"></i>Post Jobs (Company)</a></li>
                             <li><a class="dropdown-item" href="{% url 'seeker_register' %}"><i class="fas fa-user me-2"></i>Find Jobs (Seeker)</a></li>

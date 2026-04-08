@@ -2,285 +2,491 @@
 
 {% block title %}{{ job.title }} - {{ job.company.company_name }} | CameroonTechJobs{% endblock %}
 
+{% block extra_css %}
+<style>
+    .detail-shell {
+        background:
+            radial-gradient(circle at top left, rgba(26, 122, 74, 0.12), transparent 26%),
+            linear-gradient(180deg, #f8faf9 0%, #ffffff 22%, #f5f8fb 100%);
+    }
+
+    .detail-hero {
+        padding: 2.8rem 0 2rem;
+    }
+
+    .detail-hero-panel {
+        border-radius: 30px;
+        background: linear-gradient(135deg, #152033 0%, #1d2744 50%, #144332 100%);
+        color: #fff;
+        padding: 2.5rem;
+        box-shadow: 0 26px 60px rgba(13, 29, 46, 0.14);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .detail-hero-panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(circle at 84% 18%, rgba(212,165,62,0.24), transparent 16%),
+            radial-gradient(circle at 18% 84%, rgba(159,226,185,0.18), transparent 18%);
+        pointer-events: none;
+    }
+
+    .detail-hero-panel > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .detail-company-lockup {
+        display: flex;
+        align-items: center;
+        gap: 1.1rem;
+        flex-wrap: wrap;
+    }
+
+    .detail-company-lockup img,
+    .detail-company-fallback {
+        width: 78px;
+        height: 78px;
+        border-radius: 20px;
+        object-fit: cover;
+    }
+
+    .detail-company-fallback {
+        background: rgba(255,255,255,0.12);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        font-weight: 800;
+    }
+
+    .detail-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.42rem 0.72rem;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.88);
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 0.9rem;
+    }
+
+    .detail-kicker i {
+        color: #d4a53e;
+    }
+
+    .detail-title {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 800;
+        line-height: 1.02;
+        margin-bottom: 0.55rem;
+    }
+
+    .detail-company-line {
+        color: rgba(255,255,255,0.78);
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    .detail-summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+        margin-top: -1rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .detail-summary-card,
+    .detail-card-pro {
+        border-radius: 22px;
+        background: #fff;
+        border: 1px solid rgba(17, 29, 45, 0.05);
+        box-shadow: 0 18px 42px rgba(12, 28, 45, 0.08);
+    }
+
+    .detail-summary-card {
+        padding: 1.2rem;
+        text-align: center;
+    }
+
+    .detail-summary-label {
+        color: #7a8d9f;
+        font-size: 0.79rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 800;
+        margin-bottom: 0.45rem;
+    }
+
+    .detail-summary-value {
+        font-weight: 800;
+        color: #152033;
+    }
+
+    .detail-body {
+        padding: 2rem 0 4rem;
+    }
+
+    .detail-card-pro {
+        padding: 1.45rem;
+        margin-bottom: 1.15rem;
+    }
+
+    .detail-card-title {
+        font-size: 1.22rem;
+        font-weight: 800;
+        color: #152033;
+        margin-bottom: 0.9rem;
+    }
+
+    .tech-stack-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+    }
+
+    .tech-stack-chip {
+        background: var(--green-light);
+        color: var(--green);
+        padding: 0.38rem 0.85rem;
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .salary-banner {
+        background: linear-gradient(135deg, rgba(26,122,74,0.12), rgba(159,226,185,0.18));
+        border: 1px solid rgba(26,122,74,0.18);
+        border-radius: 18px;
+        padding: 1rem 1.1rem;
+        color: #185638;
+        font-weight: 700;
+        margin-bottom: 1.15rem;
+    }
+
+    .action-card-highlight {
+        border: 1px solid rgba(26, 122, 74, 0.18);
+        background: linear-gradient(180deg, #ffffff 0%, #f6fbf7 100%);
+    }
+
+    .stat-row-pro {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid rgba(21, 32, 51, 0.06);
+        color: #657789;
+    }
+
+    .stat-row-pro:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .stat-row-pro strong {
+        color: #152033;
+    }
+
+    .company-side-lockup {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        margin-bottom: 1rem;
+    }
+
+    .company-side-lockup img,
+    .company-side-fallback {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        object-fit: cover;
+    }
+
+    .company-side-fallback {
+        background: linear-gradient(135deg, rgba(26,122,74,0.16), rgba(21,32,51,0.08));
+        color: var(--green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        font-weight: 800;
+    }
+
+    .share-row {
+        display: flex;
+        gap: 0.65rem;
+        flex-wrap: wrap;
+    }
+
+    .share-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.58rem 0.95rem;
+        border-radius: 12px;
+        color: #fff;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 700;
+    }
+
+    .related-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #152033;
+        margin-bottom: 1.2rem;
+    }
+
+    @media (max-width: 1199px) {
+        .detail-summary-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 767px) {
+        .detail-summary-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .detail-hero-panel {
+            padding: 1.6rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-
-<section class="page-hero">
-    <div class="container">
-        <div class="d-flex align-items-center gap-4 flex-wrap">
-            {% if job.company.logo %}
-                <img src="{{ job.company.logo.url }}" style="width:70px;height:70px;border-radius:12px;object-fit:cover;" alt="{{ job.company.company_name }}">
-            {% else %}
-                <div class="company-logo" style="width:70px;height:70px;font-size:1.8rem;background:rgba(255,255,255,0.15);color:white;">
-                    {{ job.company.company_name|first }}
-                </div>
-            {% endif %}
-            <div>
-                <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
-                    <h1 style="font-size:1.8rem;margin:0;">{{ job.title }}</h1>
-                    {% if job.is_featured %}<span class="featured-badge">Featured</span>{% endif %}
-                </div>
-                <p style="color:rgba(255,255,255,0.75);margin:0;">
-                    {{ job.company.company_name }}
-                    {% if job.company.location %} - {{ job.company.location }}{% endif %}
-                </p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="py-5">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-lg-8">
-                <div class="form-card mb-4 p-3">
-                    <div class="row g-3 text-center">
-                        <div class="col-6 col-md-3">
-                            <div style="color:var(--gray);font-size:0.8rem;">Location</div>
-                            <div style="font-weight:700;">
-                                <i class="fas fa-map-marker-alt me-1" style="color:var(--green);"></i>
-                                {{ job.get_location_display }}
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <div style="color:var(--gray);font-size:0.8rem;">Job Type</div>
-                            <div style="font-weight:700;">
-                                <i class="fas fa-briefcase me-1" style="color:var(--green);"></i>
-                                {{ job.get_job_type_display }}
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <div style="color:var(--gray);font-size:0.8rem;">Category</div>
-                            <div style="font-weight:700;">
-                                <i class="fas fa-tag me-1" style="color:var(--green);"></i>
-                                {{ job.category.name|default:"General" }}
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <div style="color:var(--gray);font-size:0.8rem;">Posted</div>
-                            <div style="font-weight:700;">
-                                <i class="fas fa-clock me-1" style="color:var(--green);"></i>
-                                {{ job.days_ago }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {% if job.tech_stacks.count %}
-                <div class="form-card mb-4 p-3">
-                    <div style="font-weight:700;font-size:0.9rem;margin-bottom:0.75rem;">
-                        <i class="fas fa-code me-2" style="color:var(--green);"></i>Tech Stack
-                    </div>
-                    <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">
-                        {% for tech in job.tech_stacks.all %}
-                        <a href="{% url 'job_list' %}?tech={{ tech.name }}"
-                           style="background:var(--green-light);color:var(--green);padding:0.3rem 0.8rem;border-radius:20px;font-size:0.82rem;font-weight:600;text-decoration:none;">
-                            {{ tech.name }}
-                        </a>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if job.salary_range %}
-                <div class="alert" style="background:var(--green-light);border:1.5px solid var(--green);border-radius:10px;color:var(--green-dark);">
-                    <i class="fas fa-money-bill-wave me-2"></i>
-                    <strong>Salary:</strong> {{ job.salary_range }}
-                </div>
-                {% endif %}
-
-                <div class="form-card mb-4">
-                    <h5 style="font-weight:800;margin-bottom:1rem;">Job Description</h5>
-                    <div style="line-height:1.8;color:#444;">
-                        {{ job.description|linebreaks }}
-                    </div>
-                </div>
-
-                <div class="form-card mb-4">
-                    <h5 style="font-weight:800;margin-bottom:1rem;">Requirements</h5>
-                    <div style="line-height:1.8;color:#444;">
-                        {{ job.requirements|linebreaks }}
-                    </div>
-                </div>
-
-                <div class="form-card mb-4" style="border:2px solid var(--green);">
-                    <h5 style="font-weight:800;margin-bottom:1rem;">Apply on CameroonTechJobs</h5>
-                    {% if can_apply %}
-                    <p style="color:#444;">Send your seeker profile directly to this employer. Your saved skills, links, and contact details will be included.</p>
-                    {% if has_applied %}
-                    <div style="background:var(--green-light);color:var(--green);padding:0.9rem 1rem;border-radius:10px;font-weight:600;">
-                        <i class="fas fa-check-circle me-2"></i>You already applied for this job.
-                    </div>
+<div class="detail-shell">
+    <section class="detail-hero">
+        <div class="container">
+            <div class="detail-hero-panel">
+                <div class="detail-company-lockup">
+                    {% if job.company.logo %}
+                    <img src="{{ job.company.logo.url }}" alt="{{ job.company.company_name }}">
                     {% else %}
-                    <form method="post" action="{% url 'apply_job' job.pk %}">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="cover_note" class="form-label" style="font-weight:700;">Cover Note (Optional)</label>
-                            <textarea id="cover_note" name="cover_note" rows="4" class="form-control"
-                                      placeholder="Add a short message to tell the employer why you are a good fit."></textarea>
+                    <div class="detail-company-fallback">{{ job.company.company_name|first }}</div>
+                    {% endif %}
+                    <div>
+                        <div class="detail-kicker"><i class="fas fa-briefcase"></i>Cameroon tech opportunity</div>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <h1 class="detail-title">{{ job.title }}</h1>
+                            {% if job.is_featured %}<span class="featured-badge">Featured</span>{% endif %}
                         </div>
-                        <button type="submit" class="btn-green">
-                            <i class="fas fa-paper-plane me-2"></i>Apply with My Profile
-                        </button>
-                    </form>
-                    {% endif %}
-                    {% elif user.is_authenticated %}
-                    <p style="color:#444;margin-bottom:0;">Company accounts cannot apply for jobs. Switch to a seeker account to apply.</p>
-                    {% else %}
-                    <p style="color:#444;">Login as a job seeker to apply directly and let employers review your full profile.</p>
-                    <a href="{% url 'seeker_login' %}" class="btn-outline-green">
-                        <i class="fas fa-sign-in-alt me-2"></i>Login to Apply
-                    </a>
-                    {% endif %}
-                </div>
-
-                <div class="form-card mb-4" style="border:2px solid var(--green);">
-                    <h5 style="font-weight:800;margin-bottom:1rem;">How to Apply</h5>
-                    {% if job.apply_link %}
-                    <p style="color:#444;">Click the button below to apply through the company's official application page.</p>
-                    <a href="{{ job.apply_link }}" target="_blank" class="btn-green">
-                        <i class="fas fa-external-link-alt me-2"></i>Apply Now
-                    </a>
-                    {% elif job.apply_email %}
-                    <p style="color:#444;">Send your CV and cover letter to the email address below.</p>
-                    <a href="mailto:{{ job.apply_email }}" class="btn-green">
-                        <i class="fas fa-envelope me-2"></i>Apply via Email
-                    </a>
-                    <div class="mt-2" style="font-size:0.9rem;color:var(--gray);">{{ job.apply_email }}</div>
-                    {% else %}
-                    <p style="color:#444;">Contact the company directly to apply for this position.</p>
-                    {% endif %}
+                        <p class="detail-company-line">{{ job.company.company_name }}{% if job.company.location %} - {{ job.company.location }}{% endif %}</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-lg-4">
-                <div class="form-card mb-4">
-                    <h6 style="font-weight:800;margin-bottom:1rem;">About the Company</h6>
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        {% if job.company.logo %}
-                            <img src="{{ job.company.logo.url }}" style="width:52px;height:52px;border-radius:10px;object-fit:cover;" alt="">
-                        {% else %}
-                            <div class="company-logo">{{ job.company.company_name|first }}</div>
-                        {% endif %}
-                        <div>
-                            <div style="font-weight:700;">{{ job.company.company_name }}</div>
-                            {% if job.company.location %}
-                            <div style="font-size:0.85rem;color:var(--gray);">
-                                <i class="fas fa-map-marker-alt me-1"></i>{{ job.company.location }}
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% if job.company.description %}
-                    <p style="font-size:0.9rem;color:#555;line-height:1.6;">{{ job.company.description|truncatewords:30 }}</p>
-                    {% endif %}
-                    {% if job.company.website %}
-                    <a href="{{ job.company.website }}" target="_blank" style="font-size:0.9rem;color:var(--green);text-decoration:none;">
-                        <i class="fas fa-globe me-1"></i>Visit Website
-                    </a>
-                    {% endif %}
+            <div class="detail-summary-grid">
+                <div class="detail-summary-card">
+                    <div class="detail-summary-label">Location</div>
+                    <div class="detail-summary-value"><i class="fas fa-map-marker-alt me-1" style="color:var(--green);"></i>{{ job.get_location_display }}</div>
                 </div>
-
-                <div class="form-card mb-4">
-                    <h6 style="font-weight:800;margin-bottom:1rem;">Job Stats</h6>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span style="color:var(--gray);font-size:0.9rem;">Views</span>
-                        <span style="font-weight:700;">{{ job.views_count }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span style="color:var(--gray);font-size:0.9rem;">Applications</span>
-                        <span style="font-weight:700;">{{ job.applications.count }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span style="color:var(--gray);font-size:0.9rem;">Posted</span>
-                        <span style="font-weight:700;">{{ job.date_posted|date:"M d, Y" }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <span style="color:var(--gray);font-size:0.9rem;">Expires</span>
-                        <span style="font-weight:700;">{{ job.date_expires|date:"M d, Y" }}</span>
-                    </div>
+                <div class="detail-summary-card">
+                    <div class="detail-summary-label">Job Type</div>
+                    <div class="detail-summary-value"><i class="fas fa-briefcase me-1" style="color:var(--green);"></i>{{ job.get_job_type_display }}</div>
                 </div>
-
-                <div class="form-card mb-4">
-                    <h6 style="font-weight:800;margin-bottom:1rem;">
-                        <i class="fas fa-bookmark me-2" style="color:var(--green);"></i>Save This Job
-                    </h6>
-                    {% if user.is_authenticated and not user.company_name %}
-                        {% if job in user.saved_jobs.all %}
-                        <a href="{% url 'save_job' job.pk %}" class="btn-outline-green w-100 text-center" style="padding:0.5rem;color:red;border-color:red;">
-                            <i class="fas fa-bookmark me-2"></i>Saved - Click to Remove
-                        </a>
-                        {% else %}
-                        <a href="{% url 'save_job' job.pk %}" class="btn-green w-100 text-center" style="padding:0.5rem;">
-                            <i class="far fa-bookmark me-2"></i>Save Job
-                        </a>
-                        {% endif %}
-                    {% else %}
-                    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.75rem;">
-                        Login as a job seeker to save this job.
-                    </p>
-                    <a href="{% url 'seeker_login' %}" class="btn-outline-green w-100 text-center" style="padding:0.5rem;">
-                        <i class="fas fa-sign-in-alt me-2"></i>Login to Save
-                    </a>
-                    {% endif %}
+                <div class="detail-summary-card">
+                    <div class="detail-summary-label">Category</div>
+                    <div class="detail-summary-value"><i class="fas fa-tag me-1" style="color:var(--green);"></i>{{ job.category.name|default:"General" }}</div>
                 </div>
-
-                {% if user.is_authenticated and user == job.company %}
-                <div class="form-card mb-4">
-                    <h6 style="font-weight:800;margin-bottom:1rem;">Manage Applicants</h6>
-                    <p style="font-size:0.9rem;color:var(--gray);margin-bottom:0.75rem;">
-                        Review the seekers who applied for this role and contact the strongest matches.
-                    </p>
-                    <a href="{% url 'job_applicants' job.pk %}" class="btn-green w-100 text-center" style="padding:0.5rem;">
-                        <i class="fas fa-users me-2"></i>View {{ job.applications.count }} applicant{{ job.applications.count|pluralize }}
-                    </a>
-                </div>
-                {% endif %}
-
-                <div class="form-card mb-4">
-                    <h6 style="font-weight:800;margin-bottom:1rem;">Share this Job</h6>
-                    <div class="d-flex gap-2">
-                        <a href="https://wa.me/?text=Check this job: {{ request.build_absolute_uri }}" target="_blank"
-                           style="background:#25D366;color:white;padding:0.5rem 1rem;border-radius:8px;text-decoration:none;font-size:0.9rem;">
-                            <i class="fab fa-whatsapp me-1"></i>WhatsApp
-                        </a>
-                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}" target="_blank"
-                           style="background:#0077b5;color:white;padding:0.5rem 1rem;border-radius:8px;text-decoration:none;font-size:0.9rem;">
-                            <i class="fab fa-linkedin me-1"></i>LinkedIn
-                        </a>
-                    </div>
+                <div class="detail-summary-card">
+                    <div class="detail-summary-label">Posted</div>
+                    <div class="detail-summary-value"><i class="fas fa-clock me-1" style="color:var(--green);"></i>{{ job.days_ago }}</div>
                 </div>
             </div>
         </div>
+    </section>
 
-        {% if related_jobs %}
-        <div class="mt-4">
-            <h4 style="font-weight:800;margin-bottom:1.5rem;">Related Jobs</h4>
-            <div class="row g-3">
-                {% for related in related_jobs %}
+    <section class="detail-body">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    {% if job.tech_stacks.count %}
+                    <div class="detail-card-pro">
+                        <div class="detail-card-title">Tech Stack</div>
+                        <div class="tech-stack-row">
+                            {% for tech in job.tech_stacks.all %}
+                            <a href="{% url 'job_list' %}?tech={{ tech.name }}" class="tech-stack-chip">{{ tech.name }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if job.salary_range %}
+                    <div class="salary-banner">
+                        <i class="fas fa-money-bill-wave me-2"></i>Salary: {{ job.salary_range }}
+                    </div>
+                    {% endif %}
+
+                    <div class="detail-card-pro">
+                        <div class="detail-card-title">Job Description</div>
+                        <div style="line-height:1.85;color:#47586a;">{{ job.description|linebreaks }}</div>
+                    </div>
+
+                    <div class="detail-card-pro">
+                        <div class="detail-card-title">Requirements</div>
+                        <div style="line-height:1.85;color:#47586a;">{{ job.requirements|linebreaks }}</div>
+                    </div>
+
+                    <div class="detail-card-pro action-card-highlight">
+                        <div class="detail-card-title">Apply on CameroonTechJobs</div>
+                        {% if can_apply %}
+                        <p style="color:#56697b;line-height:1.75;">Send your seeker profile directly to this employer. Your saved skills, links, and contact details will be included.</p>
+                        {% if has_applied %}
+                        <div style="background:var(--green-light);color:var(--green);padding:0.95rem 1rem;border-radius:14px;font-weight:700;">
+                            <i class="fas fa-check-circle me-2"></i>You already applied for this job.
+                        </div>
+                        {% else %}
+                        <form method="post" action="{% url 'apply_job' job.pk %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="cover_note" class="form-label" style="font-weight:700;">Cover Note (Optional)</label>
+                                <textarea id="cover_note" name="cover_note" rows="4" class="form-control" placeholder="Add a short message to tell the employer why you are a good fit."></textarea>
+                            </div>
+                            <button type="submit" class="btn-green"><i class="fas fa-paper-plane me-2"></i>Apply with My Profile</button>
+                        </form>
+                        {% endif %}
+                        {% elif user.is_authenticated %}
+                        <p style="color:#56697b;margin-bottom:0;">Company accounts cannot apply for jobs. Switch to a seeker account to apply.</p>
+                        {% else %}
+                        <p style="color:#56697b;">Login as a job seeker to apply directly and let employers review your full profile.</p>
+                        <a href="{% url 'seeker_login' %}" class="btn-outline-green"><i class="fas fa-sign-in-alt me-2"></i>Login to Apply</a>
+                        {% endif %}
+                    </div>
+
+                    <div class="detail-card-pro action-card-highlight">
+                        <div class="detail-card-title">Alternative Application Route</div>
+                        {% if job.apply_link %}
+                        <p style="color:#56697b;">Click below to apply through the company’s official application page.</p>
+                        <a href="{{ job.apply_link }}" target="_blank" class="btn-green"><i class="fas fa-external-link-alt me-2"></i>Apply on Company Site</a>
+                        {% elif job.apply_email %}
+                        <p style="color:#56697b;">Send your CV and cover letter directly to the company’s inbox.</p>
+                        <a href="mailto:{{ job.apply_email }}" class="btn-green"><i class="fas fa-envelope me-2"></i>Apply via Email</a>
+                        <div class="mt-2" style="font-size:0.92rem;color:#718496;">{{ job.apply_email }}</div>
+                        {% else %}
+                        <p style="color:#56697b;margin:0;">Contact the company directly to apply for this position.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
                 <div class="col-lg-4">
-                    <a href="{% url 'job_detail' related.pk %}" class="job-card">
-                        <div class="d-flex align-items-center gap-3 mb-3">
-                            {% if related.company.logo %}
-                                <img src="{{ related.company.logo.url }}" class="company-logo" alt="">
+                    <div class="detail-card-pro">
+                        <div class="detail-card-title">About the Company</div>
+                        <div class="company-side-lockup">
+                            {% if job.company.logo %}
+                            <img src="{{ job.company.logo.url }}" alt="{{ job.company.company_name }}">
                             {% else %}
-                                <div class="company-logo">{{ related.company.company_name|first }}</div>
+                            <div class="company-side-fallback">{{ job.company.company_name|first }}</div>
                             {% endif %}
                             <div>
-                                <div class="job-title">{{ related.title }}</div>
-                                <div class="company-name">{{ related.company.company_name }}</div>
+                                <div style="font-weight:800;color:#152033;">{{ job.company.company_name }}</div>
+                                {% if job.company.location %}
+                                <div style="font-size:0.88rem;color:#728496;"><i class="fas fa-map-marker-alt me-1"></i>{{ job.company.location }}</div>
+                                {% endif %}
                             </div>
                         </div>
-                        <div class="job-meta">
-                            <span><i class="fas fa-map-marker-alt"></i>{{ related.get_location_display }}</span>
-                            <span><i class="fas fa-clock"></i>{{ related.days_ago }}</span>
-                        </div>
-                    </a>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
-    </div>
-</section>
+                        {% if job.company.description %}
+                        <p style="font-size:0.92rem;color:#5c6f81;line-height:1.75;">{{ job.company.description|truncatewords:30 }}</p>
+                        {% endif %}
+                        {% if job.company.website %}
+                        <a href="{{ job.company.website }}" target="_blank" style="font-size:0.92rem;color:var(--green);text-decoration:none;font-weight:700;">
+                            <i class="fas fa-globe me-1"></i>Visit Website
+                        </a>
+                        {% endif %}
+                    </div>
 
+                    <div class="detail-card-pro">
+                        <div class="detail-card-title">Job Stats</div>
+                        <div class="stat-row-pro"><span>Views</span><strong>{{ job.views_count }}</strong></div>
+                        <div class="stat-row-pro"><span>Applications</span><strong>{{ job.applications.count }}</strong></div>
+                        <div class="stat-row-pro"><span>Posted</span><strong>{{ job.date_posted|date:"M d, Y" }}</strong></div>
+                        <div class="stat-row-pro"><span>Expires</span><strong>{{ job.date_expires|date:"M d, Y" }}</strong></div>
+                    </div>
+
+                    <div class="detail-card-pro">
+                        <div class="detail-card-title"><i class="fas fa-bookmark me-2" style="color:var(--green);"></i>Save This Job</div>
+                        {% if user.is_authenticated and not user.company_name %}
+                            {% if job in user.saved_jobs.all %}
+                            <a href="{% url 'save_job' job.pk %}" class="btn-outline-green w-100 text-center" style="padding:0.65rem;color:#dc3545;border-color:#dc3545;">
+                                <i class="fas fa-bookmark me-2"></i>Saved - Click to Remove
+                            </a>
+                            {% else %}
+                            <a href="{% url 'save_job' job.pk %}" class="btn-green w-100 text-center" style="padding:0.65rem;">
+                                <i class="far fa-bookmark me-2"></i>Save Job
+                            </a>
+                            {% endif %}
+                        {% else %}
+                        <p style="font-size:0.88rem;color:#728496;line-height:1.7;">Login as a job seeker to save this job.</p>
+                        <a href="{% url 'seeker_login' %}" class="btn-outline-green w-100 text-center" style="padding:0.65rem;">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login to Save
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    {% if user.is_authenticated and user == job.company %}
+                    <div class="detail-card-pro">
+                        <div class="detail-card-title">Manage Applicants</div>
+                        <p style="font-size:0.92rem;color:#728496;line-height:1.75;">Review the seekers who applied for this role and contact the strongest matches.</p>
+                        <a href="{% url 'job_applicants' job.pk %}" class="btn-green w-100 text-center" style="padding:0.65rem;">
+                            <i class="fas fa-users me-2"></i>View {{ job.applications.count }} applicant{{ job.applications.count|pluralize }}
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    <div class="detail-card-pro">
+                        <div class="detail-card-title">Share this Job</div>
+                        <div class="share-row">
+                            <a href="https://wa.me/?text=Check this job: {{ request.build_absolute_uri }}" target="_blank" class="share-btn" style="background:#25D366;">
+                                <i class="fab fa-whatsapp"></i>WhatsApp
+                            </a>
+                            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}" target="_blank" class="share-btn" style="background:#0077b5;">
+                                <i class="fab fa-linkedin"></i>LinkedIn
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if related_jobs %}
+            <div class="mt-4">
+                <h4 class="related-title">Related Jobs</h4>
+                <div class="row g-3">
+                    {% for related in related_jobs %}
+                    <div class="col-lg-4">
+                        <a href="{% url 'job_detail' related.pk %}" class="job-card">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                {% if related.company.logo %}
+                                <img src="{{ related.company.logo.url }}" class="company-logo" alt="">
+                                {% else %}
+                                <div class="company-logo">{{ related.company.company_name|first }}</div>
+                                {% endif %}
+                                <div>
+                                    <div class="job-title">{{ related.title }}</div>
+                                    <div class="company-name">{{ related.company.company_name }}</div>
+                                </div>
+                            </div>
+                            <div class="job-meta">
+                                <span><i class="fas fa-map-marker-alt"></i>{{ related.get_location_display }}</span>
+                                <span><i class="fas fa-clock"></i>{{ related.days_ago }}</span>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
 {% endblock %}
