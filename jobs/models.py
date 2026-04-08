@@ -236,3 +236,31 @@ class ApplicationInterview(models.Model):
 
     class Meta:
         ordering = ['-scheduled_for']
+
+
+class Notification(models.Model):
+    recipient_company = models.ForeignKey(
+        'companies.Company',
+        on_delete=models.CASCADE,
+        related_name='notifications',
+        blank=True,
+        null=True,
+    )
+    recipient_seeker = models.ForeignKey(
+        'seekers.Seeker',
+        on_delete=models.CASCADE,
+        related_name='notifications',
+        blank=True,
+        null=True,
+    )
+    title = models.CharField(max_length=200)
+    body = models.TextField()
+    link = models.CharField(max_length=255, blank=True)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        ordering = ['-created_at']

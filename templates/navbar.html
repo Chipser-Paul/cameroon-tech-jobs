@@ -30,6 +30,14 @@
                 {% if user.is_authenticated %}
                     {% if user.company_name %}
                         <li class="nav-item">
+                            <a class="nav-link" href="{% url 'notifications' %}">
+                                <i class="fas fa-bell me-1"></i>Alerts
+                                {% if navbar_unread_notifications %}
+                                <span class="badge rounded-pill bg-danger ms-1">{{ navbar_unread_notifications }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{% url 'dashboard' %}">
                                 <i class="fas fa-building me-1"></i>{{ user.company_name }}
                             </a>
@@ -45,6 +53,14 @@
                             </a>
                         </li>
                     {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'notifications' %}">
+                                <i class="fas fa-bell me-1"></i>Alerts
+                                {% if navbar_unread_notifications %}
+                                <span class="badge rounded-pill bg-danger ms-1">{{ navbar_unread_notifications }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'seeker_dashboard' %}">
                                 <i class="fas fa-user me-1"></i>{{ user.full_name }}

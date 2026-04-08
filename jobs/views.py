@@ -6,7 +6,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 
 from .forms import JobForm
-from .models import ApplicationInterview, ApplicationMessage, Job, Category, TechStack, JobApplication
+from .models import ApplicationInterview, ApplicationMessage, Job, Category, Notification, TechStack, JobApplication
+from .notifications import notify_company, notify_seeker
 from companies.models import Company
 from seekers.models import Seeker
 
@@ -136,10 +137,16 @@ def apply_job(request, pk):
         )
         return redirect('job_detail', pk=job.pk)
 
-    JobApplication.objects.create(
+    application = JobApplication.objects.create(
         job=job,
         seeker=request.user,
         cover_note=request.POST.get('cover_note', '').strip(),
+    )
+    notify_company(
+        job.company,
+        'New job application received',
+        f'{request.user.full_name} applied for {job.title}.',
+        link=f'/applications/{application.pk}/conversation/',
     )
     messages.success(request, 'Application submitted successfully. The employer can now review your profile.')
     return redirect('job_detail', pk=job.pk)
@@ -191,6 +198,12 @@ def update_application_status(request, pk):
 
     application.status = new_status
     application.save(update_fields=['status'])
+    notify_seeker(
+        application.seeker,
+        'Application status updated',
+        f'Your application for {application.job.title} is now marked as {application.get_status_display()}.',
+        link=f'/applications/{application.pk}/conversation/',
+    )
     messages.success(request, 'Application status updated successfully.')
     return redirect('job_applicants', pk=application.job.pk)
 
@@ -221,6 +234,20 @@ def application_conversation(request, pk):
             else:
                 message_kwargs['sender_seeker'] = request.user
             ApplicationMessage.objects.create(**message_kwargs)
+            if is_company:
+                notify_seeker(
+                    application.seeker,
+                    'New message from employer',
+                    f'{application.job.company.company_name} sent you a new message about {application.job.title}.',
+                    link=f'/applications/{application.pk}/conversation/',
+                )
+            else:
+                notify_company(
+                    application.job.company,
+                    'New message from candidate',
+                    f'{application.seeker.full_name} sent a new message about {application.job.title}.',
+                    link=f'/applications/{application.pk}/conversation/',
+                )
             messages.success(request, 'Message sent successfully.')
             return redirect('application_conversation', pk=application.pk)
         messages.error(request, 'Please enter a message before sending.')
@@ -290,6 +317,12 @@ def schedule_interview(request, pk):
             f'via {interview.get_meeting_type_display()}.'
         ),
     )
+    notify_seeker(
+        application.seeker,
+        'New interview invitation',
+        f'You have been invited to an interview for {application.job.title}.',
+        link=f'/applications/{application.pk}/conversation/',
+    )
     messages.success(request, 'Interview invitation sent successfully.')
     return redirect('application_conversation', pk=application.pk)
 
@@ -320,5 +353,60 @@ def respond_to_interview(request, pk):
         sender_seeker=request.user,
         body=f'Interview invitation {interview.get_status_display().lower()}.',
     )
+    notify_company(
+        interview.application.job.company,
+        'Interview response received',
+        f'{request.user.full_name} {interview.get_status_display().lower()} the interview for {interview.application.job.title}.',
+        link=f'/applications/{interview.application.pk}/conversation/',
+    )
     messages.success(request, f'Interview invitation {interview.get_status_display().lower()}.')
     return redirect('application_conversation', pk=interview.application.pk)
+
+
+@login_required
+def notifications_list(request):
+    user = request.user
+    if isinstance(user, Company):
+        notifications = user.notifications.all()
+    elif isinstance(user, Seeker):
+        notifications = user.notifications.all()
+    else:
+        notifications = Notification.objects.none()
+
+    context = {
+        'notifications': notifications,
+    }
+    return render(request, 'jobs/notifications.html', context)
+
+
+@login_required
+def mark_notification_read(request, pk):
+    if request.method != 'POST':
+        return redirect('notifications')
+
+    user = request.user
+    if isinstance(user, Company):
+        notification = get_object_or_404(Notification, pk=pk, recipient_company=user)
+    elif isinstance(user, Seeker):
+        notification = get_object_or_404(Notification, pk=pk, recipient_seeker=user)
+    else:
+        return redirect('home')
+
+    notification.is_read = True
+    notification.save(update_fields=['is_read'])
+    return redirect(notification.link or 'notifications')
+
+
+@login_required
+def mark_all_notifications_read(request):
+    if request.method != 'POST':
+        return redirect('notifications')
+
+    user = request.user
+    if isinstance(user, Company):
+        user.notifications.filter(is_read=False).update(is_read=True)
+    elif isinstance(user, Seeker):
+        user.notifications.filter(is_read=False).update(is_read=True)
+
+    messages.success(request, 'All notifications marked as read.')
+    return redirect('notifications')

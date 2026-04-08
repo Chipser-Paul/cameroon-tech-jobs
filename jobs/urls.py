@@ -10,5 +10,8 @@ urlpatterns = [
     path('applications/<int:pk>/conversation/', views.application_conversation, name='application_conversation'),
     path('applications/<int:pk>/schedule-interview/', views.schedule_interview, name='schedule_interview'),
     path('interviews/<int:pk>/respond/', views.respond_to_interview, name='respond_to_interview'),
+    path('notifications/', views.notifications_list, name='notifications'),
+    path('notifications/<int:pk>/read/', views.mark_notification_read, name='mark_notification_read'),
+    path('notifications/read-all/', views.mark_all_notifications_read, name='mark_all_notifications_read'),
     path('post-job/', views.post_job, name='post_job'),
 ]
