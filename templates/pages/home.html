@@ -1,180 +1,373 @@
 {% extends 'base.html' %}
 
-{% block title %}CameroonTechJobs - Find IT Jobs in Cameroon{% endblock %}
+{% block title %}CameroonTechJobs | Hire and Get Hired in Cameroon Tech{% endblock %}
+
+{% block extra_css %}
+<style>
+    .home-shell {
+        background:
+            radial-gradient(circle at top left, rgba(26, 122, 74, 0.18), transparent 36%),
+            radial-gradient(circle at top right, rgba(212, 165, 62, 0.16), transparent 28%),
+            linear-gradient(180deg, #f7f8f5 0%, #ffffff 24%, #f4f7f8 100%);
+    }
+    .hero-premium { padding: 4.5rem 0 3.5rem; }
+    .hero-panel {
+        background: linear-gradient(135deg, #0f1728 0%, #18213a 42%, #123126 100%);
+        border-radius: 30px;
+        overflow: hidden;
+        position: relative;
+        padding: 3.2rem;
+        box-shadow: 0 28px 70px rgba(11, 20, 35, 0.16);
+    }
+    .hero-panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(circle at 18% 22%, rgba(255,255,255,0.12), transparent 20%),
+            radial-gradient(circle at 82% 16%, rgba(212, 165, 62, 0.28), transparent 18%),
+            linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.04) 35%, transparent 60%);
+        pointer-events: none;
+    }
+    .hero-copy, .hero-rail { position: relative; z-index: 1; }
+    .hero-kicker {
+        display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.55rem 0.9rem;
+        border-radius: 999px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.9);
+        font-size: 0.82rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 1.2rem;
+    }
+    .hero-kicker i { color: #d4a53e; }
+    .hero-title-premium {
+        color: #fff; font-size: clamp(2.5rem, 5vw, 4.5rem); line-height: 0.98; font-weight: 800;
+        margin-bottom: 1.2rem; max-width: 11ch;
+    }
+    .hero-title-premium span { color: #9fe2b9; }
+    .hero-subtitle-premium {
+        color: rgba(255,255,255,0.78); font-size: 1.08rem; line-height: 1.8; max-width: 48rem; margin-bottom: 1.8rem;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 0.9rem; margin-bottom: 2rem; }
+    .btn-hero-primary, .btn-hero-secondary {
+        display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;
+        padding: 0.95rem 1.35rem; border-radius: 14px; font-weight: 700; text-decoration: none;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+    .btn-hero-primary { background: #1a7a4a; color: #fff; box-shadow: 0 16px 30px rgba(26, 122, 74, 0.28); }
+    .btn-hero-secondary { color: #fff; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); }
+    .btn-hero-primary:hover, .btn-hero-secondary:hover { transform: translateY(-2px); color: #fff; }
+    .hero-search-premium {
+        display: grid; grid-template-columns: 1.45fr 1fr auto; gap: 0.8rem; padding: 0.95rem; border-radius: 20px;
+        background: rgba(255,255,255,0.08); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 1.6rem;
+    }
+    .hero-search-premium input, .hero-search-premium select {
+        width: 100%; border: none; border-radius: 14px; padding: 0.95rem 1rem; background: rgba(255,255,255,0.98);
+        color: #162033; font-weight: 600;
+    }
+    .hero-search-premium button {
+        border: none; border-radius: 14px; padding: 0.95rem 1.25rem; background: #d4a53e; color: #152033; font-weight: 800;
+    }
+    .hero-proof-row { display: flex; flex-wrap: wrap; gap: 0.9rem; }
+    .hero-proof-pill {
+        display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 0.95rem; border-radius: 999px;
+        background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.88); font-size: 0.88rem; font-weight: 600;
+    }
+    .hero-proof-pill i { color: #9fe2b9; }
+    .hero-rail { display: grid; gap: 1rem; }
+    .hero-rail-card, .trust-card, .signal-card, .showcase-card, .process-card, .cta-panel {
+        border-radius: 22px; background: #fff; box-shadow: 0 18px 45px rgba(12, 28, 45, 0.08);
+    }
+    .hero-rail-card {
+        padding: 1.3rem; background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(8px);
+    }
+    .hero-rail-number { font-size: 2rem; font-weight: 800; color: #fff; line-height: 1; }
+    .hero-rail-label { color: rgba(255,255,255,0.72); font-size: 0.88rem; margin-top: 0.4rem; }
+    .mini-metric-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.9rem; }
+    .section-wrap { padding: 1.25rem 0 4.5rem; }
+    .section-header-premium {
+        display: flex; justify-content: space-between; align-items: end; gap: 1rem; margin-bottom: 1.8rem; flex-wrap: wrap;
+    }
+    .section-eyebrow { color: #1a7a4a; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 800; margin-bottom: 0.55rem; }
+    .section-title-premium { font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 800; color: #152033; margin: 0; }
+    .section-copy-premium { color: #607080; max-width: 42rem; margin: 0.5rem 0 0; line-height: 1.75; }
+    .trust-grid, .signal-grid, .process-grid { display: grid; gap: 1.2rem; }
+    .trust-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: -2rem; position: relative; z-index: 2; }
+    .trust-card { padding: 1.35rem; }
+    .trust-icon {
+        width: 46px; height: 46px; border-radius: 14px; background: var(--green-light); color: var(--green);
+        display: flex; align-items: center; justify-content: center; font-size: 1.1rem; margin-bottom: 1rem;
+    }
+    .trust-title { font-size: 1.02rem; font-weight: 800; color: #152033; margin-bottom: 0.45rem; }
+    .trust-copy { color: #667788; line-height: 1.7; font-size: 0.94rem; margin: 0; }
+    .signal-grid { grid-template-columns: 1.2fr 1fr; align-items: stretch; }
+    .signal-card { padding: 1.7rem; }
+    .signal-list { display: grid; gap: 1rem; margin-top: 1.4rem; }
+    .signal-item { display: grid; grid-template-columns: 44px 1fr; gap: 0.9rem; align-items: start; }
+    .signal-item-icon {
+        width: 44px; height: 44px; border-radius: 14px; background: rgba(26, 122, 74, 0.12); color: var(--green);
+        display: flex; align-items: center; justify-content: center;
+    }
+    .showcase-card {
+        padding: 1.7rem; background: linear-gradient(160deg, #132034 0%, #1b2745 100%); color: #fff; position: relative; overflow: hidden;
+    }
+    .showcase-card::before {
+        content: ""; position: absolute; inset: auto -12% -24% auto; width: 220px; height: 220px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(159, 226, 185, 0.38), transparent 70%);
+    }
+    .showcase-stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.9rem; margin-top: 1.2rem; }
+    .showcase-stat { padding: 1rem; border-radius: 18px; background: rgba(255,255,255,0.08); }
+    .showcase-stat strong { display: block; font-size: 1.7rem; font-weight: 800; line-height: 1; margin-bottom: 0.3rem; }
+    .job-grid-premium { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.2rem; }
+    .job-featured-shell, .category-shell, .process-shell { margin-top: 4.5rem; }
+    .job-spotlight-card {
+        display: block; padding: 1.4rem; border-radius: 22px; background: #fff; border: 1px solid rgba(16, 27, 45, 0.05);
+        box-shadow: 0 18px 40px rgba(12, 28, 45, 0.08); text-decoration: none; color: inherit;
+        transition: transform 0.18s ease, box-shadow 0.18s ease; height: 100%;
+    }
+    .job-spotlight-card:hover { transform: translateY(-4px); box-shadow: 0 24px 48px rgba(12, 28, 45, 0.12); color: inherit; }
+    .job-spotlight-top { display: flex; justify-content: space-between; align-items: start; gap: 0.8rem; margin-bottom: 1rem; }
+    .company-stack { display: flex; align-items: center; gap: 0.85rem; }
+    .company-stack img, .logo-fallback-premium { width: 52px; height: 52px; border-radius: 16px; object-fit: cover; }
+    .logo-fallback-premium {
+        background: linear-gradient(135deg, rgba(26, 122, 74, 0.16), rgba(16, 28, 46, 0.08));
+        color: var(--green); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem;
+    }
+    .job-spotlight-title { font-size: 1.08rem; font-weight: 800; color: #152033; margin-bottom: 0.2rem; }
+    .job-spotlight-company { color: #617282; font-size: 0.93rem; font-weight: 600; }
+    .job-spotlight-meta { display: flex; flex-wrap: wrap; gap: 0.8rem; color: #68798b; font-size: 0.88rem; margin-bottom: 1rem; }
+    .job-spotlight-footer { display: flex; justify-content: space-between; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+    .category-premium-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1rem; }
+    .category-premium-card {
+        display: block; padding: 1.2rem; border-radius: 20px; background: #fff; text-decoration: none; box-shadow: 0 18px 40px rgba(12, 28, 45, 0.07);
+        border: 1px solid rgba(16, 27, 45, 0.05); color: inherit; min-height: 170px;
+    }
+    .category-premium-card:hover { color: inherit; transform: translateY(-3px); }
+    .category-glyph {
+        width: 44px; height: 44px; border-radius: 14px; background: rgba(26, 122, 74, 0.12); color: var(--green);
+        display: flex; align-items: center; justify-content: center; margin-bottom: 0.95rem; font-weight: 800;
+    }
+    .process-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .process-card { padding: 1.55rem; }
+    .process-number {
+        width: 38px; height: 38px; border-radius: 50%; background: #152033; color: #fff; display: flex;
+        align-items: center; justify-content: center; font-weight: 800; margin-bottom: 1rem;
+    }
+    .cta-panel {
+        margin-top: 4.5rem; padding: 2.2rem; background: linear-gradient(135deg, #113227 0%, #1a7a4a 58%, #d4a53e 140%); color: #fff;
+    }
+    .cta-panel p { color: rgba(255,255,255,0.82); margin: 0.7rem 0 0; line-height: 1.75; max-width: 42rem; }
+    @media (max-width: 1199px) {
+        .trust-grid, .category-premium-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .signal-grid, .job-grid-premium, .process-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 991px) {
+        .hero-panel { padding: 2rem; }
+        .hero-search-premium { grid-template-columns: 1fr; }
+        .trust-grid { margin-top: 1.25rem; }
+    }
+    @media (max-width: 767px) {
+        .category-premium-grid, .trust-grid, .mini-metric-grid { grid-template-columns: 1fr; }
+        .hero-actions { flex-direction: column; }
+        .btn-hero-primary, .btn-hero-secondary { width: 100%; }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-
-<!-- HERO SECTION -->
-<section class="hero">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <h1 class="hero-title">
-                    Find Your Next <span>Tech Job</span><br>in Cameroon
-                </h1>
-                <p class="hero-subtitle">
-                    The #1 job board for IT & tech professionals in Cameroon.<br>
-                    Connect with top companies in Douala, Yaounde and beyond.
-                </p>
-
-                <form class="hero-search" method="GET" action="{% url 'job_list' %}">
-                    <input
-                        type="text"
-                        name="q"
-                        placeholder="Search jobs, skills, companies..."
-                        value="{{ request.GET.q }}"
-                    >
-                    <button type="submit">
-                        <i class="fas fa-search me-2"></i>Search Jobs
-                    </button>
-                </form>
-
-                <div class="hero-stats">
-                    <div class="hero-stat">
-                        <strong>{{ total_jobs }}</strong>
-                        Active Jobs
+<div class="home-shell">
+    <section class="hero-premium">
+        <div class="container">
+            <div class="hero-panel">
+                <div class="row g-4 align-items-center">
+                    <div class="col-xl-8 hero-copy">
+                        <div class="hero-kicker"><i class="fas fa-shield-alt"></i>Cameroon tech hiring, built for trust</div>
+                        <h1 class="hero-title-premium">Hire sharper. <span>Grow faster.</span> Build your team in Cameroon tech.</h1>
+                        <p class="hero-subtitle-premium">CameroonTechJobs helps employers post roles, review applicants, message talent, schedule interviews, and move hiring forward inside one focused platform.</p>
+                        <div class="hero-actions">
+                            <a href="{% url 'register' %}" class="btn-hero-primary"><i class="fas fa-building"></i>Post a Job</a>
+                            <a href="{% url 'job_list' %}" class="btn-hero-secondary"><i class="fas fa-briefcase"></i>Explore Open Roles</a>
+                        </div>
+                        <form class="hero-search-premium" method="GET" action="{% url 'job_list' %}">
+                            <input type="text" name="q" placeholder="Search job titles, stacks, or companies">
+                            <select name="location">
+                                <option value="">All Locations</option>
+                                <option value="douala">Douala</option>
+                                <option value="yaounde">Yaounde</option>
+                                <option value="buea">Buea</option>
+                                <option value="remote">Remote</option>
+                            </select>
+                            <button type="submit"><i class="fas fa-search me-2"></i>Search</button>
+                        </form>
+                        <div class="hero-proof-row">
+                            <div class="hero-proof-pill"><i class="fas fa-check-circle"></i>Focused on tech hiring</div>
+                            <div class="hero-proof-pill"><i class="fas fa-user-check"></i>Talent profiles and applications</div>
+                            <div class="hero-proof-pill"><i class="fas fa-comments"></i>Built-in employer messaging</div>
+                        </div>
                     </div>
-                    <div class="hero-stat">
-                        <strong>{{ total_companies }}</strong>
-                        Companies
+                    <div class="col-xl-4 hero-rail">
+                        <div class="mini-metric-grid">
+                            <div class="hero-rail-card"><div class="hero-rail-number">{{ total_jobs }}</div><div class="hero-rail-label">live roles on the platform</div></div>
+                            <div class="hero-rail-card"><div class="hero-rail-number">{{ total_companies }}</div><div class="hero-rail-label">companies building teams</div></div>
+                            <div class="hero-rail-card"><div class="hero-rail-number">{{ total_categories }}</div><div class="hero-rail-label">specialized tech categories</div></div>
+                            <div class="hero-rail-card"><div class="hero-rail-number">1</div><div class="hero-rail-label">place to post, review, message, schedule</div></div>
+                        </div>
+                        <div class="hero-rail-card">
+                            <div style="font-size:0.82rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#9fe2b9;margin-bottom:0.8rem;">Why employers like this workflow</div>
+                            <div style="display:grid;gap:0.85rem;">
+                                <div style="display:flex;gap:0.75rem;align-items:start;"><i class="fas fa-layer-group" style="color:#d4a53e;margin-top:0.2rem;"></i><div><div style="font-weight:700;">Cleaner hiring pipeline</div><div style="font-size:0.9rem;color:rgba(255,255,255,0.72);">Applications, conversations, and interviews stay linked to each job.</div></div></div>
+                                <div style="display:flex;gap:0.75rem;align-items:start;"><i class="fas fa-bell" style="color:#d4a53e;margin-top:0.2rem;"></i><div><div style="font-weight:700;">Less manual follow-up</div><div style="font-size:0.9rem;color:rgba(255,255,255,0.72);">Notifications keep both employers and candidates engaged.</div></div></div>
+                                <div style="display:flex;gap:0.75rem;align-items:start;"><i class="fas fa-star" style="color:#d4a53e;margin-top:0.2rem;"></i><div><div style="font-weight:700;">Built for Cameroon tech teams</div><div style="font-size:0.9rem;color:rgba(255,255,255,0.72);">More focused than a broad generic jobs board.</div></div></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="hero-stat">
-                        <strong>{{ total_categories }}</strong>
-                        Categories
+                </div>
+            </div>
+            <div class="trust-grid">
+                <div class="trust-card"><div class="trust-icon"><i class="fas fa-building-shield"></i></div><div class="trust-title">Employer-first credibility</div><p class="trust-copy">A hiring-focused experience that feels closer to a recruitment product than a basic classifieds board.</p></div>
+                <div class="trust-card"><div class="trust-icon"><i class="fas fa-user-tie"></i></div><div class="trust-title">Structured candidate review</div><p class="trust-copy">See applications, review talent profiles, update statuses, and keep a real shortlist process moving.</p></div>
+                <div class="trust-card"><div class="trust-icon"><i class="fas fa-comments"></i></div><div class="trust-title">Conversations in context</div><p class="trust-copy">Employers and candidates can message around a specific application instead of losing context in email threads.</p></div>
+                <div class="trust-card"><div class="trust-icon"><i class="fas fa-calendar-check"></i></div><div class="trust-title">Interview-ready workflow</div><p class="trust-copy">Schedule interviews and let candidates respond without leaving the platform.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-wrap">
+        <div class="container">
+            <div class="signal-grid">
+                <div class="signal-card">
+                    <div class="section-eyebrow">Built for hiring teams</div>
+                    <h2 class="section-title-premium">A stronger trust signal for companies</h2>
+                    <p class="section-copy-premium">The fastest way to make employers trust a platform is to make it feel operationally useful. CameroonTechJobs is starting to do that with internal applications, messaging, interviews, and hiring visibility.</p>
+                    <div class="signal-list">
+                        <div class="signal-item"><div class="signal-item-icon"><i class="fas fa-inbox"></i></div><div><div class="trust-title">Applications land inside the product</div><p class="trust-copy">Companies do not just post and wait. They receive applications in a reviewable workflow.</p></div></div>
+                        <div class="signal-item"><div class="signal-item-icon"><i class="fas fa-route"></i></div><div><div class="trust-title">Pipeline visibility</div><p class="trust-copy">Status tracking makes the platform feel managed, not passive.</p></div></div>
+                        <div class="signal-item"><div class="signal-item-icon"><i class="fas fa-bolt"></i></div><div><div class="trust-title">Local speed and relevance</div><p class="trust-copy">Focused categories and talent browsing keep the experience tailored to Cameroon tech hiring needs.</p></div></div>
+                    </div>
+                </div>
+                <div class="showcase-card">
+                    <div style="font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:#9fe2b9;font-weight:800;">Employer value snapshot</div>
+                    <h3 style="font-size:1.8rem;font-weight:800;margin:0.8rem 0 0.9rem;">From post to interview in one place</h3>
+                    <p style="color:rgba(255,255,255,0.8);line-height:1.8;margin:0;">Companies can already post jobs, receive applications, review candidates, message them, update statuses, and schedule interviews inside the platform.</p>
+                    <div class="showcase-stat-grid">
+                        <div class="showcase-stat"><strong>{{ total_jobs }}</strong><span>roles discoverable today</span></div>
+                        <div class="showcase-stat"><strong>{{ total_companies }}</strong><span>companies shaping demand</span></div>
+                        <div class="showcase-stat"><strong>{{ total_categories }}</strong><span>specialized tech lanes</span></div>
+                        <div class="showcase-stat"><strong>24/7</strong><span>self-serve job posting flow</span></div>
+                    </div>
+                </div>
+            </div>
+
+            {% if featured_jobs %}
+            <div class="job-featured-shell">
+                <div class="section-header-premium">
+                    <div>
+                        <div class="section-eyebrow">Featured opportunities</div>
+                        <h2 class="section-title-premium">High-visibility roles from serious hiring teams</h2>
+                        <p class="section-copy-premium">Premium listings help good roles stand out and make the marketplace feel active, selective, and credible.</p>
+                    </div>
+                </div>
+                <div class="job-grid-premium">
+                    {% for job in featured_jobs %}
+                    <a href="{% url 'job_detail' job.pk %}" class="job-spotlight-card">
+                        <div class="job-spotlight-top">
+                            <div class="company-stack">
+                                {% if job.company.logo %}<img src="{{ job.company.logo.url }}" alt="{{ job.company.company_name }}">{% else %}<div class="logo-fallback-premium">{{ job.company.company_name|first }}</div>{% endif %}
+                                <div><div class="job-spotlight-title">{{ job.title }}</div><div class="job-spotlight-company">{{ job.company.company_name }}</div></div>
+                            </div>
+                            <span class="featured-badge">Featured</span>
+                        </div>
+                        <div class="job-spotlight-meta">
+                            <span><i class="fas fa-map-marker-alt me-1"></i>{{ job.get_location_display }}</span>
+                            <span><i class="fas fa-clock me-1"></i>{{ job.days_ago }}</span>
+                            {% if job.salary_range %}<span><i class="fas fa-wallet me-1"></i>{{ job.salary_range }}</span>{% endif %}
+                        </div>
+                        <div class="job-spotlight-footer"><span class="job-type-badge">{{ job.get_job_type_display }}</span><span style="font-weight:700;color:var(--green);">View role</span></div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="job-featured-shell">
+                <div class="section-header-premium">
+                    <div>
+                        <div class="section-eyebrow">Latest roles</div>
+                        <h2 class="section-title-premium">Fresh opportunities across Cameroon tech</h2>
+                        <p class="section-copy-premium">A tighter, more curated stream of roles helps both employers and talent feel the platform is alive and worth checking often.</p>
+                    </div>
+                    <a href="{% url 'job_list' %}" class="btn-outline-green">View All Jobs</a>
+                </div>
+                <div class="job-grid-premium">
+                    {% for job in latest_jobs %}
+                    <a href="{% url 'job_detail' job.pk %}" class="job-spotlight-card">
+                        <div class="job-spotlight-top">
+                            <div class="company-stack">
+                                {% if job.company.logo %}<img src="{{ job.company.logo.url }}" alt="{{ job.company.company_name }}">{% else %}<div class="logo-fallback-premium">{{ job.company.company_name|first }}</div>{% endif %}
+                                <div><div class="job-spotlight-title">{{ job.title }}</div><div class="job-spotlight-company">{{ job.company.company_name }}</div></div>
+                            </div>
+                            {% if job.is_featured %}<span class="featured-badge">Featured</span>{% endif %}
+                        </div>
+                        <div class="job-spotlight-meta">
+                            <span><i class="fas fa-map-marker-alt me-1"></i>{{ job.get_location_display }}</span>
+                            <span><i class="fas fa-clock me-1"></i>{{ job.days_ago }}</span>
+                            {% if job.salary_range %}<span><i class="fas fa-wallet me-1"></i>{{ job.salary_range }}</span>{% endif %}
+                        </div>
+                        <div class="job-spotlight-footer"><span class="job-type-badge">{{ job.get_job_type_display }}</span><span style="font-weight:700;color:#152033;">Open details</span></div>
+                    </a>
+                    {% empty %}
+                    <div class="showcase-card" style="grid-column:1/-1;">
+                        <h3 style="font-size:1.8rem;font-weight:800;margin-bottom:0.6rem;">No jobs posted yet</h3>
+                        <p style="color:rgba(255,255,255,0.8);margin:0 0 1.2rem;">Be the first company to set the tone and publish a role on CameroonTechJobs.</p>
+                        <a href="{% url 'post_job' %}" class="btn-hero-primary" style="display:inline-flex;width:auto;"><i class="fas fa-plus"></i>Post a Job</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="category-shell">
+                <div class="section-header-premium">
+                    <div>
+                        <div class="section-eyebrow">Talent lanes</div>
+                        <h2 class="section-title-premium">Browse the categories companies are hiring in</h2>
+                        <p class="section-copy-premium">Clear specialization makes the platform feel more serious to employers and faster to navigate for candidates.</p>
+                    </div>
+                </div>
+                <div class="category-premium-grid">
+                    {% for category in categories %}
+                    <a href="{% url 'job_list' %}?category={{ category.slug }}" class="category-premium-card">
+                        <div class="category-glyph">{% if category.slug == 'web-development' %}WB{% elif category.slug == 'mobile-development' %}MB{% elif category.slug == 'networking-infrastructure' %}NW{% elif category.slug == 'data-analytics' %}DT{% elif category.slug == 'it-support' %}IT{% elif category.slug == 'cybersecurity' %}CS{% elif category.slug == 'software-engineering' %}SE{% elif category.slug == 'ui-ux-design' %}UX{% elif category.slug == 'database-administration' %}DB{% else %}TC{% endif %}</div>
+                        <div class="trust-title">{{ category.name }}</div>
+                        <p class="trust-copy" style="margin-top:0.4rem;">{{ category.jobs.count }} active role{{ category.jobs.count|pluralize }}</p>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="process-shell">
+                <div class="section-header-premium">
+                    <div>
+                        <div class="section-eyebrow">How it works</div>
+                        <h2 class="section-title-premium">A simpler employer journey</h2>
+                        <p class="section-copy-premium">The site becomes more trustworthy when the process is obvious. This keeps the value proposition clear for companies.</p>
+                    </div>
+                </div>
+                <div class="process-grid">
+                    <div class="process-card"><div class="process-number">1</div><div class="trust-title">Post the role</div><p class="trust-copy">Create the listing, choose the stack and category, and get your role in front of Cameroon tech talent.</p></div>
+                    <div class="process-card"><div class="process-number">2</div><div class="trust-title">Review and message applicants</div><p class="trust-copy">See who applied, update statuses, and talk to promising candidates directly in the platform.</p></div>
+                    <div class="process-card"><div class="process-number">3</div><div class="trust-title">Schedule interviews faster</div><p class="trust-copy">Invite candidates to interviews and keep the hiring conversation moving without losing context.</p></div>
+                </div>
+            </div>
+
+            <div class="cta-panel">
+                <div class="row g-3 align-items-center">
+                    <div class="col-lg-8">
+                        <div class="section-eyebrow" style="color:#ccefd8;">Ready to hire?</div>
+                        <h2 style="font-size:2.25rem;font-weight:800;margin:0;">Turn CameroonTechJobs into your recruiting front door.</h2>
+                        <p>Post your first role, attract focused tech talent, and manage the first stages of hiring in one place.</p>
+                    </div>
+                    <div class="col-lg-4 text-lg-end">
+                        <a href="{% url 'register' %}" class="btn-hero-secondary" style="display:inline-flex;"><i class="fas fa-building"></i>Create Company Account</a>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
-
-{% if featured_jobs %}
-<section class="py-5" style="background: var(--gold-light);">
-    <div class="container">
-        <h2 class="section-title">Featured Jobs</h2>
-        <p class="section-subtitle">Top opportunities from premium companies</p>
-        <div class="row g-4">
-            {% for job in featured_jobs %}
-            <div class="col-lg-6">
-                <a href="{% url 'job_detail' job.pk %}" class="job-card featured">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div class="d-flex align-items-center gap-3">
-                            {% if job.company.logo %}
-                                <img src="{{ job.company.logo.url }}" class="company-logo" alt="{{ job.company.company_name }}">
-                            {% else %}
-                                <div class="company-logo">{{ job.company.company_name|first }}</div>
-                            {% endif %}
-                            <div>
-                                <div class="job-title">{{ job.title }}</div>
-                                <div class="company-name">{{ job.company.company_name }}</div>
-                            </div>
-                        </div>
-                        <span class="featured-badge">Featured</span>
-                    </div>
-                    <div class="job-meta mb-3">
-                        <span><i class="fas fa-map-marker-alt"></i>{{ job.get_location_display }}</span>
-                        <span><i class="fas fa-clock"></i>{{ job.days_ago }}</span>
-                        {% if job.salary_range %}
-                        <span><i class="fas fa-money-bill"></i>{{ job.salary_range }}</span>
-                        {% endif %}
-                    </div>
-                    <span class="job-type-badge">{{ job.get_job_type_display }}</span>
-                </a>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-{% endif %}
-
-<section class="py-5">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h2 class="section-title">Latest Jobs</h2>
-                <p class="section-subtitle mb-0">Fresh opportunities posted recently</p>
-            </div>
-            <a href="{% url 'job_list' %}" class="btn-outline-green">View All Jobs</a>
-        </div>
-        <div class="row g-4">
-            {% for job in latest_jobs %}
-            <div class="col-lg-6">
-                <a href="{% url 'job_detail' job.pk %}" class="job-card">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        {% if job.company.logo %}
-                            <img src="{{ job.company.logo.url }}" class="company-logo" alt="{{ job.company.company_name }}">
-                        {% else %}
-                            <div class="company-logo">{{ job.company.company_name|first }}</div>
-                        {% endif %}
-                        <div>
-                            <div class="job-title">{{ job.title }}</div>
-                            <div class="company-name">{{ job.company.company_name }}</div>
-                        </div>
-                    </div>
-                    <div class="job-meta mb-3">
-                        <span><i class="fas fa-map-marker-alt"></i>{{ job.get_location_display }}</span>
-                        <span><i class="fas fa-clock"></i>{{ job.days_ago }}</span>
-                        {% if job.salary_range %}
-                        <span><i class="fas fa-money-bill"></i>{{ job.salary_range }}</span>
-                        {% endif %}
-                    </div>
-                    <span class="job-type-badge">{{ job.get_job_type_display }}</span>
-                </a>
-            </div>
-            {% empty %}
-            <div class="col-12 text-center py-5">
-                <i class="fas fa-briefcase fa-3x mb-3" style="color: var(--green); opacity:0.3;"></i>
-                <h5 class="text-muted">No jobs posted yet</h5>
-                <p class="text-muted">Be the first company to post a job!</p>
-                <a href="{% url 'post_job' %}" class="btn-green mt-2">Post a Job</a>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-
-<section class="py-5" style="background: var(--light-gray);">
-    <div class="container">
-        <h2 class="section-title text-center">Browse by Category</h2>
-        <p class="section-subtitle text-center">Find jobs in your area of expertise</p>
-        <div class="row g-3">
-            {% for category in categories %}
-            <div class="col-lg-2 col-md-3 col-6">
-                <a href="{% url 'job_list' %}?category={{ category.slug }}" class="category-card">
-                    <div class="category-icon">
-                        {% if category.slug == 'web-development' %}[Web]
-                        {% elif category.slug == 'mobile-development' %}[Mobile]
-                        {% elif category.slug == 'networking-infrastructure' %}[Network]
-                        {% elif category.slug == 'data-analytics' %}[Data]
-                        {% elif category.slug == 'it-support' %}[Support]
-                        {% elif category.slug == 'cybersecurity' %}[Security]
-                        {% elif category.slug == 'software-engineering' %}[Code]
-                        {% elif category.slug == 'ui-ux-design' %}[Design]
-                        {% elif category.slug == 'database-administration' %}[DB]
-                        {% else %}[Tech]
-                        {% endif %}
-                    </div>
-                    <div class="category-name">{{ category.name }}</div>
-                    <div class="category-count">{{ category.jobs.count }} jobs</div>
-                </a>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-
-<section class="py-5" style="background: var(--green);">
-    <div class="container text-center">
-        <h2 style="color:white; font-weight:800; font-size:2rem;">
-            Hiring IT Talent in Cameroon?
-        </h2>
-        <p style="color:rgba(255,255,255,0.85); font-size:1.1rem;" class="mt-2 mb-4">
-            Post your first job for free. Reach thousands of qualified tech professionals.
-        </p>
-        <a href="{% url 'register' %}" class="btn-outline-green" style="border-color:white; color:white;">
-            <i class="fas fa-building me-2"></i>Post a Job - First One Free
-        </a>
-    </div>
-</section>
-
+    </section>
+</div>
 {% endblock %}

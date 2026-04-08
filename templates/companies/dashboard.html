@@ -1,193 +1,223 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard — CameroonTechJobs{% endblock %}
+{% block title %}Company Dashboard | CameroonTechJobs{% endblock %}
+
+{% block extra_css %}
+<style>
+    .employer-shell {
+        background:
+            radial-gradient(circle at top right, rgba(26, 122, 74, 0.12), transparent 26%),
+            linear-gradient(180deg, #f8faf8 0%, #ffffff 20%, #f6f8fb 100%);
+    }
+    .dashboard-hero-pro { padding: 2.6rem 0 2rem; }
+    .dashboard-hero-panel {
+        background: linear-gradient(135deg, #152033 0%, #18243d 52%, #15412f 100%);
+        border-radius: 28px; padding: 2.4rem; color: #fff; box-shadow: 0 24px 56px rgba(12, 28, 45, 0.14);
+        position: relative; overflow: hidden;
+    }
+    .dashboard-hero-panel::before {
+        content: ""; position: absolute; inset: 0;
+        background: radial-gradient(circle at 86% 18%, rgba(212,165,62,0.26), transparent 16%), radial-gradient(circle at 12% 86%, rgba(159,226,185,0.18), transparent 18%);
+        pointer-events: none;
+    }
+    .dashboard-hero-panel > * { position: relative; z-index: 1; }
+    .dashboard-kicker {
+        display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.8rem; border-radius: 999px;
+        background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.88); font-size: 0.8rem; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1rem;
+    }
+    .dashboard-kicker i { color: #d4a53e; }
+    .dashboard-title-pro { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; line-height: 1.03; margin-bottom: 0.85rem; }
+    .dashboard-subtitle-pro { color: rgba(255,255,255,0.74); line-height: 1.8; max-width: 44rem; margin: 0; }
+    .hero-action-row { display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: flex-end; }
+    .hero-outline-btn, .hero-solid-btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 0.55rem;
+        padding: 0.9rem 1.2rem; border-radius: 14px; text-decoration: none; font-weight: 700;
+    }
+    .hero-outline-btn { border: 1px solid rgba(255,255,255,0.2); color: #fff; background: rgba(255,255,255,0.06); }
+    .hero-solid-btn { color: #152033; background: #d4a53e; }
+    .pro-stat-grid {
+        display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1rem; margin-top: -1.1rem; position: relative; z-index: 2;
+    }
+    .pro-stat-card, .table-card-pro, .profile-card-pro, .notice-card-pro {
+        border-radius: 22px; background: #fff; box-shadow: 0 18px 42px rgba(12, 28, 45, 0.08); border: 1px solid rgba(15, 23, 36, 0.05);
+    }
+    .pro-stat-card { padding: 1.3rem; }
+    .pro-stat-label { color: #6a7d8f; font-size: 0.84rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 800; margin-bottom: 0.55rem; }
+    .pro-stat-value { font-size: 2rem; font-weight: 800; line-height: 1; color: #152033; }
+    .pro-stat-note { margin-top: 0.45rem; font-size: 0.88rem; color: #778a9b; }
+    .dashboard-main { padding: 2rem 0 4rem; }
+    .notice-card-pro { padding: 1.15rem 1.25rem; margin-bottom: 1.4rem; }
+    .table-card-pro { padding: 1.5rem; }
+    .section-head-pro {
+        display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 0.9rem; margin-bottom: 1.25rem;
+    }
+    .section-title-pro { margin: 0; font-size: 1.35rem; font-weight: 800; color: #152033; }
+    .section-note-pro { color: #738698; margin: 0.35rem 0 0; line-height: 1.7; }
+    .dashboard-table-pro { width: 100%; border-collapse: separate; border-spacing: 0 0.7rem; }
+    .dashboard-table-pro thead th {
+        color: #7a8d9e; font-size: 0.79rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 800; padding: 0 0.8rem 0.3rem;
+    }
+    .dashboard-table-pro tbody tr { background: #f8fafc; box-shadow: inset 0 0 0 1px rgba(18, 30, 48, 0.05); }
+    .dashboard-table-pro tbody td { padding: 1rem 0.8rem; vertical-align: middle; }
+    .dashboard-table-pro tbody tr td:first-child { border-radius: 16px 0 0 16px; }
+    .dashboard-table-pro tbody tr td:last-child { border-radius: 0 16px 16px 0; }
+    .job-title-link-pro { color: #152033; text-decoration: none; font-weight: 800; }
+    .job-title-link-pro:hover { color: var(--green); }
+    .applicant-pill {
+        display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.8rem; border-radius: 999px;
+        background: rgba(26, 122, 74, 0.1); color: var(--green); text-decoration: none; font-weight: 700; font-size: 0.84rem;
+    }
+    .profile-grid-pro { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 1.2rem; margin-top: 1.4rem; }
+    .profile-card-pro { padding: 1.5rem; }
+    .company-profile-head { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.1rem; }
+    .company-profile-head img, .company-profile-fallback { width: 66px; height: 66px; border-radius: 18px; object-fit: cover; }
+    .company-profile-fallback {
+        background: linear-gradient(135deg, rgba(26, 122, 74, 0.16), rgba(15, 23, 36, 0.08));
+        color: var(--green); display: flex; align-items: center; justify-content: center; font-size: 1.35rem; font-weight: 800;
+    }
+    .info-list-pro { display: grid; gap: 0.7rem; }
+    .info-line-pro { display: flex; gap: 0.7rem; align-items: start; color: #586b7d; line-height: 1.7; font-size: 0.94rem; }
+    .info-line-pro i { color: var(--green); margin-top: 0.22rem; }
+    @media (max-width: 1199px) {
+        .pro-stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .profile-grid-pro { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 767px) {
+        .dashboard-hero-panel { padding: 1.5rem; }
+        .pro-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 1rem; }
+        .hero-action-row { justify-content: start; }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-
-<section class="page-hero">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div>
-                <h1>Welcome, {{ user.company_name }} 👋</h1>
-                <p style="color:rgba(255,255,255,0.75);margin:0;">Manage your job listings from here.</p>
-            </div>
-            <a href="{% url 'post_job' %}" class="btn-outline-green" style="border-color:white;color:white;">
-                <i class="fas fa-plus me-2"></i>Post a New Job
-            </a>
-        </div>
-    </div>
-</section>
-
-<section class="py-5">
-    <div class="container">
-
-        <!-- STATS -->
-        <div class="row g-4 mb-5">
-            <div class="col-6 col-md-3">
-                <div class="stat-card">
-                    <div class="stat-number">{{ total_jobs }}</div>
-                    <div class="stat-label">Total Listings</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="stat-card" style="border-left-color:#0f5132;">
-                    <div class="stat-number" style="color:#0f5132;">{{ active_jobs }}</div>
-                    <div class="stat-label">Active Jobs</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="stat-card" style="border-left-color:#856404;">
-                    <div class="stat-number" style="color:#856404;">{{ pending_jobs }}</div>
-                    <div class="stat-label">Pending Approval</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="stat-card" style="border-left-color:#0d6efd;">
-                    <div class="stat-number" style="color:#0d6efd;">{{ total_views }}</div>
-                    <div class="stat-label">Total Views</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="stat-card" style="border-left-color:#6f42c1;">
-                    <div class="stat-number" style="color:#6f42c1;">{{ total_applicants }}</div>
-                    <div class="stat-label">Applicants</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- FREE LISTING NOTICE -->
-        {% if not user.has_used_free_listing %}
-        <div class="alert mb-4" style="background:var(--green-light);border:1.5px solid var(--green);border-radius:12px;color:var(--green-dark);">
-            <i class="fas fa-gift me-2"></i>
-            <strong>You have a free job listing available!</strong>
-            <a href="{% url 'post_job' %}" style="color:var(--green-dark);font-weight:700;margin-left:0.5rem;">Post it now →</a>
-        </div>
-        {% else %}
-        <div class="alert mb-4" style="background:var(--gold-light);border:1.5px solid var(--gold);border-radius:12px;color:#856404;">
-            <i class="fas fa-info-circle me-2"></i>
-            <strong>Your free listing has been used.</strong>
-            Future listings cost 5,000 XAF (Basic) or 15,000 XAF (Featured).
-            <a href="{% url 'payment_info' %}" style="color:#856404;font-weight:700;margin-left:0.5rem;">See payment info →</a>
-        </div>
-        {% endif %}
-
-        <!-- JOB LISTINGS TABLE -->
-        <div class="form-card">
-            <h5 style="font-weight:800;margin-bottom:1.5rem;">Your Job Listings</h5>
-
-            {% if jobs %}
-            <div class="table-responsive">
-                <table class="table" style="font-size:0.9rem;">
-                    <thead style="background:var(--light-gray);">
-                        <tr>
-                            <th style="padding:1rem;font-weight:700;">Job Title</th>
-                            <th style="padding:1rem;font-weight:700;">Category</th>
-                            <th style="padding:1rem;font-weight:700;">Location</th>
-                            <th style="padding:1rem;font-weight:700;">Plan</th>
-                            <th style="padding:1rem;font-weight:700;">Status</th>
-                            <th style="padding:1rem;font-weight:700;">Views</th>
-                            <th style="padding:1rem;font-weight:700;">Applicants</th>
-                            <th style="padding:1rem;font-weight:700;">Posted</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for job in jobs %}
-                        <tr style="border-bottom:1px solid #f0f0f0;">
-                            <td style="padding:1rem;">
-                                <a href="{% url 'job_detail' job.pk %}" style="color:var(--dark);font-weight:600;text-decoration:none;">
-                                    {{ job.title }}
-                                </a>
-                                {% if job.is_featured %}
-                                <span class="featured-badge ms-1">Featured</span>
-                                {% endif %}
-                            </td>
-                            <td style="padding:1rem;color:var(--gray);">{{ job.category.name|default:"—" }}</td>
-                            <td style="padding:1rem;color:var(--gray);">{{ job.get_location_display }}</td>
-                            <td style="padding:1rem;">
-                                <span style="font-size:0.8rem;font-weight:600;color:var(--green);">
-                                    {{ job.get_plan_display }}
-                                </span>
-                            </td>
-                            <td style="padding:1rem;">
-                                <span class="status-badge status-{{ job.status }}">
-                                    {{ job.get_status_display }}
-                                </span>
-                            </td>
-                            <td style="padding:1rem;color:var(--gray);">{{ job.views_count }}</td>
-                            <td style="padding:1rem;">
-                                <a href="{% url 'job_applicants' job.pk %}" style="color:var(--green);font-weight:700;text-decoration:none;">
-                                    {{ job.applicant_count }} applicant{{ job.applicant_count|pluralize }}
-                                </a>
-                            </td>
-                            <td style="padding:1rem;color:var(--gray);">{{ job.date_posted|date:"M d, Y" }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <div class="text-center py-5">
-                <i class="fas fa-briefcase fa-3x mb-3" style="color:var(--green);opacity:0.3;"></i>
-                <h5 class="text-muted">No job listings yet</h5>
-                <p class="text-muted">Post your first job for free and start finding talent!</p>
-                <a href="{% url 'post_job' %}" class="btn-green mt-2">
-                    <i class="fas fa-plus me-2"></i>Post Your First Job
-                </a>
-            </div>
-            {% endif %}
-        </div>
-
-        <!-- COMPANY PROFILE CARD -->
-        <div class="row g-4 mt-2">
-            <div class="col-lg-6">
-                <div class="form-card">
-                    <h6 style="font-weight:800;margin-bottom:1rem;">Company Profile</h6>
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        {% if user.logo %}
-                            <img src="{{ user.logo.url }}" style="width:60px;height:60px;border-radius:10px;object-fit:cover;" alt="">
-                        {% else %}
-                            <div class="company-logo" style="width:60px;height:60px;font-size:1.5rem;">
-                                {{ user.company_name|first }}
-                            </div>
-                        {% endif %}
-                        <div>
-                            <div style="font-weight:700;font-size:1.1rem;">{{ user.company_name }}</div>
-                            <div style="color:var(--gray);font-size:0.9rem;">{{ user.email }}</div>
+<div class="employer-shell">
+    <section class="dashboard-hero-pro">
+        <div class="container">
+            <div class="dashboard-hero-panel">
+                <div class="row g-4 align-items-center">
+                    <div class="col-lg-8">
+                        <div class="dashboard-kicker"><i class="fas fa-chart-line"></i>Employer workspace</div>
+                        <h1 class="dashboard-title-pro">Manage hiring with more clarity, speed, and confidence.</h1>
+                        <p class="dashboard-subtitle-pro">This workspace gives your company a cleaner view of listings, applicants, and pipeline activity so the platform feels like a real recruiting tool, not just a place to post jobs.</p>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="hero-action-row">
+                            <a href="{% url 'post_job' %}" class="hero-solid-btn"><i class="fas fa-plus"></i>Post a New Job</a>
+                            <a href="{% url 'payment_info' %}" class="hero-outline-btn"><i class="fas fa-wallet"></i>Payment Info</a>
                         </div>
                     </div>
-                    {% if user.phone %}
-                    <div style="font-size:0.9rem;color:var(--gray);margin-bottom:0.5rem;">
-                        <i class="fas fa-phone me-2"></i>{{ user.phone }}
-                    </div>
-                    {% endif %}
-                    {% if user.location %}
-                    <div style="font-size:0.9rem;color:var(--gray);margin-bottom:0.5rem;">
-                        <i class="fas fa-map-marker-alt me-2"></i>{{ user.location }}
-                    </div>
-                    {% endif %}
-                    {% if user.website %}
-                    <div style="font-size:0.9rem;margin-bottom:0.5rem;">
-                        <i class="fas fa-globe me-2" style="color:var(--green);"></i>
-                        <a href="{{ user.website }}" target="_blank" style="color:var(--green);">{{ user.website }}</a>
-                    </div>
-                    {% endif %}
                 </div>
             </div>
+            <div class="pro-stat-grid">
+                <div class="pro-stat-card"><div class="pro-stat-label">Total listings</div><div class="pro-stat-value">{{ total_jobs }}</div><div class="pro-stat-note">all roles created by your company</div></div>
+                <div class="pro-stat-card"><div class="pro-stat-label">Active jobs</div><div class="pro-stat-value" style="color:#0f5132;">{{ active_jobs }}</div><div class="pro-stat-note">currently discoverable by candidates</div></div>
+                <div class="pro-stat-card"><div class="pro-stat-label">Pending approval</div><div class="pro-stat-value" style="color:#856404;">{{ pending_jobs }}</div><div class="pro-stat-note">waiting for activation review</div></div>
+                <div class="pro-stat-card"><div class="pro-stat-label">Profile views</div><div class="pro-stat-value" style="color:#0d6efd;">{{ total_views }}</div><div class="pro-stat-note">traffic generated across your roles</div></div>
+                <div class="pro-stat-card"><div class="pro-stat-label">Applicants</div><div class="pro-stat-value" style="color:#6f42c1;">{{ total_applicants }}</div><div class="pro-stat-note">people currently in your pipeline</div></div>
+            </div>
+        </div>
+    </section>
 
-            <div class="col-lg-6">
-                <div class="form-card">
-                    <h6 style="font-weight:800;margin-bottom:1rem;">Payment Information</h6>
-                    <p style="font-size:0.9rem;color:var(--gray);">
-                        After your free listing, pay for future job posts using Mobile Money or bank transfer.
-                    </p>
-                    <a href="{% url 'payment_info' %}" class="btn-outline-green" style="font-size:0.9rem;padding:0.5rem 1.2rem;">
-                        <i class="fas fa-money-bill me-2"></i>View Payment Details
-                    </a>
+    <section class="dashboard-main">
+        <div class="container">
+            {% if not user.has_used_free_listing %}
+            <div class="notice-card-pro" style="background:linear-gradient(135deg, rgba(26,122,74,0.1), rgba(159,226,185,0.12));">
+                <div style="display:flex;justify-content:space-between;gap:1rem;align-items:center;flex-wrap:wrap;">
+                    <div><div class="section-title-pro" style="font-size:1.05rem;">Your first listing is still available</div><p class="section-note-pro">Use your free post to test the platform and start receiving applicants quickly.</p></div>
+                    <a href="{% url 'post_job' %}" class="btn-green"><i class="fas fa-gift me-2"></i>Use Free Listing</a>
+                </div>
+            </div>
+            {% else %}
+            <div class="notice-card-pro" style="background:linear-gradient(135deg, rgba(212,165,62,0.14), rgba(255,248,220,0.7));">
+                <div style="display:flex;justify-content:space-between;gap:1rem;align-items:center;flex-wrap:wrap;">
+                    <div><div class="section-title-pro" style="font-size:1.05rem;">Ready for your next hiring campaign</div><p class="section-note-pro">Basic and featured listings help your next openings stand out more strongly to top talent.</p></div>
+                    <a href="{% url 'payment_info' %}" class="btn-outline-green"><i class="fas fa-arrow-right me-2"></i>See Pricing Options</a>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="table-card-pro">
+                <div class="section-head-pro">
+                    <div>
+                        <h2 class="section-title-pro">Your hiring pipeline</h2>
+                        <p class="section-note-pro">A sharper view of each listing makes the whole platform feel more dependable to employers.</p>
+                    </div>
+                    <a href="{% url 'post_job' %}" class="btn-outline-green">Add another role</a>
+                </div>
+                {% if jobs %}
+                <div class="table-responsive">
+                    <table class="dashboard-table-pro">
+                        <thead>
+                            <tr>
+                                <th>Job</th>
+                                <th>Category</th>
+                                <th>Location</th>
+                                <th>Plan</th>
+                                <th>Status</th>
+                                <th>Views</th>
+                                <th>Applicants</th>
+                                <th>Posted</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job in jobs %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'job_detail' job.pk %}" class="job-title-link-pro">{{ job.title }}</a>
+                                    {% if job.is_featured %}<div style="margin-top:0.35rem;"><span class="featured-badge">Featured</span></div>{% endif %}
+                                </td>
+                                <td style="color:#5e7082;">{{ job.category.name|default:"Uncategorized" }}</td>
+                                <td style="color:#5e7082;">{{ job.get_location_display }}</td>
+                                <td><span style="font-size:0.82rem;font-weight:800;color:var(--green);">{{ job.get_plan_display }}</span></td>
+                                <td><span class="status-badge status-{{ job.status }}">{{ job.get_status_display }}</span></td>
+                                <td style="font-weight:700;color:#152033;">{{ job.views_count }}</td>
+                                <td><a href="{% url 'job_applicants' job.pk %}" class="applicant-pill"><i class="fas fa-users"></i>{{ job.applicant_count }}</a></td>
+                                <td style="color:#5e7082;">{{ job.date_posted|date:"M d, Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div style="text-align:center;padding:3rem 1rem;">
+                    <i class="fas fa-briefcase fa-3x mb-3" style="color:var(--green);opacity:0.22;"></i>
+                    <h5 style="font-weight:800;">No job listings yet</h5>
+                    <p style="color:#728395;">Create your first role and start building a more credible employer presence on the platform.</p>
+                    <a href="{% url 'post_job' %}" class="btn-green"><i class="fas fa-plus me-2"></i>Post Your First Job</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="profile-grid-pro">
+                <div class="profile-card-pro">
+                    <div class="section-head-pro" style="margin-bottom:1rem;">
+                        <div><h2 class="section-title-pro">Company profile</h2><p class="section-note-pro">Strong employer profiles help candidates trust listings faster.</p></div>
+                    </div>
+                    <div class="company-profile-head">
+                        {% if user.logo %}<img src="{{ user.logo.url }}" alt="{{ user.company_name }}">{% else %}<div class="company-profile-fallback">{{ user.company_name|first }}</div>{% endif %}
+                        <div><div style="font-size:1.15rem;font-weight:800;color:#152033;">{{ user.company_name }}</div><div style="color:#738698;">{{ user.email }}</div></div>
+                    </div>
+                    <div class="info-list-pro">
+                        {% if user.phone %}<div class="info-line-pro"><i class="fas fa-phone"></i><span>{{ user.phone }}</span></div>{% endif %}
+                        {% if user.location %}<div class="info-line-pro"><i class="fas fa-map-marker-alt"></i><span>{{ user.location }}</span></div>{% endif %}
+                        {% if user.website %}<div class="info-line-pro"><i class="fas fa-globe"></i><a href="{{ user.website }}" target="_blank" style="color:var(--green);text-decoration:none;">{{ user.website }}</a></div>{% endif %}
+                    </div>
+                </div>
+                <div class="profile-card-pro">
+                    <div class="section-head-pro" style="margin-bottom:1rem;">
+                        <div><h2 class="section-title-pro">Upgrade the trust signal</h2><p class="section-note-pro">The more polished your hiring presence feels, the more candidates take your roles seriously.</p></div>
+                    </div>
+                    <div class="info-list-pro">
+                        <div class="info-line-pro"><i class="fas fa-star"></i><span>Use featured listings when a role needs stronger visibility.</span></div>
+                        <div class="info-line-pro"><i class="fas fa-comments"></i><span>Respond quickly to applicants to keep momentum high.</span></div>
+                        <div class="info-line-pro"><i class="fas fa-calendar-check"></i><span>Use interview scheduling to keep the process professional.</span></div>
+                    </div>
+                    <a href="{% url 'payment_info' %}" class="btn-green" style="margin-top:1.2rem;"><i class="fas fa-wallet me-2"></i>View Hiring Plans</a>
                 </div>
             </div>
         </div>
-
-    </div>
-</section>
-
+    </section>
+</div>
 {% endblock %}
