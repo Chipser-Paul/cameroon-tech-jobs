@@ -86,7 +86,7 @@
     }
 
     .navbar-nav.ms-auto {
-        gap: 0.3rem;
+        gap: 0.45rem;
     }
 
     .nav-user-shell {
@@ -95,9 +95,10 @@
         gap: 0.55rem;
         padding: 0.72rem 0.95rem;
         border-radius: 14px;
-        background: rgba(17, 29, 45, 0.04);
+        background: linear-gradient(135deg, rgba(17, 29, 45, 0.045), rgba(26, 122, 74, 0.04));
         color: #223448;
         font-weight: 800;
+        border: 1px solid rgba(17, 29, 45, 0.05);
     }
 
     .nav-user-shell i {
@@ -110,6 +111,11 @@
         gap: 0.45rem;
         padding: 0.72rem 0.92rem;
         border-radius: 14px;
+        border: 1px solid transparent;
+    }
+
+    .nav-ghost-link:hover {
+        border-color: rgba(26, 122, 74, 0.1);
     }
 
     .nav-divider {

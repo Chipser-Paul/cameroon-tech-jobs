@@ -1,126 +1,111 @@
 {% extends 'base.html' %}
 
-{% block title %}Join as Job Seeker — CameroonTechJobs{% endblock %}
+{% block title %}Join as Job Seeker | CameroonTechJobs{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-shell { background: linear-gradient(180deg, #f8faf9 0%, #ffffff 24%, #f5f8fb 100%); }
+    .auth-wrap { padding: 2.8rem 0 4rem; }
+    .auth-panel { border-radius: 30px; overflow: hidden; background: #fff; box-shadow: 0 28px 60px rgba(13, 29, 46, 0.12); border: 1px solid rgba(17, 29, 45, 0.05); }
+    .auth-side { background: linear-gradient(135deg, #152033 0%, #1c2845 52%, #144332 100%); color: #fff; padding: 2.35rem; height: 100%; position: relative; overflow: hidden; }
+    .auth-side::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 82% 18%, rgba(212,165,62,0.24), transparent 16%), radial-gradient(circle at 18% 84%, rgba(159,226,185,0.18), transparent 18%); pointer-events: none; }
+    .auth-side > * { position: relative; z-index: 1; }
+    .auth-kicker { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.42rem 0.72rem; border-radius: 999px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.88); font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.95rem; }
+    .auth-kicker i { color: #d4a53e; }
+    .auth-side-title { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; line-height: 1.05; margin-bottom: 0.85rem; }
+    .auth-side-copy { color: rgba(255,255,255,0.78); line-height: 1.8; }
+    .auth-benefits { display: grid; gap: 0.85rem; margin-top: 1.5rem; }
+    .auth-benefit { display: flex; gap: 0.7rem; align-items: start; color: rgba(255,255,255,0.82); line-height: 1.7; }
+    .auth-benefit i { color: #9fe2b9; margin-top: 0.2rem; }
+    .auth-form-wrap { padding: 2.2rem; }
+    .auth-form-title { font-size: 1.45rem; font-weight: 800; color: #152033; margin-bottom: 0.45rem; }
+    .auth-form-copy { color: #728496; line-height: 1.75; margin-bottom: 1.35rem; }
+</style>
+{% endblock %}
 
 {% block content %}
+<div class="auth-shell">
+    <section class="auth-wrap">
+        <div class="container">
+            <div class="auth-panel">
+                <div class="row g-0">
+                    <div class="col-lg-5">
+                        <div class="auth-side">
+                            <div class="auth-kicker"><i class="fas fa-user-plus"></i>Seeker Onboarding</div>
+                            <h1 class="auth-side-title">Build a profile that companies can trust quickly.</h1>
+                            <p class="auth-side-copy">Join for free, show your skills, get matched with opportunities, and manage recruiter conversations in one place.</p>
+                            <div class="auth-benefits">
+                                <div class="auth-benefit"><i class="fas fa-check-circle"></i><span>Free forever for job seekers</span></div>
+                                <div class="auth-benefit"><i class="fas fa-check-circle"></i><span>Show your GitHub, portfolio, and experience clearly</span></div>
+                                <div class="auth-benefit"><i class="fas fa-check-circle"></i><span>Track applications, messages, and interviews in one dashboard</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7">
+                        <div class="auth-form-wrap">
+                            <div class="auth-form-title">Create Your Profile</div>
+                            <p class="auth-form-copy">Start with the basics now, then complete your full profile after signup to improve your visibility to employers.</p>
 
-<section class="page-hero">
-    <div class="container text-center">
-        <h1>Create Your Profile</h1>
-        <p style="color:rgba(255,255,255,0.75);">Join thousands of IT professionals finding jobs in Cameroon.</p>
-    </div>
-</section>
-
-<section class="py-5">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-6">
-
-                <div class="alert mb-4" style="background:var(--green-light);border:1.5px solid var(--green);border-radius:12px;color:var(--green-dark);">
-                    <i class="fas fa-user-check me-2"></i>
-                    <strong>Free forever for job seekers!</strong> Create your profile and get discovered by top companies.
-                </div>
-
-                <div class="form-card">
-                    <h4 style="font-weight:800;margin-bottom:1.5rem;">Your Information</h4>
-
-                    <form method="POST">
-                        {% csrf_token %}
-
-                        {% if form.errors %}
-                        <div class="alert alert-danger border-0" style="border-radius:10px;">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            <strong>Please fix the following:</strong>
-                            <ul class="mb-0 mt-2">
-                                {% for field in form %}
-                                    {% for error in field.errors %}
-                                    <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                            {% if form.errors %}
+                            <div class="alert alert-danger border-0" style="border-radius:14px;">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                <strong>Please fix the following:</strong>
+                                <ul class="mb-0 mt-2">
+                                    {% for field in form %}
+                                        {% for error in field.errors %}
+                                        <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                                        {% endfor %}
                                     {% endfor %}
-                                {% endfor %}
-                                {% for error in form.non_field_errors %}
-                                <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                        {% endif %}
+                                    {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
 
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label class="form-label">Full Name *</label>
-                                {{ form.full_name }}
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Email *</label>
-                                {{ form.email }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Phone</label>
-                                {{ form.phone }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Location</label>
-                                {{ form.location }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Password *</label>
-                                {{ form.password1 }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Confirm Password *</label>
-                                {{ form.password2 }}
-                            </div>
-                            <div class="col-12 mt-2">
-                                <button type="submit" class="btn-green w-100" style="padding:0.9rem;">
-                                    <i class="fas fa-user-plus me-2"></i>Create My Profile
-                                </button>
-                            </div>
-                            <div class="col-12 text-center">
-                                <span style="color:var(--gray);font-size:0.9rem;">
-                                    Already have an account?
-                                    <a href="{% url 'seeker_login' %}" style="color:var(--green);font-weight:600;">Login here</a>
-                                </span>
-                            </div>
-                            <div class="col-12 text-center">
-                                <span style="color:var(--gray);font-size:0.9rem;">
-                                    Are you a company?
-                                    <a href="{% url 'register' %}" style="color:var(--green);font-weight:600;">Register your company</a>
-                                </span>
-                            </div>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Full Name *</label>
+                                        {{ form.full_name }}
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Email *</label>
+                                        {{ form.email }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Phone</label>
+                                        {{ form.phone }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Location</label>
+                                        {{ form.location }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Password *</label>
+                                        {{ form.password1 }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Confirm Password *</label>
+                                        {{ form.password2 }}
+                                    </div>
+                                    <div class="col-12 mt-2">
+                                        <button type="submit" class="btn-green w-100" style="padding:0.95rem;"><i class="fas fa-user-plus me-2"></i>Create My Profile</button>
+                                    </div>
+                                    <div class="col-12 text-center">
+                                        <span style="color:var(--gray);font-size:0.92rem;">Already have an account? <a href="{% url 'seeker_login' %}" style="color:var(--green);font-weight:700;">Login here</a></span>
+                                    </div>
+                                    <div class="col-12 text-center">
+                                        <span style="color:var(--gray);font-size:0.92rem;">Are you a company? <a href="{% url 'register' %}" style="color:var(--green);font-weight:700;">Register your company</a></span>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Side Info -->
-            <div class="col-lg-4 d-none d-lg-block">
-                <div class="form-card" style="background:var(--light-gray);border:none;">
-                    <h6 style="font-weight:800;margin-bottom:1rem;">Why Join?</h6>
-                    <ul style="list-style:none;padding:0;">
-                        <li class="mb-3" style="font-size:0.9rem;">
-                            <i class="fas fa-check-circle me-2" style="color:var(--green);"></i>
-                            Get discovered by <strong>top companies</strong>
-                        </li>
-                        <li class="mb-3" style="font-size:0.9rem;">
-                            <i class="fas fa-check-circle me-2" style="color:var(--green);"></i>
-                            Show your <strong>GitHub & portfolio</strong>
-                        </li>
-                        <li class="mb-3" style="font-size:0.9rem;">
-                            <i class="fas fa-check-circle me-2" style="color:var(--green);"></i>
-                            Get <strong>job alerts</strong> matching your skills
-                        </li>
-                        <li class="mb-3" style="font-size:0.9rem;">
-                            <i class="fas fa-check-circle me-2" style="color:var(--green);"></i>
-                            Save jobs and <strong>apply later</strong>
-                        </li>
-                        <li class="mb-3" style="font-size:0.9rem;">
-                            <i class="fas fa-check-circle me-2" style="color:var(--green);"></i>
-                            100% <strong>free</strong> for job seekers
-                        </li>
-                    </ul>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
-
+    </section>
+</div>
 {% endblock %}

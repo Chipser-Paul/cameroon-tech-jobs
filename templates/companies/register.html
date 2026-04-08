@@ -1,174 +1,120 @@
 {% extends 'base.html' %}
 
-{% block title %}Register Your Company — CameroonTechJobs{% endblock %}
+{% block title %}Register Your Company | CameroonTechJobs{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-shell { background: linear-gradient(180deg, #f8faf9 0%, #ffffff 24%, #f5f8fb 100%); }
+    .auth-wrap { padding: 2.8rem 0 4rem; }
+    .auth-panel { border-radius: 30px; overflow: hidden; background: #fff; box-shadow: 0 28px 60px rgba(13, 29, 46, 0.12); border: 1px solid rgba(17, 29, 45, 0.05); }
+    .auth-side { background: linear-gradient(135deg, #152033 0%, #1c2845 52%, #144332 100%); color: #fff; padding: 2.35rem; height: 100%; position: relative; overflow: hidden; }
+    .auth-side::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 82% 18%, rgba(212,165,62,0.24), transparent 16%), radial-gradient(circle at 18% 84%, rgba(159,226,185,0.18), transparent 18%); pointer-events: none; }
+    .auth-side > * { position: relative; z-index: 1; }
+    .auth-kicker { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.42rem 0.72rem; border-radius: 999px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.88); font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.95rem; }
+    .auth-kicker i { color: #d4a53e; }
+    .auth-side-title { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; line-height: 1.05; margin-bottom: 0.85rem; }
+    .auth-side-copy { color: rgba(255,255,255,0.78); line-height: 1.8; }
+    .auth-benefits { display: grid; gap: 0.85rem; margin-top: 1.5rem; }
+    .auth-benefit { display: flex; gap: 0.7rem; align-items: start; color: rgba(255,255,255,0.82); line-height: 1.7; }
+    .auth-benefit i { color: #9fe2b9; margin-top: 0.2rem; }
+    .price-box { margin-top: 1.5rem; padding: 1rem; border-radius: 18px; background: rgba(255,255,255,0.08); }
+    .auth-form-wrap { padding: 2.2rem; }
+    .auth-form-title { font-size: 1.45rem; font-weight: 800; color: #152033; margin-bottom: 0.45rem; }
+    .auth-form-copy { color: #728496; line-height: 1.75; margin-bottom: 1.35rem; }
+</style>
+{% endblock %}
 
 {% block content %}
-
-<section class="page-hero">
-    <div class="container text-center">
-        <h1>Register Your Company</h1>
-        <p style="color:rgba(255,255,255,0.75);">Create an account to start posting jobs. Your first listing is free!</p>
-    </div>
-</section>
-
-<section class="py-5">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-7">
-
-                <!-- Free listing banner -->
-                <div class="alert mb-4" style="background:var(--green-light);border:1.5px solid var(--green);border-radius:12px;color:var(--green-dark);">
-                    <i class="fas fa-gift me-2"></i>
-                    <strong>Your first job listing is completely free!</strong> No payment required to get started.
-                </div>
-
-                <div class="form-card">
-                    <h4 style="font-weight:800;margin-bottom:1.5rem;">Company Information</h4>
-
-                    <form method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-
-                        {% if form.errors %}
-                        <div class="alert alert-danger border-0" style="border-radius:10px;">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            Please fix the errors below.
+<div class="auth-shell">
+    <section class="auth-wrap">
+        <div class="container">
+            <div class="auth-panel">
+                <div class="row g-0">
+                    <div class="col-lg-5">
+                        <div class="auth-side">
+                            <div class="auth-kicker"><i class="fas fa-gift"></i>Employer Onboarding</div>
+                            <h1 class="auth-side-title">Create a company account built for serious hiring.</h1>
+                            <p class="auth-side-copy">Your first listing is free, and the platform is now designed to help employers review applicants, message talent, and schedule interviews in one place.</p>
+                            <div class="auth-benefits">
+                                <div class="auth-benefit"><i class="fas fa-check-circle"></i><span>First job listing is completely free</span></div>
+                                <div class="auth-benefit"><i class="fas fa-check-circle"></i><span>Reach a focused Cameroon tech audience</span></div>
+                                <div class="auth-benefit"><i class="fas fa-check-circle"></i><span>Use built-in applications, conversations, and interviews</span></div>
+                            </div>
+                            <div class="price-box">
+                                <div style="font-size:0.85rem;color:rgba(255,255,255,0.72);">Pricing after your free listing</div>
+                                <div style="font-weight:800;font-size:1.05rem;margin-top:0.35rem;">Basic - 5,000 XAF</div>
+                                <div style="font-weight:800;font-size:1.05rem;">Featured - 15,000 XAF</div>
+                            </div>
                         </div>
-                        {% endif %}
+                    </div>
+                    <div class="col-lg-7">
+                        <div class="auth-form-wrap">
+                            <div class="auth-form-title">Register Your Company</div>
+                            <p class="auth-form-copy">Create your company profile and start building a more credible employer presence on CameroonTechJobs.</p>
 
-                        <div class="row g-3">
-                            <!-- Company Name -->
-                            <div class="col-12">
-                                <label class="form-label">Company Name *</label>
-                                <input type="text" name="company_name" class="form-control {% if form.company_name.errors %}is-invalid{% endif %}"
-                                    placeholder="e.g. MTN Cameroon" value="{{ form.company_name.value|default:'' }}">
-                                {% if form.company_name.errors %}
-                                <div class="invalid-feedback">{{ form.company_name.errors|join:", " }}</div>
-                                {% endif %}
+                            {% if form.errors %}
+                            <div class="alert alert-danger border-0" style="border-radius:14px;">
+                                <i class="fas fa-exclamation-circle me-2"></i>Please fix the errors below.
                             </div>
+                            {% endif %}
 
-                            <!-- Email -->
-                            <div class="col-md-6">
-                                <label class="form-label">Work Email *</label>
-                                <input type="email" name="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}"
-                                    placeholder="hr@yourcompany.com" value="{{ form.email.value|default:'' }}">
-                                {% if form.email.errors %}
-                                <div class="invalid-feedback">{{ form.email.errors|join:", " }}</div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Phone -->
-                            <div class="col-md-6">
-                                <label class="form-label">Phone Number</label>
-                                <input type="text" name="phone" class="form-control"
-                                    placeholder="+237 6XX XXX XXX" value="{{ form.phone.value|default:'' }}">
-                            </div>
-
-                            <!-- Password -->
-                            <div class="col-md-6">
-                                <label class="form-label">Password *</label>
-                                <input type="password" name="password1" class="form-control {% if form.password1.errors %}is-invalid{% endif %}"
-                                    placeholder="Min. 8 characters">
-                                {% if form.password1.errors %}
-                                <div class="invalid-feedback">{{ form.password1.errors|join:", " }}</div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Confirm Password -->
-                            <div class="col-md-6">
-                                <label class="form-label">Confirm Password *</label>
-                                <input type="password" name="password2" class="form-control {% if form.password2.errors %}is-invalid{% endif %}"
-                                    placeholder="Repeat password">
-                                {% if form.password2.errors %}
-                                <div class="invalid-feedback">{{ form.password2.errors|join:", " }}</div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Website -->
-                            <div class="col-md-6">
-                                <label class="form-label">Website</label>
-                                <input type="url" name="website" class="form-control"
-                                    placeholder="https://yourcompany.com" value="{{ form.website.value|default:'' }}">
-                            </div>
-
-                            <!-- Location -->
-                            <div class="col-md-6">
-                                <label class="form-label">Company Location</label>
-                                <input type="text" name="location" class="form-control"
-                                    placeholder="e.g. Douala, Cameroon" value="{{ form.location.value|default:'' }}">
-                            </div>
-
-                            <!-- Description -->
-                            <div class="col-12">
-                                <label class="form-label">Company Description</label>
-                                <textarea name="description" class="form-control" rows="3"
-                                    placeholder="Brief description of your company...">{{ form.description.value|default:'' }}</textarea>
-                            </div>
-
-                            <!-- Logo -->
-                            <div class="col-12">
-                                <label class="form-label">Company Logo</label>
-                                <input type="file" name="logo" class="form-control" accept="image/*">
-                                <div style="font-size:0.82rem;color:var(--gray);margin-top:0.3rem;">
-                                    Optional. PNG or JPG, max 2MB.
+                            <form method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Company Name *</label>
+                                        <input type="text" name="company_name" class="form-control {% if form.company_name.errors %}is-invalid{% endif %}" placeholder="e.g. MTN Cameroon" value="{{ form.company_name.value|default:'' }}">
+                                        {% if form.company_name.errors %}<div class="invalid-feedback">{{ form.company_name.errors|join:", " }}</div>{% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Work Email *</label>
+                                        <input type="email" name="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" placeholder="hr@yourcompany.com" value="{{ form.email.value|default:'' }}">
+                                        {% if form.email.errors %}<div class="invalid-feedback">{{ form.email.errors|join:", " }}</div>{% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Phone Number</label>
+                                        <input type="text" name="phone" class="form-control" placeholder="+237 6XX XXX XXX" value="{{ form.phone.value|default:'' }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Password *</label>
+                                        <input type="password" name="password1" class="form-control {% if form.password1.errors %}is-invalid{% endif %}" placeholder="Min. 8 characters">
+                                        {% if form.password1.errors %}<div class="invalid-feedback">{{ form.password1.errors|join:", " }}</div>{% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Confirm Password *</label>
+                                        <input type="password" name="password2" class="form-control {% if form.password2.errors %}is-invalid{% endif %}" placeholder="Repeat password">
+                                        {% if form.password2.errors %}<div class="invalid-feedback">{{ form.password2.errors|join:", " }}</div>{% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Website</label>
+                                        <input type="url" name="website" class="form-control" placeholder="https://yourcompany.com" value="{{ form.website.value|default:'' }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Company Location</label>
+                                        <input type="text" name="location" class="form-control" placeholder="e.g. Douala, Cameroon" value="{{ form.location.value|default:'' }}">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Company Description</label>
+                                        <textarea name="description" class="form-control" rows="3" placeholder="Brief description of your company...">{{ form.description.value|default:'' }}</textarea>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Company Logo</label>
+                                        <input type="file" name="logo" class="form-control" accept="image/*">
+                                        <div style="font-size:0.82rem;color:var(--gray);margin-top:0.3rem;">Optional. PNG or JPG, max 2MB.</div>
+                                    </div>
+                                    <div class="col-12 mt-2">
+                                        <button type="submit" class="btn-green w-100" style="padding:0.95rem;"><i class="fas fa-building me-2"></i>Create Company Account</button>
+                                    </div>
+                                    <div class="col-12 text-center">
+                                        <span style="color:var(--gray);font-size:0.92rem;">Already have an account? <a href="{% url 'login' %}" style="color:var(--green);font-weight:700;">Login here</a></span>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <!-- Submit -->
-                            <div class="col-12 mt-2">
-                                <button type="submit" class="btn-green w-100" style="padding:0.9rem;">
-                                    <i class="fas fa-building me-2"></i>Create Company Account
-                                </button>
-                            </div>
-
-                            <div class="col-12 text-center">
-                                <span style="color:var(--gray);font-size:0.9rem;">
-                                    Already have an account?
-                                    <a href="{% url 'login' %}" style="color:var(--green);font-weight:600;">Login here</a>
-                                </span>
-                            </div>
+                            </form>
                         </div>
-                    </form>
-                </div>
-
-            </div>
-
-            <!-- Side Info -->
-            <div class="col-lg-4 d-none d-lg-block">
-                <div class="form-card" style="background:var(--light-gray);border:none;">
-                    <h6 style="font-weight:800;margin-bottom:1rem;">Why CameroonTechJobs?</h6>
-                    <ul style="list-style:none;padding:0;">
-                        <li class="mb-3" style="font-size:0.9rem;">
-                            <i class="fas fa-check-circle me-2" style="color:var(--green);"></i>
-                            First job post is <strong>completely free</strong>
-                        </li>
-                        <li class="mb-3" style="font-size:0.9rem;">
-                            <i class="fas fa-check-circle me-2" style="color:var(--green);"></i>
-                            Reach <strong>IT professionals</strong> across Cameroon
-                        </li>
-                        <li class="mb-3" style="font-size:0.9rem;">
-                            <i class="fas fa-check-circle me-2" style="color:var(--green);"></i>
-                            Listings stay active for <strong>30 days</strong>
-                        </li>
-                        <li class="mb-3" style="font-size:0.9rem;">
-                            <i class="fas fa-check-circle me-2" style="color:var(--green);"></i>
-                            Pay with <strong>MTN MoMo or Orange Money</strong>
-                        </li>
-                        <li class="mb-3" style="font-size:0.9rem;">
-                            <i class="fas fa-check-circle me-2" style="color:var(--green);"></i>
-                            Dedicated <strong>Cameroon tech</strong> talent pool
-                        </li>
-                    </ul>
-
-                    <div style="background:var(--green);border-radius:10px;padding:1rem;color:white;margin-top:1rem;">
-                        <div style="font-size:0.85rem;opacity:0.85;">Pricing after free listing</div>
-                        <div style="font-weight:800;font-size:1.1rem;margin-top:0.3rem;">Basic — 5,000 XAF</div>
-                        <div style="font-weight:800;font-size:1.1rem;">Featured — 15,000 XAF</div>
                     </div>
                 </div>
             </div>
-
         </div>
-    </div>
-</section>
-
+    </section>
+</div>
 {% endblock %}
