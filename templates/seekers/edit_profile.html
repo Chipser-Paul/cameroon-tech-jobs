@@ -1,148 +1,243 @@
 {% extends 'base.html' %}
 
-{% block title %}Edit Profile — CameroonTechJobs{% endblock %}
+{% block title %}Edit Profile | CameroonTechJobs{% endblock %}
+
+{% block extra_css %}
+<style>
+    .edit-shell {
+        background:
+            radial-gradient(circle at top left, rgba(26, 122, 74, 0.12), transparent 24%),
+            linear-gradient(180deg, #f8faf9 0%, #ffffff 24%, #f5f8fb 100%);
+    }
+
+    .edit-hero {
+        padding: 2.8rem 0 2rem;
+    }
+
+    .edit-hero-panel {
+        border-radius: 30px;
+        background: linear-gradient(135deg, #152033 0%, #1d2744 52%, #14503a 100%);
+        color: #fff;
+        padding: 2.35rem;
+        box-shadow: 0 26px 60px rgba(13, 29, 46, 0.14);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .edit-hero-panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(circle at 84% 18%, rgba(212,165,62,0.24), transparent 16%),
+            radial-gradient(circle at 18% 84%, rgba(159,226,185,0.18), transparent 18%);
+        pointer-events: none;
+    }
+
+    .edit-hero-panel > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .edit-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.42rem 0.72rem;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.88);
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 0.9rem;
+    }
+
+    .edit-kicker i { color: #d4a53e; }
+
+    .edit-title {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 800;
+        line-height: 1.03;
+        margin-bottom: 0.6rem;
+    }
+
+    .edit-copy {
+        color: rgba(255,255,255,0.78);
+        line-height: 1.8;
+        margin: 0;
+        max-width: 42rem;
+    }
+
+    .edit-body {
+        padding: 2rem 0 4rem;
+    }
+
+    .edit-card-pro {
+        border-radius: 24px;
+        background: #fff;
+        border: 1px solid rgba(17, 29, 45, 0.05);
+        box-shadow: 0 18px 42px rgba(12, 28, 45, 0.08);
+        padding: 1.5rem;
+    }
+
+    .edit-section-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #152033;
+        margin-bottom: 1rem;
+        padding-bottom: 0.6rem;
+        border-bottom: 2px solid var(--green-light);
+    }
+
+    .checkbox-grid-pro {
+        display: grid;
+        gap: 0.55rem;
+    }
+
+    .checkbox-chip-pro {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        padding: 0.55rem 0.8rem;
+        border: 1.5px solid #dfe6ed;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        background: #fff;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
+<div class="edit-shell">
+    <section class="edit-hero">
+        <div class="container">
+            <div class="edit-hero-panel">
+                <div class="edit-kicker"><i class="fas fa-pen"></i>Profile Editor</div>
+                <h1 class="edit-title">Shape a stronger candidate profile.</h1>
+                <p class="edit-copy">A clear, complete profile helps companies trust you faster, shortlist you more confidently, and reach out with better opportunities.</p>
+            </div>
+        </div>
+    </section>
 
-<section class="page-hero">
-    <div class="container">
-        <h1>Edit Your Profile</h1>
-        <p style="color:rgba(255,255,255,0.75);">Keep your profile updated to attract the right opportunities.</p>
-    </div>
-</section>
+    <section class="edit-body">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-9">
+                    <div class="edit-card-pro">
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
 
-<section class="py-5">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="form-card">
-                    <form method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
+                            {% if form.errors %}
+                            <div class="alert alert-danger border-0" style="border-radius:14px;">
+                                <i class="fas fa-exclamation-circle me-2"></i>Please fix the errors below.
+                            </div>
+                            {% endif %}
 
-                        {% if form.errors %}
-                        <div class="alert alert-danger border-0" style="border-radius:10px;">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            Please fix the errors below.
-                        </div>
-                        {% endif %}
-
-                        <!-- Basic Info -->
-                        <h5 style="font-weight:800;margin-bottom:1.5rem;padding-bottom:0.5rem;border-bottom:2px solid var(--green-light);">
-                            <i class="fas fa-user me-2" style="color:var(--green);"></i>Basic Information
-                        </h5>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label">Full Name</label>
-                                {{ form.full_name }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Phone</label>
-                                {{ form.phone }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Location</label>
-                                {{ form.location }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Profile Photo</label>
-                                {{ form.upload_photo }}
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Bio</label>
-                                {{ form.bio }}
-                            </div>
-                        </div>
-
-                        <!-- Professional -->
-                        <h5 style="font-weight:800;margin-bottom:1.5rem;padding-bottom:0.5rem;border-bottom:2px solid var(--green-light);">
-                            <i class="fas fa-briefcase me-2" style="color:var(--green);"></i>Professional Info
-                        </h5>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label">Experience Level</label>
-                                {{ form.experience_level }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Availability</label>
-                                {{ form.availability }}
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Preferred Locations</label>
-                                {{ form.preferred_locations }}
-                            </div>
-                        </div>
-
-                        <!-- Links -->
-                        <h5 style="font-weight:800;margin-bottom:1.5rem;padding-bottom:0.5rem;border-bottom:2px solid var(--green-light);">
-                            <i class="fas fa-link me-2" style="color:var(--green);"></i>Links
-                        </h5>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-4">
-                                <label class="form-label"><i class="fab fa-github me-1"></i>GitHub</label>
-                                {{ form.github }}
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label"><i class="fas fa-globe me-1"></i>Portfolio</label>
-                                {{ form.portfolio }}
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label"><i class="fab fa-linkedin me-1"></i>LinkedIn</label>
-                                {{ form.linkedin }}
-                            </div>
-                        </div>
-
-                        <!-- Skills -->
-                        <h5 style="font-weight:800;margin-bottom:1.5rem;padding-bottom:0.5rem;border-bottom:2px solid var(--green-light);">
-                            <i class="fas fa-code me-2" style="color:var(--green);"></i>Technical Skills
-                        </h5>
-                        <div class="mb-4">
-                            <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));gap:0.5rem;">
-                                {% for checkbox in form.skills %}
-                                <label style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.75rem;border:1.5px solid #dee2e6;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:500;">
-                                    {{ checkbox.tag }}
-                                    {{ checkbox.choice_label }}
-                                </label>
-                                {% endfor %}
-                            </div>
-                        </div>
-
-                        <!-- Preferences -->
-                        <h5 style="font-weight:800;margin-bottom:1.5rem;padding-bottom:0.5rem;border-bottom:2px solid var(--green-light);">
-                            <i class="fas fa-sliders-h me-2" style="color:var(--green);"></i>Job Preferences
-                        </h5>
-                        <div class="mb-4">
-                            <label class="form-label">Preferred Job Categories</label>
-                            <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));gap:0.5rem;">
-                                {% for checkbox in form.preferred_categories %}
-                                <label style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.75rem;border:1.5px solid #dee2e6;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:500;">
-                                    {{ checkbox.tag }}
-                                    {{ checkbox.choice_label }}
-                                </label>
-                                {% endfor %}
-                            </div>
-                        </div>
-
-                        <!-- Alerts -->
-                        <div class="mb-4 p-3" style="background:var(--green-light);border-radius:10px;">
-                            <label style="display:flex;align-items:center;gap:0.75rem;cursor:pointer;">
-                                {{ form.job_alerts_enabled }}
-                                <div>
-                                    <div style="font-weight:700;">Enable Job Alerts</div>
-                                    <div style="font-size:0.85rem;color:var(--gray);">
-                                        Get email notifications when matching jobs are posted
-                                    </div>
+                            <div class="edit-section-title"><i class="fas fa-user me-2" style="color:var(--green);"></i>Basic Information</div>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">Full Name</label>
+                                    {{ form.full_name }}
                                 </div>
-                            </label>
-                        </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Phone</label>
+                                    {{ form.phone }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Location</label>
+                                    {{ form.location }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Profile Photo</label>
+                                    {{ form.upload_photo }}
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Bio</label>
+                                    {{ form.bio }}
+                                </div>
+                            </div>
 
-                        <button type="submit" class="btn-green w-100" style="padding:0.9rem;">
-                            <i class="fas fa-save me-2"></i>Save Profile
-                        </button>
-                    </form>
+                            <div class="edit-section-title"><i class="fas fa-briefcase me-2" style="color:var(--green);"></i>Professional Info</div>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">Experience Level</label>
+                                    {{ form.experience_level }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Availability</label>
+                                    {{ form.availability }}
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Preferred Locations</label>
+                                    {{ form.preferred_locations }}
+                                </div>
+                            </div>
+
+                            <div class="edit-section-title"><i class="fas fa-link me-2" style="color:var(--green);"></i>Links</div>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label"><i class="fab fa-github me-1"></i>GitHub</label>
+                                    {{ form.github }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label"><i class="fas fa-globe me-1"></i>Portfolio</label>
+                                    {{ form.portfolio }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label"><i class="fab fa-linkedin me-1"></i>LinkedIn</label>
+                                    {{ form.linkedin }}
+                                </div>
+                            </div>
+
+                            <div class="edit-section-title"><i class="fas fa-code me-2" style="color:var(--green);"></i>Technical Skills</div>
+                            <div class="mb-4">
+                                <div class="checkbox-grid-pro" style="grid-template-columns:repeat(auto-fill, minmax(170px, 1fr));">
+                                    {% for checkbox in form.skills %}
+                                    <label class="checkbox-chip-pro">
+                                        {{ checkbox.tag }}
+                                        {{ checkbox.choice_label }}
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="edit-section-title"><i class="fas fa-sliders-h me-2" style="color:var(--green);"></i>Job Preferences</div>
+                            <div class="mb-4">
+                                <label class="form-label">Preferred Job Categories</label>
+                                <div class="checkbox-grid-pro" style="grid-template-columns:repeat(auto-fill, minmax(210px, 1fr));">
+                                    {% for checkbox in form.preferred_categories %}
+                                    <label class="checkbox-chip-pro">
+                                        {{ checkbox.tag }}
+                                        {{ checkbox.choice_label }}
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="mb-4 p-3" style="background:var(--green-light);border-radius:14px;">
+                                <label style="display:flex;align-items:center;gap:0.75rem;cursor:pointer;">
+                                    {{ form.job_alerts_enabled }}
+                                    <div>
+                                        <div style="font-weight:700;">Enable Job Alerts</div>
+                                        <div style="font-size:0.85rem;color:var(--gray);">
+                                            Get notified when matching jobs are posted
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn-green w-100" style="padding:0.95rem;">
+                                <i class="fas fa-save me-2"></i>Save Profile
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
-
+    </section>
+</div>
 {% endblock %}

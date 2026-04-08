@@ -22,9 +22,10 @@
     .navbar .nav-link {
         color: #314356;
         font-weight: 700;
-        padding: 0.72rem 0.95rem !important;
+        padding: 0.72rem 0.82rem !important;
         border-radius: 12px;
         transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+        white-space: nowrap;
     }
 
     .navbar .nav-link:hover,
@@ -80,6 +81,44 @@
         font-size: 0.7rem;
     }
 
+    .navbar .navbar-collapse {
+        gap: 1.2rem;
+    }
+
+    .navbar-nav.ms-auto {
+        gap: 0.3rem;
+    }
+
+    .nav-user-shell {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        padding: 0.72rem 0.95rem;
+        border-radius: 14px;
+        background: rgba(17, 29, 45, 0.04);
+        color: #223448;
+        font-weight: 800;
+    }
+
+    .nav-user-shell i {
+        color: var(--green);
+    }
+
+    .nav-ghost-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.72rem 0.92rem;
+        border-radius: 14px;
+    }
+
+    .nav-divider {
+        width: 1px;
+        height: 26px;
+        background: rgba(21, 32, 51, 0.08);
+        margin: 0 0.35rem;
+    }
+
     @media (max-width: 991px) {
         .navbar .nav-link {
             padding-left: 0.75rem !important;
@@ -89,6 +128,15 @@
         .nav-cta {
             width: 100%;
             margin-top: 0.5rem;
+        }
+
+        .nav-divider {
+            display: none;
+        }
+
+        .nav-user-shell {
+            width: 100%;
+            justify-content: center;
         }
     }
 </style>
@@ -123,7 +171,7 @@
             <ul class="navbar-nav ms-auto align-items-lg-center">
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'notifications' %}">
+                        <a class="nav-link nav-ghost-link" href="{% url 'notifications' %}">
                             <span class="notify-pill">
                                 <i class="fas fa-bell"></i>Alerts
                                 {% if navbar_unread_notifications %}
@@ -132,10 +180,13 @@
                             </span>
                         </a>
                     </li>
+                    <li class="nav-item d-none d-lg-flex align-items-center">
+                        <span class="nav-divider"></span>
+                    </li>
                     {% if user.company_name %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'dashboard' %}">
-                                <i class="fas fa-building me-1"></i>{{ user.company_name }}
+                            <a class="nav-link nav-user-shell" href="{% url 'dashboard' %}">
+                                <i class="fas fa-building"></i>{{ user.company_name }}
                             </a>
                         </li>
                         <li class="nav-item ms-lg-2">
@@ -150,12 +201,12 @@
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'seeker_dashboard' %}">
-                                <i class="fas fa-user me-1"></i>{{ user.full_name }}
+                            <a class="nav-link nav-user-shell" href="{% url 'seeker_dashboard' %}">
+                                <i class="fas fa-user"></i>{{ user.full_name }}
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'seeker_logout' %}">
+                            <a class="nav-link nav-ghost-link" href="{% url 'seeker_logout' %}">
                                 <i class="fas fa-sign-out-alt me-1"></i>Logout
                             </a>
                         </li>
