@@ -2,143 +2,180 @@
 
 {% block title %}Applicants for {{ job.title }} | CameroonTechJobs{% endblock %}
 
+{% block extra_css %}
+<style>
+    .applicants-shell { background: radial-gradient(circle at top right, rgba(26, 122, 74, 0.12), transparent 28%), linear-gradient(180deg, #f7faf8 0%, #ffffff 20%, #f5f8fb 100%); }
+    .applicants-hero { padding: 2.5rem 0 2rem; }
+    .applicants-hero-panel { border-radius: 28px; background: linear-gradient(135deg, #152033 0%, #1d2744 52%, #144332 100%); color: #fff; padding: 2.35rem; box-shadow: 0 24px 58px rgba(13, 29, 46, 0.14); position: relative; overflow: hidden; }
+    .applicants-hero-panel::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 86% 18%, rgba(212, 165, 62, 0.24), transparent 16%), radial-gradient(circle at 18% 84%, rgba(159, 226, 185, 0.18), transparent 18%); pointer-events: none; }
+    .applicants-hero-panel > * { position: relative; z-index: 1; }
+    .applicants-kicker { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.8rem; border-radius: 999px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.88); font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1rem; }
+    .applicants-kicker i { color: #d4a53e; }
+    .applicants-title { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; line-height: 1.04; margin-bottom: 0.8rem; }
+    .applicants-copy { color: rgba(255,255,255,0.76); line-height: 1.75; max-width: 42rem; margin: 0; }
+    .hero-back-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.55rem; padding: 0.9rem 1.2rem; border-radius: 14px; color: #fff; text-decoration: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); font-weight: 700; }
+    .app-summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; margin-top: -1rem; position: relative; z-index: 2; }
+    .app-summary-card, .pipeline-card, .candidate-card { border-radius: 22px; background: #fff; border: 1px solid rgba(17, 29, 45, 0.05); box-shadow: 0 18px 42px rgba(12, 28, 45, 0.08); }
+    .app-summary-card { padding: 1.25rem; }
+    .app-summary-label { color: #6b7c8d; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.8rem; font-weight: 800; margin-bottom: 0.45rem; }
+    .app-summary-value { font-size: 1.85rem; font-weight: 800; line-height: 1; color: #152033; }
+    .applicants-content { padding: 2rem 0 4rem; }
+    .pipeline-card { padding: 1.5rem; margin-bottom: 1.4rem; }
+    .pipeline-row { display: flex; flex-wrap: wrap; gap: 0.85rem; color: #617282; font-size: 0.92rem; }
+    .pipeline-row span { display: inline-flex; align-items: center; gap: 0.45rem; }
+    .candidate-stack { display: grid; gap: 1.2rem; }
+    .candidate-card { padding: 1.45rem; }
+    .candidate-head { display: flex; justify-content: space-between; align-items: start; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .candidate-identity { display: flex; align-items: center; gap: 1rem; }
+    .candidate-avatar, .candidate-avatar-fallback { width: 66px; height: 66px; border-radius: 18px; object-fit: cover; }
+    .candidate-avatar-fallback { background: linear-gradient(135deg, rgba(26, 122, 74, 0.14), rgba(21, 32, 51, 0.08)); color: var(--green); display: flex; align-items: center; justify-content: center; font-size: 1.35rem; font-weight: 800; }
+    .candidate-name { font-size: 1.12rem; font-weight: 800; color: #152033; margin-bottom: 0.2rem; }
+    .candidate-meta { color: #6d7f90; font-size: 0.9rem; line-height: 1.7; }
+    .candidate-actions { display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; }
+    .conversation-link { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.55rem 0.9rem; border-radius: 999px; background: rgba(26, 122, 74, 0.1); color: var(--green); text-decoration: none; font-weight: 700; font-size: 0.85rem; }
+    .detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 1.1rem; }
+    .detail-box { border-radius: 18px; background: #f8fafc; padding: 1rem; }
+    .detail-title { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 800; color: #7b8ea0; margin-bottom: 0.55rem; }
+    .detail-box a { color: var(--green); text-decoration: none; font-weight: 700; }
+    .skill-cluster { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.9rem; }
+    .skill-chip { background: var(--green-light); color: var(--green); padding: 0.35rem 0.8rem; border-radius: 999px; font-size: 0.82rem; font-weight: 700; }
+    .status-form-shell { margin-top: 1rem; padding: 1rem; border-radius: 18px; background: linear-gradient(180deg, #fbfcfd 0%, #f6f9fb 100%); border: 1px solid rgba(21, 32, 51, 0.05); }
+    @media (max-width: 1199px) { .app-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 767px) { .app-summary-grid, .detail-grid { grid-template-columns: 1fr; } .applicants-hero-panel { padding: 1.6rem; } }
+</style>
+{% endblock %}
+
 {% block content %}
-<section class="page-hero">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div>
-                <h1>{{ job.title }}</h1>
-                <p style="color:rgba(255,255,255,0.78);margin:0;">
-                    {{ total_applications }} applicant{{ total_applications|pluralize }} for this role.
-                </p>
+<div class="applicants-shell">
+    <section class="applicants-hero">
+        <div class="container">
+            <div class="applicants-hero-panel">
+                <div class="row g-4 align-items-center">
+                    <div class="col-lg-8">
+                        <div class="applicants-kicker"><i class="fas fa-users"></i>Candidate review workspace</div>
+                        <h1 class="applicants-title">{{ job.title }}</h1>
+                        <p class="applicants-copy">Review serious applicants, update pipeline status, and keep the hiring conversation moving from one recruiter-focused page.</p>
+                    </div>
+                    <div class="col-lg-4 text-lg-end">
+                        <a href="{% url 'dashboard' %}" class="hero-back-btn"><i class="fas fa-arrow-left"></i>Back to Dashboard</a>
+                    </div>
+                </div>
             </div>
-            <a href="{% url 'dashboard' %}" class="btn-outline-green" style="border-color:white;color:white;">
-                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
-            </a>
-        </div>
-    </div>
-</section>
-
-<section class="py-5">
-    <div class="container">
-        <div class="form-card mb-4">
-            <div class="d-flex flex-wrap gap-3" style="font-size:0.92rem;color:var(--gray);">
-                <span><i class="fas fa-layer-group me-2" style="color:var(--green);"></i>{{ job.category.name|default:"Uncategorized" }}</span>
-                <span><i class="fas fa-map-marker-alt me-2" style="color:var(--green);"></i>{{ job.get_location_display }}</span>
-                <span><i class="fas fa-briefcase me-2" style="color:var(--green);"></i>{{ job.get_job_type_display }}</span>
-                <span><i class="fas fa-calendar-alt me-2" style="color:var(--green);"></i>{{ job.date_posted|date:"M d, Y" }}</span>
+            <div class="app-summary-grid">
+                <div class="app-summary-card"><div class="app-summary-label">Applicants</div><div class="app-summary-value">{{ total_applications }}</div></div>
+                <div class="app-summary-card"><div class="app-summary-label">Category</div><div class="app-summary-value" style="font-size:1.15rem;">{{ job.category.name|default:"Uncategorized" }}</div></div>
+                <div class="app-summary-card"><div class="app-summary-label">Job Type</div><div class="app-summary-value" style="font-size:1.15rem;">{{ job.get_job_type_display }}</div></div>
+                <div class="app-summary-card"><div class="app-summary-label">Location</div><div class="app-summary-value" style="font-size:1.15rem;">{{ job.get_location_display }}</div></div>
             </div>
         </div>
+    </section>
 
-        {% if applications %}
-        <div class="row g-4">
-            {% for application in applications %}
-            <div class="col-12">
-                <div class="form-card">
-                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
-                        <div class="d-flex align-items-center gap-3">
+    <section class="applicants-content">
+        <div class="container">
+            <div class="pipeline-card">
+                <div style="display:flex;justify-content:space-between;align-items:end;gap:1rem;flex-wrap:wrap;">
+                    <div>
+                        <h2 style="font-size:1.3rem;font-weight:800;color:#152033;margin:0;">Hiring context</h2>
+                        <p style="margin:0.45rem 0 0;color:#6e8091;line-height:1.7;">Everything below is organized to help you quickly decide who to advance, contact, or interview.</p>
+                    </div>
+                </div>
+                <div class="pipeline-row" style="margin-top:1rem;">
+                    <span><i class="fas fa-layer-group" style="color:var(--green);"></i>{{ job.category.name|default:"Uncategorized" }}</span>
+                    <span><i class="fas fa-map-marker-alt" style="color:var(--green);"></i>{{ job.get_location_display }}</span>
+                    <span><i class="fas fa-briefcase" style="color:var(--green);"></i>{{ job.get_job_type_display }}</span>
+                    <span><i class="fas fa-calendar-alt" style="color:var(--green);"></i>{{ job.date_posted|date:"M d, Y" }}</span>
+                </div>
+            </div>
+
+            {% if applications %}
+            <div class="candidate-stack">
+                {% for application in applications %}
+                <div class="candidate-card">
+                    <div class="candidate-head">
+                        <div class="candidate-identity">
                             {% if application.seeker.profile_photo_url %}
-                            <img src="{{ application.seeker.profile_photo_url }}" alt="{{ application.seeker.full_name }}"
-                                 style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid var(--green);">
+                            <img src="{{ application.seeker.profile_photo_url }}" alt="{{ application.seeker.full_name }}" class="candidate-avatar">
                             {% else %}
-                            <div style="width:60px;height:60px;border-radius:50%;background:var(--green-light);color:var(--green);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.25rem;">
-                                {{ application.seeker.full_name|first }}
-                            </div>
+                            <div class="candidate-avatar-fallback">{{ application.seeker.full_name|first }}</div>
                             {% endif %}
                             <div>
-                                <div style="font-weight:800;font-size:1.08rem;">{{ application.seeker.full_name }}</div>
-                                <div style="font-size:0.9rem;color:var(--gray);">{{ application.seeker.email }}</div>
-                                {% if application.seeker.experience_level %}
-                                <div style="font-size:0.85rem;color:var(--gray);margin-top:0.25rem;">
-                                    <i class="fas fa-chart-line me-1"></i>{{ application.seeker.get_experience_level_display }}
+                                <div class="candidate-name">{{ application.seeker.full_name }}</div>
+                                <div class="candidate-meta">
+                                    {{ application.seeker.email }}<br>
+                                    {% if application.seeker.experience_level %}{{ application.seeker.get_experience_level_display }}{% else %}Experience not set{% endif %}
                                 </div>
-                                {% endif %}
                             </div>
                         </div>
-                        <div class="text-end">
-                            <div class="status-badge status-active" style="display:inline-block;">{{ application.get_status_display }}</div>
-                            <div style="font-size:0.85rem;color:var(--gray);margin-top:0.4rem;">Applied {{ application.date_applied|date:"M d, Y H:i" }}</div>
-                            <div style="margin-top:0.6rem;">
-                                <a href="{% url 'application_conversation' application.pk %}" style="color:var(--green);font-weight:700;text-decoration:none;">
-                                    <i class="fas fa-comments me-1"></i>Open Conversation
-                                </a>
-                            </div>
+                        <div class="candidate-actions">
+                            <span class="status-badge status-active">{{ application.get_status_display }}</span>
+                            <a href="{% url 'application_conversation' application.pk %}" class="conversation-link"><i class="fas fa-comments"></i>Open Conversation</a>
                         </div>
                     </div>
 
-                    <form method="post" action="{% url 'update_application_status' application.pk %}" class="mb-3">
-                        {% csrf_token %}
-                        <div class="row g-2 align-items-end">
-                            <div class="col-md-6 col-lg-4">
-                                <label class="form-label" style="font-weight:700;font-size:0.9rem;">Application Status</label>
-                                <select name="status" class="form-select">
-                                    {% for value, label in application.STATUS_CHOICES %}
-                                    <option value="{{ value }}" {% if application.status == value %}selected{% endif %}>{{ label }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-4 col-lg-3">
-                                <button type="submit" class="btn-outline-green w-100" style="padding:0.6rem 1rem;">
-                                    <i class="fas fa-save me-2"></i>Update Status
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-
                     {% if application.cover_note %}
-                    <div class="mb-3">
-                        <div style="font-weight:700;font-size:0.9rem;margin-bottom:0.4rem;">Cover Note</div>
-                        <div style="color:#555;line-height:1.7;">{{ application.cover_note|linebreaks }}</div>
+                    <div class="detail-box" style="margin-top:0.9rem;">
+                        <div class="detail-title">Cover Note</div>
+                        <div style="color:#47586a;line-height:1.75;">{{ application.cover_note|linebreaks }}</div>
                     </div>
                     {% endif %}
 
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div style="font-size:0.9rem;color:var(--gray);margin-bottom:0.45rem;">Contact</div>
-                            {% if application.seeker.phone %}
-                            <div style="font-size:0.9rem;color:#444;"><i class="fas fa-phone me-2" style="color:var(--green);"></i>{{ application.seeker.phone }}</div>
-                            {% endif %}
-                            {% if application.seeker.location %}
-                            <div style="font-size:0.9rem;color:#444;"><i class="fas fa-map-marker-alt me-2" style="color:var(--green);"></i>{{ application.seeker.location }}</div>
-                            {% endif %}
+                    <div class="detail-grid">
+                        <div class="detail-box">
+                            <div class="detail-title">Contact Details</div>
+                            <div style="display:grid;gap:0.5rem;color:#58697b;line-height:1.7;">
+                                {% if application.seeker.phone %}<div><i class="fas fa-phone me-2" style="color:var(--green);"></i>{{ application.seeker.phone }}</div>{% endif %}
+                                {% if application.seeker.location %}<div><i class="fas fa-map-marker-alt me-2" style="color:var(--green);"></i>{{ application.seeker.location }}</div>{% endif %}
+                                <div><i class="fas fa-calendar me-2" style="color:var(--green);"></i>Applied {{ application.date_applied|date:"M d, Y H:i" }}</div>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <div style="font-size:0.9rem;color:var(--gray);margin-bottom:0.45rem;">Links</div>
-                            {% if application.seeker.github %}
-                            <div><a href="{{ application.seeker.github }}" target="_blank" style="color:var(--green);text-decoration:none;"><i class="fab fa-github me-2"></i>GitHub</a></div>
-                            {% endif %}
-                            {% if application.seeker.portfolio %}
-                            <div><a href="{{ application.seeker.portfolio }}" target="_blank" style="color:var(--green);text-decoration:none;"><i class="fas fa-globe me-2"></i>Portfolio</a></div>
-                            {% endif %}
-                            {% if application.seeker.linkedin %}
-                            <div><a href="{{ application.seeker.linkedin }}" target="_blank" style="color:var(--green);text-decoration:none;"><i class="fab fa-linkedin me-2"></i>LinkedIn</a></div>
-                            {% endif %}
+                        <div class="detail-box">
+                            <div class="detail-title">Professional Links</div>
+                            <div style="display:grid;gap:0.5rem;">
+                                {% if application.seeker.github %}<div><a href="{{ application.seeker.github }}" target="_blank"><i class="fab fa-github me-2"></i>GitHub</a></div>{% endif %}
+                                {% if application.seeker.portfolio %}<div><a href="{{ application.seeker.portfolio }}" target="_blank"><i class="fas fa-globe me-2"></i>Portfolio</a></div>{% endif %}
+                                {% if application.seeker.linkedin %}<div><a href="{{ application.seeker.linkedin }}" target="_blank"><i class="fab fa-linkedin me-2"></i>LinkedIn</a></div>{% endif %}
+                                {% if not application.seeker.github and not application.seeker.portfolio and not application.seeker.linkedin %}<div style="color:#7b8d9f;">No external links added yet.</div>{% endif %}
+                            </div>
                         </div>
                     </div>
 
                     {% if application.seeker.skills.all %}
-                    <div class="mt-3">
-                        <div style="font-size:0.9rem;color:var(--gray);margin-bottom:0.6rem;">Skills</div>
-                        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
-                            {% for skill in application.seeker.skills.all %}
-                            <span style="background:var(--green-light);color:var(--green);padding:0.35rem 0.8rem;border-radius:999px;font-size:0.82rem;font-weight:600;">
-                                {{ skill.name }}
-                            </span>
-                            {% endfor %}
-                        </div>
+                    <div class="skill-cluster">
+                        {% for skill in application.seeker.skills.all %}
+                        <span class="skill-chip">{{ skill.name }}</span>
+                        {% endfor %}
                     </div>
                     {% endif %}
+
+                    <div class="status-form-shell">
+                        <form method="post" action="{% url 'update_application_status' application.pk %}">
+                            {% csrf_token %}
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-6 col-lg-4">
+                                    <label class="form-label" style="font-weight:700;font-size:0.88rem;">Application Status</label>
+                                    <select name="status" class="form-select">
+                                        {% for value, label in application.STATUS_CHOICES %}
+                                        <option value="{{ value }}" {% if application.status == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4 col-lg-3">
+                                    <button type="submit" class="btn-outline-green w-100" style="padding:0.7rem 1rem;"><i class="fas fa-save me-2"></i>Update Status</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+            {% else %}
+            <div class="candidate-card" style="text-align:center;padding:3rem 1rem;">
+                <i class="fas fa-user-clock fa-3x mb-3" style="color:var(--green);opacity:0.22;"></i>
+                <h5 style="font-weight:800;">No applicants yet</h5>
+                <p style="color:#738597;max-width:32rem;margin:0 auto;">Once seekers start applying, this page will turn into your candidate review board with messaging and interview coordination.</p>
+            </div>
+            {% endif %}
         </div>
-        {% else %}
-        <div class="form-card text-center py-5">
-            <i class="fas fa-user-clock fa-3x mb-3" style="color:var(--green);opacity:0.25;"></i>
-            <h5 style="font-weight:800;">No applicants yet</h5>
-            <p style="color:var(--gray);">Once seekers start applying, you will see their profiles and contact details here.</p>
-        </div>
-        {% endif %}
-    </div>
-</section>
+    </section>
+</div>
 {% endblock %}

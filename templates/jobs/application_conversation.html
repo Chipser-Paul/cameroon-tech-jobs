@@ -2,190 +2,183 @@
 
 {% block title %}Conversation for {{ application.job.title }} | CameroonTechJobs{% endblock %}
 
+{% block extra_css %}
+<style>
+    .conversation-shell { background: radial-gradient(circle at top left, rgba(26, 122, 74, 0.12), transparent 24%), linear-gradient(180deg, #f8faf9 0%, #ffffff 24%, #f5f8fb 100%); }
+    .conversation-wrap { padding: 2.6rem 0 4rem; }
+    .conversation-layout { display: grid; grid-template-columns: 340px 1fr; gap: 1.25rem; align-items: start; }
+    .conversation-sidebar, .conversation-main-card, .interview-card, .composer-card { border-radius: 24px; background: #fff; border: 1px solid rgba(17, 29, 45, 0.05); box-shadow: 0 18px 42px rgba(12, 28, 45, 0.08); }
+    .conversation-sidebar { padding: 1.45rem; position: sticky; top: 92px; }
+    .sidebar-kicker { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.42rem 0.72rem; border-radius: 999px; background: rgba(26, 122, 74, 0.1); color: var(--green); font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.95rem; }
+    .sidebar-title { font-size: 1.35rem; font-weight: 800; color: #152033; line-height: 1.15; margin-bottom: 0.7rem; }
+    .sidebar-copy { color: #697c8e; line-height: 1.75; margin-bottom: 1rem; }
+    .summary-list { display: grid; gap: 0.8rem; margin-top: 1.1rem; }
+    .summary-item { padding: 0.95rem 1rem; border-radius: 18px; background: #f8fafc; }
+    .summary-item-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 800; color: #7c8ea1; margin-bottom: 0.35rem; }
+    .summary-item-value { color: #152033; font-weight: 700; line-height: 1.6; }
+    .back-link-pro { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--green); font-weight: 700; text-decoration: none; margin-top: 1rem; }
+    .conversation-main { display: grid; gap: 1.15rem; }
+    .conversation-main-card { padding: 1.5rem; }
+    .section-title-chat { font-size: 1.25rem; font-weight: 800; color: #152033; margin: 0 0 0.35rem; }
+    .section-copy-chat { color: #718496; margin: 0; line-height: 1.75; }
+    .interview-list { display: grid; gap: 1rem; }
+    .interview-card { padding: 1.2rem; background: linear-gradient(180deg, #fbfcfd 0%, #f5f9fb 100%); }
+    .interview-head { display: flex; justify-content: space-between; align-items: start; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+    .interview-title { font-size: 1rem; font-weight: 800; color: #152033; }
+    .interview-meta { color: #6f8294; line-height: 1.7; font-size: 0.9rem; }
+    .message-thread { display: grid; gap: 1rem; max-height: 560px; overflow-y: auto; padding-right: 0.25rem; }
+    .message-bubble { border-radius: 20px; padding: 1rem 1.05rem; border: 1px solid rgba(17, 29, 45, 0.05); }
+    .message-bubble.company { background: #f7f9fc; }
+    .message-bubble.seeker { background: var(--green-light); }
+    .message-head { display: flex; justify-content: space-between; align-items: start; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.55rem; }
+    .message-author { font-weight: 800; color: #152033; }
+    .message-role { color: #7a8d9f; font-weight: 700; font-size: 0.82rem; margin-left: 0.35rem; }
+    .message-time { color: #7e91a4; font-size: 0.82rem; }
+    .message-body { color: #495b6d; line-height: 1.75; }
+    .composer-card { padding: 1.35rem; }
+    @media (max-width: 991px) { .conversation-layout { grid-template-columns: 1fr; } .conversation-sidebar { position: static; } }
+</style>
+{% endblock %}
+
 {% block content %}
-<section class="page-hero">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div>
-                <h1>{{ application.job.title }}</h1>
-                <p style="color:rgba(255,255,255,0.78);margin:0;">
-                    Conversation between {{ application.job.company.company_name }} and {{ application.seeker.full_name }}.
-                </p>
-            </div>
-            {% if is_company_participant %}
-            <a href="{% url 'job_applicants' application.job.pk %}" class="btn-outline-green" style="border-color:white;color:white;">
-                <i class="fas fa-arrow-left me-2"></i>Back to Applicants
-            </a>
-            {% else %}
-            <a href="{% url 'my_applications' %}" class="btn-outline-green" style="border-color:white;color:white;">
-                <i class="fas fa-arrow-left me-2"></i>Back to My Applications
-            </a>
-            {% endif %}
-        </div>
-    </div>
-</section>
+<div class="conversation-shell">
+    <section class="conversation-wrap">
+        <div class="container">
+            <div class="conversation-layout">
+                <aside class="conversation-sidebar">
+                    <div class="sidebar-kicker"><i class="fas fa-comments"></i>Hiring conversation</div>
+                    <div class="sidebar-title">{{ application.job.title }}</div>
+                    <p class="sidebar-copy">Keep the application, interview planning, and candidate communication in one place so the process feels organized and credible.</p>
 
-<section class="py-5">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-lg-4">
-                <div class="form-card">
-                    <h5 style="font-weight:800;margin-bottom:1rem;">Application Summary</h5>
-                    <div style="font-size:0.92rem;color:var(--gray);display:flex;flex-direction:column;gap:0.65rem;">
-                        <div><strong style="color:var(--dark);">Company:</strong> {{ application.job.company.company_name }}</div>
-                        <div><strong style="color:var(--dark);">Candidate:</strong> {{ application.seeker.full_name }}</div>
-                        <div><strong style="color:var(--dark);">Status:</strong> {{ application.get_status_display }}</div>
-                        <div><strong style="color:var(--dark);">Applied:</strong> {{ application.date_applied|date:"M d, Y H:i" }}</div>
+                    <div class="summary-list">
+                        <div class="summary-item"><div class="summary-item-label">Company</div><div class="summary-item-value">{{ application.job.company.company_name }}</div></div>
+                        <div class="summary-item"><div class="summary-item-label">Candidate</div><div class="summary-item-value">{{ application.seeker.full_name }}</div></div>
+                        <div class="summary-item"><div class="summary-item-label">Status</div><div class="summary-item-value">{{ application.get_status_display }}</div></div>
+                        <div class="summary-item"><div class="summary-item-label">Applied</div><div class="summary-item-value">{{ application.date_applied|date:"M d, Y H:i" }}</div></div>
+                        <div class="summary-item"><div class="summary-item-label">Contact</div><div class="summary-item-value">{{ application.seeker.email }}<br>{% if application.seeker.phone %}{{ application.seeker.phone }}{% else %}No phone added{% endif %}</div></div>
                     </div>
 
-                    {% if application.seeker.phone or application.seeker.email %}
-                    <div style="margin-top:1.2rem;">
-                        <div style="font-weight:700;margin-bottom:0.5rem;">Contact</div>
-                        <div style="font-size:0.92rem;color:var(--gray);display:flex;flex-direction:column;gap:0.45rem;">
-                            <div><i class="fas fa-envelope me-2" style="color:var(--green);"></i>{{ application.seeker.email }}</div>
-                            {% if application.seeker.phone %}
-                            <div><i class="fas fa-phone me-2" style="color:var(--green);"></i>{{ application.seeker.phone }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="col-lg-8">
-                <div class="form-card mb-4">
-                    <h5 style="font-weight:800;margin-bottom:1rem;">Interview Scheduling</h5>
-                    {% if interviews %}
-                    <div style="display:flex;flex-direction:column;gap:1rem;">
-                        {% for interview in interviews %}
-                        <div style="border:1px solid #eef1f4;border-radius:14px;padding:1rem;background:#fafbfc;">
-                            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
-                                <div style="font-weight:800;">
-                                    {{ interview.get_meeting_type_display }}
-                                    <span style="font-weight:600;color:var(--gray);font-size:0.85rem;">
-                                        on {{ interview.scheduled_for|date:"M d, Y H:i" }}
-                                    </span>
-                                </div>
-                                <div class="status-badge status-active" style="display:inline-block;">{{ interview.get_status_display }}</div>
-                            </div>
-                            {% if interview.meeting_link %}
-                            <div style="font-size:0.92rem;margin-bottom:0.35rem;">
-                                <a href="{{ interview.meeting_link }}" target="_blank" style="color:var(--green);text-decoration:none;">
-                                    <i class="fas fa-video me-2"></i>Open Meeting Link
-                                </a>
-                            </div>
-                            {% endif %}
-                            {% if interview.location %}
-                            <div style="font-size:0.92rem;color:var(--gray);margin-bottom:0.35rem;">
-                                <i class="fas fa-map-marker-alt me-2" style="color:var(--green);"></i>{{ interview.location }}
-                            </div>
-                            {% endif %}
-                            {% if interview.notes %}
-                            <div style="font-size:0.92rem;color:#444;line-height:1.7;">{{ interview.notes|linebreaks }}</div>
-                            {% endif %}
-
-                            {% if is_seeker_participant and interview.status == 'pending' %}
-                            <div class="d-flex gap-2 flex-wrap mt-3">
-                                <form method="post" action="{% url 'respond_to_interview' interview.pk %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="decision" value="accepted">
-                                    <button type="submit" class="btn-green">
-                                        <i class="fas fa-check me-2"></i>Accept
-                                    </button>
-                                </form>
-                                <form method="post" action="{% url 'respond_to_interview' interview.pk %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="decision" value="declined">
-                                    <button type="submit" class="btn-outline-green" style="color:#dc3545;border-color:#dc3545;">
-                                        <i class="fas fa-times me-2"></i>Decline
-                                    </button>
-                                </form>
-                            </div>
-                            {% endif %}
-                        </div>
-                        {% endfor %}
-                    </div>
+                    {% if is_company_participant %}
+                    <a href="{% url 'job_applicants' application.job.pk %}" class="back-link-pro"><i class="fas fa-arrow-left"></i>Back to Applicants</a>
                     {% else %}
-                    <p style="color:var(--gray);margin:0;">No interviews scheduled yet.</p>
+                    <a href="{% url 'my_applications' %}" class="back-link-pro"><i class="fas fa-arrow-left"></i>Back to My Applications</a>
                     {% endif %}
-                </div>
+                </aside>
 
-                {% if is_company_participant %}
-                <div class="form-card mb-4">
-                    <h6 style="font-weight:800;margin-bottom:1rem;">Schedule an Interview</h6>
-                    <form method="post" action="{% url 'schedule_interview' application.pk %}">
-                        {% csrf_token %}
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label" style="font-weight:700;">Date & Time</label>
-                                <input type="datetime-local" name="scheduled_for" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label" style="font-weight:700;">Meeting Type</label>
-                                <select name="meeting_type" class="form-select">
-                                    <option value="video">Video Call</option>
-                                    <option value="phone">Phone Call</option>
-                                    <option value="in_person">In Person</option>
-                                </select>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label" style="font-weight:700;">Meeting Link</label>
-                                <input type="url" name="meeting_link" class="form-control" placeholder="https://meet.google.com/...">
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label" style="font-weight:700;">Location</label>
-                                <input type="text" name="location" class="form-control" placeholder="Office address or meeting venue">
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label" style="font-weight:700;">Notes</label>
-                                <textarea name="notes" rows="3" class="form-control" placeholder="Share what the candidate should expect during the interview."></textarea>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn-green mt-3">
-                            <i class="fas fa-calendar-plus me-2"></i>Send Interview Invite
-                        </button>
-                    </form>
-                </div>
-                {% endif %}
+                <div class="conversation-main">
+                    <div class="conversation-main-card">
+                        <h2 class="section-title-chat">Interviews</h2>
+                        <p class="section-copy-chat">Interview invites stay attached to the same application thread, so both sides can follow the process clearly.</p>
 
-                <div class="form-card mb-4">
-                    <h5 style="font-weight:800;margin-bottom:1rem;">Conversation</h5>
-                    {% if conversation_messages %}
-                    <div style="display:flex;flex-direction:column;gap:1rem;max-height:540px;overflow-y:auto;padding-right:0.3rem;">
-                        {% for message in conversation_messages %}
-                        <div style="background:{% if message.sender_role == 'company' %}#f6f8fb{% else %}var(--green-light){% endif %};border:1px solid #eef1f4;border-radius:14px;padding:1rem;">
-                            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
-                                <div style="font-weight:800;">
-                                    {{ message.sender_name }}
-                                    <span style="font-weight:600;color:var(--gray);font-size:0.85rem;">
-                                        {% if message.sender_role == 'company' %}Employer{% else %}Candidate{% endif %}
-                                    </span>
+                        <div class="interview-list" style="margin-top:1rem;">
+                            {% if interviews %}
+                                {% for interview in interviews %}
+                                <div class="interview-card">
+                                    <div class="interview-head">
+                                        <div>
+                                            <div class="interview-title">{{ interview.get_meeting_type_display }}</div>
+                                            <div class="interview-meta">
+                                                {{ interview.scheduled_for|date:"M d, Y H:i" }}<br>
+                                                {% if interview.meeting_link %}<a href="{{ interview.meeting_link }}" target="_blank" style="color:var(--green);text-decoration:none;font-weight:700;">Open meeting link</a>{% endif %}
+                                                {% if interview.location %}<span>{% if interview.meeting_link %}<br>{% endif %}{{ interview.location }}</span>{% endif %}
+                                            </div>
+                                        </div>
+                                        <span class="status-badge status-active">{{ interview.get_status_display }}</span>
+                                    </div>
+                                    {% if interview.notes %}<div class="message-body" style="margin-bottom:0.85rem;">{{ interview.notes|linebreaks }}</div>{% endif %}
+                                    {% if is_seeker_participant and interview.status == 'pending' %}
+                                    <div class="d-flex gap-2 flex-wrap">
+                                        <form method="post" action="{% url 'respond_to_interview' interview.pk %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="decision" value="accepted">
+                                            <button type="submit" class="btn-green"><i class="fas fa-check me-2"></i>Accept</button>
+                                        </form>
+                                        <form method="post" action="{% url 'respond_to_interview' interview.pk %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="decision" value="declined">
+                                            <button type="submit" class="btn-outline-green" style="color:#dc3545;border-color:#dc3545;"><i class="fas fa-times me-2"></i>Decline</button>
+                                        </form>
+                                    </div>
+                                    {% endif %}
                                 </div>
-                                <div style="font-size:0.82rem;color:var(--gray);">{{ message.created_at|date:"M d, Y H:i" }}</div>
-                            </div>
-                            <div style="line-height:1.7;color:#444;">{{ message.body|linebreaks }}</div>
+                                {% endfor %}
+                            {% else %}
+                            <div class="interview-card"><div class="message-body">No interviews scheduled yet.</div></div>
+                            {% endif %}
                         </div>
-                        {% endfor %}
                     </div>
-                    {% else %}
-                    <p style="color:var(--gray);margin:0;">No messages yet. Start the conversation below.</p>
-                    {% endif %}
-                </div>
 
-                <div class="form-card">
-                    <h6 style="font-weight:800;margin-bottom:1rem;">Send a Message</h6>
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <textarea name="body" rows="5" class="form-control" placeholder="Write your message here..."></textarea>
+                    {% if is_company_participant %}
+                    <div class="composer-card">
+                        <h3 class="section-title-chat" style="font-size:1.05rem;">Schedule an Interview</h3>
+                        <p class="section-copy-chat" style="margin-bottom:1rem;">Invite the candidate directly from this conversation to keep everything in one organized place.</p>
+                        <form method="post" action="{% url 'schedule_interview' application.pk %}">
+                            {% csrf_token %}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label" style="font-weight:700;">Date & Time</label>
+                                    <input type="datetime-local" name="scheduled_for" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" style="font-weight:700;">Meeting Type</label>
+                                    <select name="meeting_type" class="form-select">
+                                        <option value="video">Video Call</option>
+                                        <option value="phone">Phone Call</option>
+                                        <option value="in_person">In Person</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" style="font-weight:700;">Meeting Link</label>
+                                    <input type="url" name="meeting_link" class="form-control" placeholder="https://meet.google.com/...">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" style="font-weight:700;">Location</label>
+                                    <input type="text" name="location" class="form-control" placeholder="Office address or meeting venue">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" style="font-weight:700;">Notes</label>
+                                    <textarea name="notes" rows="3" class="form-control" placeholder="Share what the candidate should expect during this interview."></textarea>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-green mt-3"><i class="fas fa-calendar-plus me-2"></i>Send Interview Invite</button>
+                        </form>
+                    </div>
+                    {% endif %}
+
+                    <div class="conversation-main-card">
+                        <h2 class="section-title-chat">Conversation</h2>
+                        <p class="section-copy-chat">Message in context so important hiring details do not disappear into scattered email threads.</p>
+
+                        <div class="message-thread" style="margin-top:1rem;">
+                            {% if conversation_messages %}
+                                {% for message in conversation_messages %}
+                                <div class="message-bubble {% if message.sender_role == 'company' %}company{% else %}seeker{% endif %}">
+                                    <div class="message-head">
+                                        <div><span class="message-author">{{ message.sender_name }}</span><span class="message-role">{% if message.sender_role == 'company' %}Employer{% else %}Candidate{% endif %}</span></div>
+                                        <div class="message-time">{{ message.created_at|date:"M d, Y H:i" }}</div>
+                                    </div>
+                                    <div class="message-body">{{ message.body|linebreaks }}</div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                            <div class="message-bubble company"><div class="message-body">No messages yet. Start the conversation below.</div></div>
+                            {% endif %}
                         </div>
-                        <button type="submit" class="btn-green">
-                            <i class="fas fa-paper-plane me-2"></i>Send Message
-                        </button>
-                    </form>
+                    </div>
+
+                    <div class="composer-card">
+                        <h3 class="section-title-chat" style="font-size:1.05rem;">Send a Message</h3>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <textarea name="body" rows="5" class="form-control" placeholder="Write a clear, professional message here..."></textarea>
+                            </div>
+                            <button type="submit" class="btn-green"><i class="fas fa-paper-plane me-2"></i>Send Message</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+</div>
 {% endblock %}
