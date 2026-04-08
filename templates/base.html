@@ -6,6 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}CameroonTechJobs — Find IT Jobs in Cameroon{% endblock %}</title>
     {% load static %}
+    <script>
+        (function () {
+            var savedTheme = localStorage.getItem('ctj-theme');
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = savedTheme || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     <!-- PWA -->
     <link rel="manifest" href="{% static 'manifest.json' %}">
     <meta name="theme-color" content="#1a7a4a">
