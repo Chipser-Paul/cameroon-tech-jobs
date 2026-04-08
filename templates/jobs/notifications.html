@@ -2,65 +2,222 @@
 
 {% block title %}Notifications | CameroonTechJobs{% endblock %}
 
-{% block content %}
-<section class="page-hero">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div>
-                <h1>Notifications</h1>
-                <p style="color:rgba(255,255,255,0.78);margin:0;">Stay updated on applications, messages, status changes, and interviews.</p>
-            </div>
-            <form method="post" action="{% url 'mark_all_notifications_read' %}">
-                {% csrf_token %}
-                <button type="submit" class="btn-outline-green" style="border-color:white;color:white;">
-                    <i class="fas fa-check-double me-2"></i>Mark All as Read
-                </button>
-            </form>
-        </div>
-    </div>
-</section>
+{% block extra_css %}
+<style>
+    .notifications-shell {
+        background:
+            radial-gradient(circle at top right, rgba(26, 122, 74, 0.12), transparent 28%),
+            linear-gradient(180deg, #f8faf9 0%, #ffffff 20%, #f5f8fb 100%);
+    }
 
-<section class="py-5">
-    <div class="container">
-        <div class="form-card">
-            {% if notifications %}
-            <div style="display:flex;flex-direction:column;gap:1rem;">
-                {% for notification in notifications %}
-                <div style="border:1px solid {% if notification.is_read %}#eef1f4{% else %}rgba(26,122,74,0.25){% endif %};border-radius:14px;padding:1rem;background:{% if notification.is_read %}#fff{% else %}var(--green-light){% endif %};">
-                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
-                        <div>
-                            <div style="font-weight:800;">{{ notification.title }}</div>
-                            <div style="font-size:0.85rem;color:var(--gray);">{{ notification.created_at|date:"M d, Y H:i" }}</div>
-                        </div>
-                        {% if not notification.is_read %}
-                        <span class="badge rounded-pill text-bg-success">New</span>
-                        {% endif %}
+    .notifications-hero {
+        padding: 2.6rem 0 2rem;
+    }
+
+    .notifications-panel {
+        border-radius: 28px;
+        background: linear-gradient(135deg, #152033 0%, #1a2640 48%, #14503a 100%);
+        color: #fff;
+        padding: 2.3rem;
+        box-shadow: 0 24px 58px rgba(13, 29, 46, 0.14);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .notifications-panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(circle at 84% 20%, rgba(212,165,62,0.24), transparent 16%),
+            radial-gradient(circle at 14% 82%, rgba(159,226,185,0.18), transparent 18%);
+        pointer-events: none;
+    }
+
+    .notifications-panel > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .notify-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.45rem 0.8rem;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.88);
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 1rem;
+    }
+
+    .notify-kicker i {
+        color: #d4a53e;
+    }
+
+    .notify-title {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 800;
+        line-height: 1.03;
+        margin-bottom: 0.8rem;
+    }
+
+    .notify-copy {
+        color: rgba(255,255,255,0.78);
+        line-height: 1.75;
+        margin: 0;
+        max-width: 42rem;
+    }
+
+    .notify-action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.55rem;
+        padding: 0.9rem 1.2rem;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.16);
+        color: #fff;
+        font-weight: 700;
+    }
+
+    .notifications-body {
+        padding: 2rem 0 4rem;
+    }
+
+    .notification-list-card,
+    .notification-empty-card {
+        border-radius: 24px;
+        background: #fff;
+        border: 1px solid rgba(17, 29, 45, 0.05);
+        box-shadow: 0 18px 42px rgba(12, 28, 45, 0.08);
+    }
+
+    .notification-list-card {
+        padding: 1.5rem;
+    }
+
+    .notification-stack {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .notification-item {
+        border-radius: 20px;
+        padding: 1.15rem;
+        border: 1px solid rgba(17, 29, 45, 0.05);
+        background: #f8fafc;
+    }
+
+    .notification-item.unread {
+        background: linear-gradient(180deg, #f3fbf6 0%, #f8fcf9 100%);
+        border-color: rgba(26, 122, 74, 0.18);
+    }
+
+    .notification-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.55rem;
+    }
+
+    .notification-name {
+        font-size: 1.02rem;
+        font-weight: 800;
+        color: #152033;
+        margin-bottom: 0.2rem;
+    }
+
+    .notification-time {
+        color: #7b8ea0;
+        font-size: 0.84rem;
+    }
+
+    .notification-body-copy {
+        color: #55687a;
+        line-height: 1.75;
+        margin-bottom: 0.9rem;
+    }
+
+    .notification-empty-card {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="notifications-shell">
+    <section class="notifications-hero">
+        <div class="container">
+            <div class="notifications-panel">
+                <div class="row g-4 align-items-center">
+                    <div class="col-lg-8">
+                        <div class="notify-kicker"><i class="fas fa-bell"></i>Activity center</div>
+                        <h1 class="notify-title">Stay on top of every hiring update.</h1>
+                        <p class="notify-copy">Messages, interview invites, application changes, and candidate activity now live in one polished notification hub.</p>
                     </div>
-                    <div style="color:#444;line-height:1.7;margin-bottom:0.75rem;">{{ notification.body }}</div>
-                    <div class="d-flex gap-2 flex-wrap">
-                        <form method="post" action="{% url 'mark_notification_read' notification.pk %}">
+                    <div class="col-lg-4 text-lg-end">
+                        <form method="post" action="{% url 'mark_all_notifications_read' %}">
                             {% csrf_token %}
-                            <button type="submit" class="btn-outline-green" style="padding:0.5rem 1rem;">
-                                <i class="fas fa-check me-2"></i>{% if notification.link %}Open{% else %}Mark as Read{% endif %}
+                            <button type="submit" class="notify-action-btn">
+                                <i class="fas fa-check-double"></i>Mark All as Read
                             </button>
                         </form>
-                        {% if notification.link %}
-                        <a href="{{ notification.link }}" class="btn-green" style="padding:0.5rem 1rem;">
-                            <i class="fas fa-arrow-right me-2"></i>Go Now
-                        </a>
-                        {% endif %}
                     </div>
                 </div>
-                {% endfor %}
             </div>
-            {% else %}
-            <div class="text-center py-5">
-                <i class="fas fa-bell-slash fa-3x mb-3" style="color:var(--green);opacity:0.25;"></i>
-                <h5 style="font-weight:800;">No notifications yet</h5>
-                <p style="color:var(--gray);">Important hiring activity will appear here as soon as it happens.</p>
-            </div>
-            {% endif %}
         </div>
-    </div>
-</section>
+    </section>
+
+    <section class="notifications-body">
+        <div class="container">
+            <div class="notification-list-card">
+                {% if notifications %}
+                <div class="notification-stack">
+                    {% for notification in notifications %}
+                    <div class="notification-item {% if not notification.is_read %}unread{% endif %}">
+                        <div class="notification-head">
+                            <div>
+                                <div class="notification-name">{{ notification.title }}</div>
+                                <div class="notification-time">{{ notification.created_at|date:"M d, Y H:i" }}</div>
+                            </div>
+                            {% if not notification.is_read %}
+                            <span class="badge rounded-pill text-bg-success">New</span>
+                            {% endif %}
+                        </div>
+                        <div class="notification-body-copy">{{ notification.body }}</div>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <form method="post" action="{% url 'mark_notification_read' notification.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-outline-green" style="padding:0.55rem 1rem;">
+                                    <i class="fas fa-check me-2"></i>{% if notification.link %}Open{% else %}Mark as Read{% endif %}
+                                </button>
+                            </form>
+                            {% if notification.link %}
+                            <a href="{{ notification.link }}" class="btn-green" style="padding:0.55rem 1rem;">
+                                <i class="fas fa-arrow-right me-2"></i>Go Now
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="notification-empty-card">
+                    <i class="fas fa-bell-slash fa-3x mb-3" style="color:var(--green);opacity:0.25;"></i>
+                    <h5 style="font-weight:800;">No notifications yet</h5>
+                    <p style="color:#728395;max-width:32rem;margin:0 auto;">As soon as hiring activity happens, this page will keep you updated with a cleaner, more professional activity feed.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+</div>
 {% endblock %}

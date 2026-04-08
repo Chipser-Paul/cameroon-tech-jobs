@@ -2,72 +2,269 @@
 
 {% block title %}My Applications | CameroonTechJobs{% endblock %}
 
-{% block content %}
-<section class="page-hero">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div>
-                <h1>My Applications</h1>
-                <p style="color:rgba(255,255,255,0.78);margin:0;">Track the jobs you applied for and see where each one stands.</p>
-            </div>
-            <a href="{% url 'job_list' %}" class="btn-outline-green" style="border-color:white;color:white;">
-                <i class="fas fa-search me-2"></i>Browse More Jobs
-            </a>
-        </div>
-    </div>
-</section>
+{% block extra_css %}
+<style>
+    .seeker-app-shell {
+        background:
+            radial-gradient(circle at top left, rgba(26, 122, 74, 0.12), transparent 26%),
+            linear-gradient(180deg, #f7faf8 0%, #ffffff 24%, #f5f8fb 100%);
+    }
 
-<section class="py-5">
-    <div class="container">
-        <div class="form-card">
-            {% if applications %}
-            <div class="table-responsive">
-                <table class="table" style="font-size:0.95rem;">
-                    <thead style="background:var(--light-gray);">
-                        <tr>
-                            <th style="padding:1rem;font-weight:700;">Job</th>
-                            <th style="padding:1rem;font-weight:700;">Company</th>
-                            <th style="padding:1rem;font-weight:700;">Status</th>
-                            <th style="padding:1rem;font-weight:700;">Applied</th>
-                            <th style="padding:1rem;font-weight:700;">Conversation</th>
-                            <th style="padding:1rem;font-weight:700;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for application in applications %}
-                        <tr>
-                            <td style="padding:1rem;font-weight:600;">{{ application.job.title }}</td>
-                            <td style="padding:1rem;color:var(--gray);">{{ application.job.company.company_name }}</td>
-                            <td style="padding:1rem;">
-                                <span class="status-badge status-active">{{ application.get_status_display }}</span>
-                            </td>
-                            <td style="padding:1rem;color:var(--gray);">{{ application.date_applied|date:"M d, Y" }}</td>
-                            <td style="padding:1rem;">
-                                <a href="{% url 'application_conversation' application.pk %}" style="color:var(--green);font-weight:700;text-decoration:none;">
-                                    Messages
-                                </a>
-                            </td>
-                            <td style="padding:1rem;">
-                                <a href="{% url 'job_detail' application.job.pk %}" style="color:var(--green);font-weight:700;text-decoration:none;">
-                                    View Job
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    .seeker-app-hero {
+        padding: 2.6rem 0 2rem;
+    }
+
+    .seeker-app-panel {
+        border-radius: 28px;
+        background: linear-gradient(135deg, #152033 0%, #1a2640 48%, #14503a 100%);
+        color: #fff;
+        padding: 2.3rem;
+        box-shadow: 0 24px 58px rgba(13, 29, 46, 0.14);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .seeker-app-panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(circle at 82% 20%, rgba(212,165,62,0.24), transparent 16%),
+            radial-gradient(circle at 16% 84%, rgba(159,226,185,0.18), transparent 18%);
+        pointer-events: none;
+    }
+
+    .seeker-app-panel > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .app-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.45rem 0.8rem;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.88);
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 1rem;
+    }
+
+    .app-kicker i {
+        color: #d4a53e;
+    }
+
+    .app-hero-title {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 800;
+        line-height: 1.03;
+        margin-bottom: 0.8rem;
+    }
+
+    .app-hero-copy {
+        color: rgba(255,255,255,0.78);
+        line-height: 1.75;
+        margin: 0;
+        max-width: 42rem;
+    }
+
+    .app-hero-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.55rem;
+        padding: 0.9rem 1.2rem;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.16);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .seeker-app-body {
+        padding: 2rem 0 4rem;
+    }
+
+    .app-table-card,
+    .app-empty-card {
+        border-radius: 24px;
+        background: #fff;
+        border: 1px solid rgba(17, 29, 45, 0.05);
+        box-shadow: 0 18px 42px rgba(12, 28, 45, 0.08);
+    }
+
+    .app-table-card {
+        padding: 1.5rem;
+    }
+
+    .app-section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.2rem;
+    }
+
+    .app-section-title {
+        font-size: 1.32rem;
+        font-weight: 800;
+        color: #152033;
+        margin: 0;
+    }
+
+    .app-section-copy {
+        color: #728496;
+        margin: 0.35rem 0 0;
+        line-height: 1.7;
+    }
+
+    .application-board {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 0.75rem;
+    }
+
+    .application-board thead th {
+        padding: 0 0.85rem 0.35rem;
+        color: #7a8d9f;
+        font-size: 0.79rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 800;
+    }
+
+    .application-board tbody tr {
+        background: #f8fafc;
+        box-shadow: inset 0 0 0 1px rgba(21, 32, 51, 0.05);
+    }
+
+    .application-board tbody td {
+        padding: 1rem 0.85rem;
+        vertical-align: middle;
+    }
+
+    .application-board tbody tr td:first-child {
+        border-radius: 16px 0 0 16px;
+    }
+
+    .application-board tbody tr td:last-child {
+        border-radius: 0 16px 16px 0;
+    }
+
+    .job-link-strong {
+        color: #152033;
+        text-decoration: none;
+        font-weight: 800;
+    }
+
+    .job-link-strong:hover {
+        color: var(--green);
+    }
+
+    .conversation-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.45rem 0.8rem;
+        border-radius: 999px;
+        background: rgba(26, 122, 74, 0.1);
+        color: var(--green);
+        text-decoration: none;
+        font-size: 0.84rem;
+        font-weight: 700;
+    }
+
+    .app-empty-card {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="seeker-app-shell">
+    <section class="seeker-app-hero">
+        <div class="container">
+            <div class="seeker-app-panel">
+                <div class="row g-4 align-items-center">
+                    <div class="col-lg-8">
+                        <div class="app-kicker"><i class="fas fa-paper-plane"></i>Candidate workspace</div>
+                        <h1 class="app-hero-title">Track every application with more clarity.</h1>
+                        <p class="app-hero-copy">See where you applied, follow status updates, and jump straight into recruiter conversations without losing context.</p>
+                    </div>
+                    <div class="col-lg-4 text-lg-end">
+                        <a href="{% url 'job_list' %}" class="app-hero-btn"><i class="fas fa-search"></i>Browse More Jobs</a>
+                    </div>
+                </div>
             </div>
-            {% else %}
-            <div class="text-center py-5">
-                <i class="fas fa-paper-plane fa-3x mb-3" style="color:var(--green);opacity:0.25;"></i>
-                <h5 style="font-weight:800;">No applications yet</h5>
-                <p style="color:var(--gray);">Once you apply for jobs, this page will show your current pipeline.</p>
-                <a href="{% url 'job_list' %}" class="btn-green">
-                    <i class="fas fa-search me-2"></i>Browse Jobs
-                </a>
-            </div>
-            {% endif %}
         </div>
-    </div>
-</section>
+    </section>
+
+    <section class="seeker-app-body">
+        <div class="container">
+            <div class="app-table-card">
+                {% if applications %}
+                <div class="app-section-head">
+                    <div>
+                        <h2 class="app-section-title">Your active application history</h2>
+                        <p class="app-section-copy">A polished application view helps candidates trust the platform and stay engaged throughout the hiring process.</p>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="application-board">
+                        <thead>
+                            <tr>
+                                <th>Job</th>
+                                <th>Company</th>
+                                <th>Status</th>
+                                <th>Applied</th>
+                                <th>Conversation</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for application in applications %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'job_detail' application.job.pk %}" class="job-link-strong">
+                                        {{ application.job.title }}
+                                    </a>
+                                </td>
+                                <td style="color:#66798c;font-weight:600;">{{ application.job.company.company_name }}</td>
+                                <td><span class="status-badge status-active">{{ application.get_status_display }}</span></td>
+                                <td style="color:#66798c;">{{ application.date_applied|date:"M d, Y" }}</td>
+                                <td>
+                                    <a href="{% url 'application_conversation' application.pk %}" class="conversation-pill">
+                                        <i class="fas fa-comments"></i>Messages
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{% url 'job_detail' application.job.pk %}" style="color:var(--green);font-weight:700;text-decoration:none;">
+                                        View Job
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="app-empty-card">
+                    <i class="fas fa-paper-plane fa-3x mb-3" style="color:var(--green);opacity:0.25;"></i>
+                    <h5 style="font-weight:800;">No applications yet</h5>
+                    <p style="color:#728395;max-width:32rem;margin:0 auto 1.2rem;">Once you apply to jobs, this page becomes your personal application tracker with conversation and interview visibility.</p>
+                    <a href="{% url 'job_list' %}" class="btn-green"><i class="fas fa-search me-2"></i>Browse Jobs</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+</div>
 {% endblock %}
