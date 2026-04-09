@@ -155,25 +155,35 @@ elif CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
 STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 
-# Redis and Caching
-REDIS_URL = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379')
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': REDIS_URL + '/1',
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'CONNECTION_POOL_KWARGS': {'max_connections': 50, 'retry_on_timeout': True},
-        },
-        'KEY_PREFIX': 'cameroon_tech_jobs',
-        'TIMEOUT': 3600,  # 1 hour default cache timeout
-    }
-}
-CACHE_MIDDLEWARE_SECONDS = 3600
+# Redis and Caching - Optional for free tier
+REDIS_URL = os.getenv('REDIS_URL', '')
 
-# Celery settings
-CELERY_BROKER_URL = REDIS_URL + '/0'
-CELERY_RESULT_BACKEND = REDIS_URL + '/0'
+if REDIS_URL:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': REDIS_URL + '/1',
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                'CONNECTION_POOL_KWARGS': {'max_connections': 50, 'retry_on_timeout': True},
+            },
+            'KEY_PREFIX': 'cameroon_tech_jobs',
+            'TIMEOUT': 3600,
+        }
+    }
+    CELERY_BROKER_URL = REDIS_URL + '/0'
+    CELERY_RESULT_BACKEND = REDIS_URL + '/0'
+else:
+    # Fallback for free tier (no Redis)
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }
+    }
+    CELERY_BROKER_URL = 'memory://'
+    CELERY_RESULT_BACKEND = 'cache+memory://'
+
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_TASK_ALWAYS_EAGER = not bool(REDIS_URL)  # Run tasks sync if no Redis
