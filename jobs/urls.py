@@ -14,4 +14,6 @@ urlpatterns = [
     path('notifications/<int:pk>/read/', views.mark_notification_read, name='mark_notification_read'),
     path('notifications/read-all/', views.mark_all_notifications_read, name='mark_all_notifications_read'),
     path('post-job/', views.post_job, name='post_job'),
+    path('payment/<str:payment_intent_id>/', views.payment, name='payment'),
+    path('payment/success/<str:payment_intent_id>/', views.payment_success, name='payment_success'),
 ]

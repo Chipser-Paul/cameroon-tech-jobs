@@ -43,3 +43,37 @@ class Company(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = 'Company'
         verbose_name_plural = 'Companies'
+
+
+class CompanyVerificationToken(models.Model):
+    company = models.OneToOneField(Company, on_delete=models.CASCADE, related_name='verification_token')
+    token = models.UUIDField(unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'Verification token for {self.company.company_name}'
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'Verification token for {self.company.company_name}'
+
+
+
+class CompanyVerificationToken(models.Model):
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        related_name='verification_tokens',
+    )
+    token = models.UUIDField(unique=True)
+    is_used = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Verification token for {self.company.company_name} ({self.token})'
+
+    class Meta:
+        ordering = ['-created_at']

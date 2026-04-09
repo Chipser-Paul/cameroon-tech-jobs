@@ -1,7 +1,11 @@
+import logging
+
 from django.conf import settings
 from django.core.mail import send_mail
 
 from seekers.models import Seeker
+
+logger = logging.getLogger(__name__)
 
 
 def send_job_alerts(job):
@@ -26,37 +30,37 @@ def send_job_alerts(job):
     profile_url = f'{site_url}/seeker/profile/edit/'
 
     for seeker in matching_seekers:
-        try:
-            subject = f'New Job Alert: {job.title} at {job.company.company_name}'
-            salary_line = f'Salary: {job.salary_range}\n' if job.salary_range else ''
-            message = (
-                f'Hi {seeker.full_name},\n\n'
-                'A new job matching your preferences has been posted on CameroonTechJobs!\n\n'
-                '---------------------------\n'
-                f'{job.title}\n'
-                f'{job.company.company_name}\n'
-                '---------------------------\n\n'
-                f'Location: {job.get_location_display()}\n'
-                f'Type: {job.get_job_type_display()}\n'
-                f"Category: {job.category.name if job.category else 'General'}\n"
-                f'{salary_line}'
-                'Posted: Today\n\n'
-                'View & Apply:\n'
-                f'{job_url}\n\n'
-                '---------------------------\n'
-                'To stop receiving alerts, update your preferences:\n'
-                f'{profile_url}\n\n'
-                'CameroonTechJobs - Built in Douala\n'
-            )
+        subject = f'New Job Alert: {job.title} at {job.company.company_name}'
+        salary_line = f'Salary: {job.salary_range}\n' if job.salary_range else ''
+        message = (
+            f'Hi {seeker.full_name},\n\n'
+            'A new job matching your preferences has been posted on CameroonTechJobs!\n\n'
+            '---------------------------\n'
+            f'{job.title}\n'
+            f'{job.company.company_name}\n'
+            '---------------------------\n\n'
+            f'Location: {job.get_location_display()}\n'
+            f'Type: {job.get_job_type_display()}\n'
+            f"Category: {job.category.name if job.category else 'General'}\n"
+            f'{salary_line}'
+            'Posted: Today\n\n'
+            'View & Apply:\n'
+            f'{job_url}\n\n'
+            '---------------------------\n'
+            'To stop receiving alerts, update your preferences:\n'
+            f'{profile_url}\n\n'
+            'CameroonTechJobs - Built in Douala\n'
+        )
 
+        try:
             send_mail(
                 subject=subject,
                 message=message,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[seeker.email],
-                fail_silently=True,
+                fail_silently=False,
             )
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.exception('Failed to send job alert email to %s for job %s: %s', seeker.email, job.pk, exc)
 
     return len(matching_seekers)

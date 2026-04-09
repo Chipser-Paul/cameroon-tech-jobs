@@ -1,9 +1,15 @@
+import uuid
+
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Company
+from django.urls import reverse
+from django_ratelimit.decorators import ratelimit
+from .models import Company, CompanyVerificationToken
 from .forms import CompanyRegistrationForm
 from jobs.models import Job
 from seekers.models import Seeker
@@ -16,11 +22,27 @@ def register(request):
         if form.is_valid():
             company = form.save()
             login(request, company, backend='django.contrib.auth.backends.ModelBackend')
-            messages.success(request, f'Welcome {company.company_name}! Your account is ready. Post your first job for free!')
+            verification_token = CompanyVerificationToken.objects.create(
+                company=company,
+                token=uuid.uuid4(),
+            )
+            verify_url = request.build_absolute_uri(reverse('company_verify', args=[verification_token.token]))
+            try:
+                send_mail(
+                    'Verify your CameroonTechJobs company account',
+                    f'Hi {company.company_name},\n\nPlease verify your company email by clicking the link below:\n{verify_url}\n\nIf you did not sign up, ignore this message.\n',
+                    settings.DEFAULT_FROM_EMAIL,
+                    [company.email],
+                    fail_silently=False,
+                )
+                messages.success(request, f'Welcome {company.company_name}! Please check your email to verify your account and activate future jobs faster.')
+            except Exception:
+                messages.warning(request, f'Welcome {company.company_name}! We were unable to send a verification email right now, but your account is created.')
             return redirect('dashboard')
     return render(request, 'companies/register.html', {'form': form})
 
 
+@ratelimit(key='ip', rate='5/m', block=True)
 def company_login(request):
     if request.method == 'POST':
         email = request.POST.get('username')
@@ -32,6 +54,17 @@ def company_login(request):
         else:
             messages.error(request, 'Invalid email or password.')
     return render(request, 'companies/login.html', {'form': {}})
+
+
+def verify_company(request, token):
+    verification_token = get_object_or_404(CompanyVerificationToken, token=token, is_used=False)
+    company = verification_token.company
+    company.is_verified = True
+    company.save()
+    verification_token.is_used = True
+    verification_token.save()
+    messages.success(request, 'Your company has been verified. Future free jobs from your account may be activated automatically.')
+    return redirect('dashboard')
 
 
 def company_logout(request):

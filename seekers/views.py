@@ -1,12 +1,13 @@
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django_ratelimit.decorators import ratelimit
 import logging
 import cloudinary.uploader
 from .models import Seeker
-from .forms import SeekerRegistrationForm, SeekerProfileForm
-from jobs.models import Job, JobApplication
+from .forms import SeekerRegistrationForm, SeekerProfileFormfrom .utils import calculate_profile_completionfrom jobs.models import Job, JobApplication
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +24,7 @@ def seeker_register(request):
     return render(request, 'seekers/register.html', {'form': form})
 
 
+@ratelimit(key='ip', rate='5/m', block=True)
 def seeker_login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -51,6 +53,9 @@ def seeker_dashboard(request):
         status='active',
         category__in=seeker.preferred_categories.all()
     ).exclude(saved_by=seeker)[:6]
+    
+    profile_data = calculate_profile_completion(seeker)
+    
     context = {
         'seeker': seeker,
         'saved_jobs': saved,
@@ -59,6 +64,7 @@ def seeker_dashboard(request):
         'applications_count': seeker.applications.count(),
         'saved_count': saved.count(),
         'skills_count': seeker.skills.count(),
+        'profile_completion': profile_data,
     }
     return render(request, 'seekers/dashboard.html', context)
 
@@ -139,7 +145,16 @@ def seeker_list(request):
     experience = request.GET.get('experience')
     if experience:
         seekers = seekers.filter(experience_level=experience)
-    return render(request, 'seekers/seeker_list.html', {'seekers': seekers})
+
+    seekers = seekers.prefetch_related('skills').order_by('-date_joined')
+    paginator = Paginator(seekers, 12)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(request, 'seekers/seeker_list.html', {
+        'seekers': page_obj,
+        'page_obj': page_obj,
+        'is_paginated': page_obj.has_other_pages(),
+    })
 
 
 def seeker_detail(request, pk):

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Complete Payment - CameroonTechJobs{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Complete Payment</h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>Job:</strong> {{ payment.job.title }}</p>
+                    <p><strong>Plan:</strong> {{ payment.job.get_plan_display }}</p>
+                    <p><strong>Amount:</strong> {{ payment.amount }} XAF</p>
+
+                    <form id="payment-form">
+                        <div id="card-element">
+                            <!-- Stripe Elements will create the card input -->
+                        </div>
+                        <div id="card-errors" role="alert"></div>
+                        <button id="submit" class="btn btn-primary mt-3">Pay {{ payment.amount }} XAF</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+const stripe = Stripe('{{ stripe_public_key }}');
+const elements = stripe.elements();
+const cardElement = elements.create('card');
+cardElement.mount('#card-element');
+
+const form = document.getElementById('payment-form');
+const submitButton = document.getElementById('submit');
+const errorElement = document.getElementById('card-errors');
+
+form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    submitButton.disabled = true;
+    submitButton.textContent = 'Processing...';
+
+    const { error } = await stripe.confirmCardPayment('{{ client_secret }}', {
+        payment_method: {
+            card: cardElement,
+        }
+    });
+
+    if (error) {
+        errorElement.textContent = error.message;
+        submitButton.disabled = false;
+        submitButton.textContent = 'Pay {{ payment.amount }} XAF';
+    } else {
+        // Payment succeeded
+        window.location.href = '/jobs/payment/success/{{ payment.stripe_payment_intent_id }}/';
+    }
+});
+</script>
+{% endblock %}

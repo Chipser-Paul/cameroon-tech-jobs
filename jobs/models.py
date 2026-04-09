@@ -238,6 +238,34 @@ class ApplicationInterview(models.Model):
         ordering = ['-scheduled_for']
 
 
+class Payment(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    job = models.OneToOneField(
+        Job,
+        on_delete=models.CASCADE,
+        related_name='payment',
+    )
+    stripe_payment_intent_id = models.CharField(max_length=255, unique=True)
+    client_secret = models.CharField(max_length=255)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)  # in XAF
+    currency = models.CharField(max_length=3, default='xaf')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'Payment for {self.job.title} - {self.status}'
+
+    class Meta:
+        ordering = ['-created_at']
+
+
 class Notification(models.Model):
     recipient_company = models.ForeignKey(
         'companies.Company',

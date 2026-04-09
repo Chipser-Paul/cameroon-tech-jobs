@@ -357,11 +357,32 @@
 
     <section class="seeker-main">
         <div class="container">
-            {% if not seeker.experience_level or not seeker.skills.count or not seeker.bio %}
+            {% if profile_completion.percentage < 100 %}
             <div class="warning-pro">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                <strong>Complete your profile.</strong> Companies search for candidates by skills, experience, and profile quality.
-                <a href="{% url 'edit_profile' %}" style="color:#7a5a14;font-weight:800;text-decoration:none;margin-left:0.4rem;">Finish it now</a>
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <strong>Profile Completion</strong>
+                        <span style="font-weight: 700;">{{ profile_completion.percentage }}%</span>
+                    </div>
+                    <div style="background: rgba(0, 0, 0, 0.1); border-radius: 10px; height: 10px; overflow: hidden;">
+                        <div style="background: #d4a53e; height: 100%; width: {{ profile_completion.percentage }}%; transition: width 0.3s ease;"></div>
+                    </div>
+                </div>
+                <div style="font-size: 0.9rem; line-height: 1.6;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Complete your profile</strong> to improve visibility and get discovered by more companies.
+                    {% if profile_completion.missing %}
+                    <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid rgba(0,0,0,0.1);">
+                        Missing: {{ profile_completion.missing|join:", " }}
+                    </div>
+                    {% endif %}
+                </div>
+                <a href="{% url 'edit_profile' %}" style="color:#7a5a14;font-weight:800;text-decoration:none;margin-left:auto;display:inline-block;margin-top:0.5rem;">Complete Now →</a>
+            </div>
+            {% else %}
+            <div style="padding: 1rem 1.15rem; border-radius: 18px; background: linear-gradient(135deg, rgba(26, 122, 74, 0.1), rgba(159, 226, 185, 0.1)); border: 1px solid rgba(26, 122, 74, 0.2); color: #1a7a4a; margin-bottom: 1.2rem;">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong>Profile 100% Complete!</strong> You're visible to all companies on CameroonTechJobs.
             </div>
             {% endif %}
 

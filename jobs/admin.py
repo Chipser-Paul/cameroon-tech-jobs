@@ -1,8 +1,9 @@
 from django.contrib import admin
 from django.contrib import messages
 
-from .alerts import send_job_alerts
+from .tasks import send_job_alerts_task
 from .models import ApplicationInterview, ApplicationMessage, Category, Job, JobApplication, Notification, TechStack
+from companies.models import Company
 
 
 @admin.register(Category)
@@ -25,6 +26,7 @@ class JobAdmin(admin.ModelAdmin):
     list_editable = ['status', 'is_featured']
     filter_horizontal = ['tech_stacks']
     ordering = ['-date_posted']
+    actions = ['approve_jobs', 'reject_jobs']
 
     def save_model(self, request, obj, form, change):
         is_newly_activated = False
@@ -39,20 +41,32 @@ class JobAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
         if is_newly_activated:
-            try:
-                count = send_job_alerts(obj)
-                if count > 0:
-                    self.message_user(
-                        request,
-                        f'Job activated successfully. Job alerts were attempted for {count} matching seeker(s).',
-                        messages.SUCCESS,
-                    )
-            except Exception:
-                self.message_user(
-                    request,
-                    'Job activated successfully, but job alert emails could not be sent right now.',
-                    messages.WARNING,
-                )
+            send_job_alerts_task.delay(obj.pk)
+            self.message_user(
+                request,
+                'Job activated successfully and job alert delivery has been queued.',
+                messages.SUCCESS,
+            )
+
+    def approve_jobs(self, request, queryset):
+        activated = 0
+        for job in queryset:
+            if job.status != 'active':
+                job.status = 'active'
+                job.save()
+                activated += 1
+        if activated:
+            self.message_user(request, f'{activated} job(s) approved and alerts queued.', messages.SUCCESS)
+        else:
+            self.message_user(request, 'No jobs were approved.', messages.INFO)
+
+    approve_jobs.short_description = 'Approve selected jobs'
+
+    def reject_jobs(self, request, queryset):
+        rejected = queryset.update(status='rejected')
+        self.message_user(request, f'{rejected} job(s) rejected.', messages.SUCCESS)
+
+    reject_jobs.short_description = 'Reject selected jobs'
 
 
 @admin.register(JobApplication)
@@ -69,7 +83,7 @@ class ApplicationMessageAdmin(admin.ModelAdmin):
     list_display = ['application', 'sender_name', 'created_at']
     list_filter = ['created_at']
     search_fields = ['application__job__title', 'application__seeker__full_name', 'body']
-    autocomplete_fields = ['application', 'sender_company', 'sender_seeker']
+    autocomplete_fields = ['application', 'sender_seeker']
     ordering = ['-created_at']
 
 
@@ -87,5 +101,5 @@ class NotificationAdmin(admin.ModelAdmin):
     list_display = ['title', 'recipient_company', 'recipient_seeker', 'is_read', 'created_at']
     list_filter = ['is_read', 'created_at']
     search_fields = ['title', 'body']
-    autocomplete_fields = ['recipient_company', 'recipient_seeker']
+    autocomplete_fields = ['recipient_seeker']
     ordering = ['-created_at']

@@ -1,19 +1,32 @@
 from datetime import datetime
+import logging
 
+from django.core.cache import cache
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 
 from .forms import JobForm
-from .models import ApplicationInterview, ApplicationMessage, Job, Category, Notification, TechStack, JobApplication
+from .models import ApplicationInterview, ApplicationMessage, Job, Category, Notification, TechStack, JobApplication, Payment
 from .notifications import notify_company, notify_seeker
+from .tasks import send_job_alerts_task
 from companies.models import Company
 from seekers.models import Seeker
+import stripe
+
+logger = logging.getLogger(__name__)
 
 
 def job_list(request):
-    jobs = Job.objects.filter(status='active')
+    cache_key = f'job_list_{request.GET.urlencode()}'
+    cached_data = cache.get(cache_key)
+    if cached_data:
+        return render(request, 'jobs/job_list.html', cached_data)
+
+    jobs = Job.objects.filter(status='active').select_related('company', 'category').prefetch_related('tech_stacks')
     categories = Category.objects.all()
     tech_stacks = TechStack.objects.all()
 
@@ -41,12 +54,20 @@ def job_list(request):
     if experience:
         jobs = jobs.filter(experience_level=experience)
 
+    jobs = jobs.distinct().order_by('-is_featured', '-date_posted')
+    paginator = Paginator(jobs, 12)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
     context = {
-        'jobs': jobs.distinct(),
+        'jobs': page_obj,
         'categories': categories,
         'tech_stacks': tech_stacks,
-        'total_jobs': jobs.distinct().count(),
+        'total_jobs': jobs.count(),
+        'page_obj': page_obj,
+        'is_paginated': page_obj.has_other_pages(),
     }
+
+    cache.set(cache_key, context, 300)  # Cache for 5 minutes
     return render(request, 'jobs/job_list.html', context)
 
 
@@ -91,18 +112,54 @@ def post_job(request):
 
             if is_free:
                 job.plan = 'free'
-                job.status = 'pending'
+                job.status = 'active' if company.is_verified else 'pending'
                 company.has_used_free_listing = True
                 company.save()
-                messages.success(request, '🎉 Your free job listing has been submitted! It will be activated within 24 hours.')
-            else:
-                job.status = 'pending'
-                messages.success(request, '✅ Job submitted! Please complete your payment to activate the listing.')
+                job.save()
+                form.save_m2m()
+                form.save_custom_tech(job)
 
+                if job.status == 'active':
+                    send_job_alerts_task.delay(job.pk)
+                    messages.success(request, '🎉 Your free job listing is now active and job alerts are being sent.')
+                else:
+                    messages.success(request, '🎉 Your free job listing has been submitted and will be reviewed shortly.')
+                return redirect('dashboard')
+
+            plan = form.cleaned_data['plan']
+            if plan == 'basic':
+                amount = 5000
+            elif plan == 'featured':
+                amount = 15000
+            else:
+                messages.error(request, 'Please select a valid plan.')
+                return redirect('post_job')
+
+            job.plan = plan
+            job.status = 'pending'
             job.save()
             form.save_m2m()
             form.save_custom_tech(job)
-            return redirect('dashboard')
+
+            # Create Stripe PaymentIntent
+            stripe.api_key = settings.STRIPE_SECRET_KEY
+            intent = stripe.PaymentIntent.create(
+                amount=amount,
+                currency='xaf',
+                metadata={'job_id': str(job.id)},
+            )
+
+            # Save Payment record
+            Payment.objects.create(
+                job=job,
+                stripe_payment_intent_id=intent.id,
+                client_secret=intent.client_secret,
+                amount=amount,
+                status='pending'
+            )
+
+            messages.success(request, 'Job submitted! Complete payment to activate the listing.')
+            return redirect('payment', payment_intent_id=intent.id)
     else:
         form = JobForm()
 
@@ -116,6 +173,57 @@ def post_job(request):
         'is_free': is_free,
     }
     return render(request, 'jobs/post_job.html', context)
+
+
+@login_required
+def payment(request, payment_intent_id):
+    if not isinstance(request.user, Company):
+        messages.error(request, 'Access denied.')
+        return redirect('seeker_dashboard')
+
+    try:
+        payment = Payment.objects.get(stripe_payment_intent_id=payment_intent_id, job__company=request.user)
+    except Payment.DoesNotExist:
+        messages.error(request, 'Payment not found.')
+        return redirect('dashboard')
+
+    context = {
+        'payment': payment,
+        'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
+        'client_secret': payment.client_secret,
+    }
+    return render(request, 'jobs/payment.html', context)
+
+
+@login_required
+def payment_success(request, payment_intent_id):
+    if not isinstance(request.user, Company):
+        messages.error(request, 'Access denied.')
+        return redirect('seeker_dashboard')
+
+    try:
+        payment = Payment.objects.get(stripe_payment_intent_id=payment_intent_id, job__company=request.user)
+    except Payment.DoesNotExist:
+        messages.error(request, 'Payment not found.')
+        return redirect('dashboard')
+
+    # Confirm payment with Stripe
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+
+    if intent.status == 'succeeded':
+        payment.status = 'completed'
+        payment.save()
+        payment.job.status = 'active'
+        payment.job.save()
+        send_job_alerts_task.delay(payment.job.pk)
+        messages.success(request, 'Payment successful! Your job is now active.')
+    else:
+        payment.status = 'failed'
+        payment.save()
+        messages.error(request, 'Payment failed. Please try again.')
+
+    return redirect('dashboard')
 
 
 @login_required
@@ -282,12 +390,13 @@ def schedule_interview(request, pk):
     location = request.POST.get('location', '').strip()
     notes = request.POST.get('notes', '').strip()
 
-    try:
-        scheduled_for = datetime.strptime(scheduled_for_raw, '%Y-%m-%dT%H:%M')
-        scheduled_for = timezone.make_aware(scheduled_for, timezone.get_current_timezone())
-    except ValueError:
+    scheduled_for = parse_datetime(scheduled_for_raw)
+    if scheduled_for is None:
         messages.error(request, 'Please provide a valid interview date and time.')
         return redirect('application_conversation', pk=application.pk)
+
+    if timezone.is_naive(scheduled_for):
+        scheduled_for = timezone.make_aware(scheduled_for, timezone.get_current_timezone())
 
     if scheduled_for <= timezone.now():
         messages.error(request, 'Interview time must be in the future.')
