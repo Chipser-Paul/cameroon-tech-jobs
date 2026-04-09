@@ -135,7 +135,7 @@ def post_job(request):
                     send_job_alerts_task.delay(job.pk)
                     messages.success(request, '🎉 Your free job listing is now active and job alerts are being sent.')
                 else:
-                    messages.success(request, '🎉 Your free job listing has been submitted and will be reviewed shortly.')
+                    messages.info(request, '📧 Your job listing is ready! We\'ve sent a verification email to activate it. Please check your inbox and click the verification link. Your free listing will go live immediately once verified.')
                 return redirect('dashboard')
 
             plan = form.cleaned_data['plan']
