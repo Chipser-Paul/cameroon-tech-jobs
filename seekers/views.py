@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from ratelimit.decorators import ratelimit
+from django_ratelimit.decorators import ratelimit
 import logging
 import cloudinary.uploader
 from .models import Seeker
