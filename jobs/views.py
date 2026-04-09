@@ -154,24 +154,40 @@ def post_job(request):
             form.save_custom_tech(job)
 
             # Create Stripe PaymentIntent
-            stripe.api_key = settings.STRIPE_SECRET_KEY
-            intent = stripe.PaymentIntent.create(
-                amount=amount,
-                currency='xaf',
-                metadata={'job_id': str(job.id)},
-            )
+            if not settings.STRIPE_SECRET_KEY:
+                messages.error(request, 'Payment processing is temporarily unavailable. Please try again later.')
+                job.delete()
+                return redirect('post_job')
+            
+            try:
+                stripe.api_key = settings.STRIPE_SECRET_KEY
+                intent = stripe.PaymentIntent.create(
+                    amount=amount,
+                    currency='xaf',
+                    metadata={'job_id': str(job.id)},
+                )
 
-            # Save Payment record
-            Payment.objects.create(
-                job=job,
-                stripe_payment_intent_id=intent.id,
-                client_secret=intent.client_secret,
-                amount=amount,
-                status='pending'
-            )
+                # Save Payment record
+                Payment.objects.create(
+                    job=job,
+                    stripe_payment_intent_id=intent.id,
+                    client_secret=intent.client_secret,
+                    amount=amount,
+                    status='pending'
+                )
 
-            messages.success(request, 'Job submitted! Complete payment to activate the listing.')
-            return redirect('payment', payment_intent_id=intent.id)
+                messages.success(request, 'Job submitted! Complete payment to activate the listing.')
+                return redirect('payment', payment_intent_id=intent.id)
+            except stripe.error.StripeError as e:
+                job.delete()
+                messages.error(request, f'Payment processing failed: {str(e)}. Please try again.')
+                logger.error(f'Stripe error for job {job.id}: {str(e)}')
+                return redirect('post_job')
+            except Exception as e:
+                job.delete()
+                messages.error(request, 'An unexpected error occurred. Please try again.')
+                logger.error(f'Unexpected error creating payment for job {job.id}: {str(e)}')
+                return redirect('post_job')
     else:
         form = JobForm()
 

@@ -252,7 +252,7 @@ class Payment(models.Model):
         related_name='payment',
     )
     stripe_payment_intent_id = models.CharField(max_length=255, unique=True)
-    client_secret = models.CharField(max_length=255)
+    client_secret = models.CharField(max_length=255, blank=True, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)  # in XAF
     currency = models.CharField(max_length=3, default='xaf')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')

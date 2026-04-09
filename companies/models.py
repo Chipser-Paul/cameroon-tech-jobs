@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from cloudinary.models import CloudinaryField
 
 
 class CompanyManager(BaseUserManager):
@@ -24,7 +25,7 @@ class Company(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=20, blank=True)
     website = models.URLField(blank=True)
     description = models.TextField(blank=True)
-    logo = models.ImageField(upload_to='company_logos/', blank=True, null=True)
+    logo = CloudinaryField('image', blank=True, null=True, folder='cameroon_tech_jobs/companies')
     location = models.CharField(max_length=100, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
