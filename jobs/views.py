@@ -1,13 +1,15 @@
 from datetime import datetime
 import logging
 
-from django.core.cache import cache
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
+import stripe
 
 from .forms import JobForm
 from .models import ApplicationInterview, ApplicationMessage, Job, Category, Notification, TechStack, JobApplication, Payment
@@ -15,7 +17,6 @@ from .notifications import notify_company, notify_seeker
 from .tasks import send_job_alerts_task
 from companies.models import Company
 from seekers.models import Seeker
-import stripe
 
 logger = logging.getLogger(__name__)
 

@@ -3,11 +3,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django_ratelimit.decorators import ratelimit
+from ratelimit.decorators import ratelimit
 import logging
 import cloudinary.uploader
 from .models import Seeker
-from .forms import SeekerRegistrationForm, SeekerProfileFormfrom .utils import calculate_profile_completionfrom jobs.models import Job, JobApplication
+from .forms import SeekerRegistrationForm, SeekerProfileForm
+from .utils import calculate_profile_completion
+from jobs.models import Job, JobApplication
 
 logger = logging.getLogger(__name__)
 
