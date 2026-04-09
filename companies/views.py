@@ -8,7 +8,7 @@ from django.core.mail import send_mail
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from django_ratelimit.decorators import ratelimit
+from config.decorators import conditional_ratelimit
 from .models import Company, CompanyVerificationToken
 from .forms import CompanyRegistrationForm
 from jobs.models import Job
@@ -42,7 +42,7 @@ def register(request):
     return render(request, 'companies/register.html', {'form': form})
 
 
-@ratelimit(key='ip', rate='5/m', block=True)
+@conditional_ratelimit(key='ip', rate='5/m')
 def company_login(request):
     if request.method == 'POST':
         email = request.POST.get('username')

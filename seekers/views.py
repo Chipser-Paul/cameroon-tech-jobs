@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django_ratelimit.decorators import ratelimit
+from config.decorators import conditional_ratelimit
 import logging
 import cloudinary.uploader
 from .models import Seeker
@@ -26,7 +26,7 @@ def seeker_register(request):
     return render(request, 'seekers/register.html', {'form': form})
 
 
-@ratelimit(key='ip', rate='5/m', block=True)
+@conditional_ratelimit(key='ip', rate='5/m')
 def seeker_login(request):
     if request.method == 'POST':
         email = request.POST.get('email')

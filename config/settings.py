@@ -101,6 +101,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Silence django-ratelimit checks on free tier (conditionally disabled in decorator)
+SILENCED_SYSTEM_CHECKS = ['django_ratelimit.E003', 'django_ratelimit.W001']
+
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Africa/Douala'
 USE_I18N = True
@@ -174,7 +177,8 @@ if REDIS_URL:
     CELERY_BROKER_URL = REDIS_URL + '/0'
     CELERY_RESULT_BACKEND = REDIS_URL + '/0'
 else:
-    # Fallback for free tier (no Redis)
+    # Fallback for free tier (no Redis) - use DummyCache
+    # Rate limiting disabled in this mode via conditional_ratelimit decorator
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
