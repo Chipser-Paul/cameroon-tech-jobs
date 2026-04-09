@@ -23,7 +23,13 @@ logger = logging.getLogger(__name__)
 
 def job_list(request):
     cache_key = f'job_list_{request.GET.urlencode()}'
-    cached_data = cache.get(cache_key)
+    cached_data = None
+    
+    try:
+        cached_data = cache.get(cache_key)
+    except Exception as exc:
+        logger.warning(f'Cache GET failed: {exc}')
+    
     if cached_data:
         return render(request, 'jobs/job_list.html', cached_data)
 
@@ -68,7 +74,11 @@ def job_list(request):
         'is_paginated': page_obj.has_other_pages(),
     }
 
-    cache.set(cache_key, context, 300)  # Cache for 5 minutes
+    try:
+        cache.set(cache_key, context, 300)  # Cache for 5 minutes
+    except Exception as exc:
+        logger.warning(f'Cache SET failed: {exc}')
+    
     return render(request, 'jobs/job_list.html', context)
 
 
