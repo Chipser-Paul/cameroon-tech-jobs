@@ -48,14 +48,19 @@ def initiate_payment(request, job_id):
     # Remove any spaces, dashes, or parentheses
     phone_clean = phone.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
     
+    logger.debug(f'Phone validation - Original: {phone}, Cleaned: {phone_clean}')
+    
     # Check if it's in valid format (10 digits after 237, not 9)
     if re.match(r'^\+237\d{10}$', phone_clean):
         # Format: +237XXXXXXXXXX - remove the + for CamPay
         phone_final = phone_clean[1:]  # Remove the + sign
+        logger.debug(f'Phone matched +237 format, final: {phone_final}')
     elif re.match(r'^237\d{10}$', phone_clean):
         # Format: 237XXXXXXXXXX - already correct for CamPay
         phone_final = phone_clean
+        logger.debug(f'Phone matched 237 format, final: {phone_final}')
     else:
+        logger.warning(f'Phone validation failed for: {phone_clean}')
         messages.warning(request, '📱 Phone should be in format 237XXXXXXXXXX or +237XXXXXXXXXX (10 digits after 237). Please update your profile.')
         return redirect('company_edit_profile')
 
@@ -69,11 +74,14 @@ def initiate_payment(request, job_id):
     campay_base_url = settings.CAMPAY_BASE_URL
 
     if not all([campay_username, campay_password, campay_token, campay_base_url]):
+        logger.error(f'CamPay credentials missing - username:{bool(campay_username)}, password:{bool(campay_password)}, token:{bool(campay_token)}, url:{bool(campay_base_url)}')
         messages.error(request, 'Payment processing is not configured. Please contact support.')
-        logger.error('CamPay credentials not configured')
         return redirect('post_job')
 
     try:
+        # Log credentials presence for debugging
+        logger.info(f'CamPay credentials loaded - Username: {campay_username.split("@")[0] if "@" in campay_username else campay_username[:10]}..., Base URL: {campay_base_url}')
+        
         # Call CamPay collect endpoint
         collect_url = f'{campay_base_url}/collect/'
         
@@ -81,14 +89,19 @@ def initiate_payment(request, job_id):
         payload = {
             'username': campay_username,
             'password': campay_password,
-            'phone': phone_final,  # Format: 237XXXXXXXXX (no +)
+            'phone': phone_final,  # Format: 237XXXXXXXXXX (no +)
             'amount': amount,
             'description': f'Job posting: {job.title}',
             'external_reference': str(job.id),  # Reference back to job
         }
         
-        # Log what we're sending for debugging
-        logger.info(f'Initiating CamPay payment - Phone: {phone_final}, Amount: {amount}, Job: {job.id}')
+        # Log exactly what we're sending
+        logger.info(f'=== CamPay Payment Request ===')
+        logger.info(f'URL: {collect_url}')
+        logger.info(f'Phone format: {phone_final} (length: {len(phone_final)})')
+        logger.info(f'Amount: {amount} FCFA')
+        logger.info(f'Job ID: {job.id}')
+        logger.debug(f'Full payload: {json.dumps({**payload, "password": "***"}, default=str)}')
 
         response = requests.post(
             collect_url,
@@ -97,20 +110,38 @@ def initiate_payment(request, job_id):
             timeout=10
         )
 
+        logger.info(f'CamPay Response Status: {response.status_code}')
+        logger.debug(f'CamPay Response Headers: {dict(response.headers)}')
+        logger.debug(f'CamPay Response Body: {response.text}')
+
         if response.status_code != 200:
-            error_data = response.json() if response.text else {}
-            error_msg = error_data.get('message', 'Unknown error')
-            error_code = error_data.get('error_code', '')
-            logger.error(f'CamPay collect request failed ({error_code}): {error_msg}. Phone sent: {phone_final}')
+            try:
+                error_data = response.json()
+            except:
+                error_data = {'message': response.text, 'response_body': response.text}
+            
+            error_msg = error_data.get('message', error_data.get('error', 'Unknown error'))
+            error_code = error_data.get('error_code', error_data.get('code', ''))
+            
+            logger.error(f'❌ CamPay Payment Failed')
+            logger.error(f'   Status: {response.status_code}')
+            logger.error(f'   Error Code: {error_code}')
+            logger.error(f'   Error Message: {error_msg}')
+            logger.error(f'   Phone Sent: {phone_final}')
+            logger.debug(f'   Full Error Response: {json.dumps(error_data, default=str)}')
             
             # Provide helpful error messages
-            if 'phone' in error_msg.lower() or error_code == 'ER101':
-                messages.error(request, '📱 The phone number format seems invalid to CamPay. Try using format like 237XXXXXXXXXX (10 digits after 237).')
+            if error_code == 'ER101' or 'phone' in error_msg.lower():
+                messages.error(request, '📱 CamPay rejected the phone number. Phone must be exactly 13 digits: 237XXXXXXXXXX. Please verify your phone number is correct (e.g., 2376777777777).')
             else:
-                messages.error(request, f'Payment processing error: {error_msg}. Please try again.')
+                messages.error(request, f'Payment error ({error_code}): {error_msg}')
             return redirect('post_job')
 
         data = response.json()
+        logger.info(f'✓ CamPay Payment Initiated Successfully')
+        logger.info(f'   Reference: {data.get("reference")}')
+        logger.info(f'   Payment URL: {data.get("payment_url", "").split("?")[0]}...')
+        
         payment_url = data.get('payment_url')
         campay_reference = data.get('reference')
 
