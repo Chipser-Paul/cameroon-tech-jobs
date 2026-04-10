@@ -1,36 +1,81 @@
 {% extends 'base.html' %}
 
-{% block title %}Payment Successful - CameroonTechJobs{% endblock %}
+{% block title %}Payment Initiated - CameroonTechJobs{% endblock %}
 
 {% block content %}
 <div style="padding: 60px 20px; max-width: 600px; margin: 0 auto; text-align: center;">
-    <div style="background-color: #d4edda; border: 2px solid #28a745; border-radius: 10px; padding: 40px; margin-bottom: 30px;">
-        <h1 style="color: #28a745; margin-bottom: 20px;">✓ Payment Successful!</h1>
-        <p style="font-size: 18px; color: #666; margin-bottom: 20px;">
-            Your job posting payment has been processed successfully.
-        </p>
-        <p style="font-size: 16px; color: #666; margin-bottom: 30px;">
-            Your job is now <strong>active</strong> and visible to job seekers on CameroonTechJobs.
-        </p>
-    </div>
+    {% if is_demo_mode %}
+        <!-- DEMO MODE: USSD Instructions -->
+        <div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 40px; margin-bottom: 30px;">
+            <h1 style="color: #ff9800; margin-bottom: 20px;">📱 Complete Your Payment</h1>
+            <p style="font-size: 16px; color: #666; margin-bottom: 30px;">
+                Your payment request has been initiated. Follow these steps to complete the payment using {{ operator }} Mobile Money:
+            </p>
+            
+            <div style="background-color: #fff; border: 2px solid #ffc107; border-radius: 8px; padding: 25px; margin-bottom: 20px;">
+                <h3 style="color: #ff9800; margin-bottom: 15px;">1️⃣ Dial This Code</h3>
+                <p style="font-size: 28px; font-weight: bold; color: #28a745; font-family: monospace; margin: 15px 0;">{{ ussd_code }}</p>
+                <p style="color: #666; margin: 0;">on your {{ operator }} phone</p>
+            </div>
 
-    <div style="background-color: #f8f9fa; border-radius: 10px; padding: 30px; margin-bottom: 30px;">
-        <h3 style="margin-bottom: 15px;">What's Next?</h3>
-        <ul style="text-align: left; list-style: none; padding: 0;">
-            <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
-                <strong>📧</strong> Check your email for a confirmation
-            </li>
-            <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
-                <strong>👥</strong> Review applications as they come in
-            </li>
-            <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
-                <strong>📊</strong> Track job performance in your dashboard
-            </li>
-            <li style="padding: 10px 0;">
-                <strong>💬</strong> Communicate directly with candidates
-            </li>
-        </ul>
-    </div>
+            <div style="background-color: #f8f9fa; border-left: 4px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 4px; text-align: left;">
+                <h4 style="margin-top: 0;">How to use {{ operator }} Mobile Money:</h4>
+                <ol style="text-align: left; color: #666;">
+                    <li>On your phone, press the dial button</li>
+                    <li>Enter the code: <strong>{{ ussd_code }}</strong></li>
+                    <li>Follow the prompts to enter your PIN</li>
+                    <li>Confirm the transaction details</li>
+                    <li>You'll receive a confirmation SMS</li>
+                </ol>
+            </div>
+
+            <div style="background-color: #e8f5e9; border: 2px solid #27ae60; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                <h3 style="color: #27ae60; margin-top: 0;">✓ After Payment</h3>
+                <p style="color: #666; margin: 0;">
+                    Your job will be automatically activated once payment is confirmed. 
+                    {% if job %}
+                    Job: <strong>{{ job.title }}</strong>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div style="background-color: #f8f9fa; border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+            <p style="color: #666; font-size: 14px; margin: 0;">
+                <strong>Payment Reference:</strong> <code style="background: #fff; padding: 5px 10px; border-radius: 4px;">{{ payment.campay_reference }}</code>
+            </p>
+        </div>
+
+    {% else %}
+        <!-- PRODUCTION MODE: Standard success message -->
+        <div style="background-color: #d4edda; border: 2px solid #28a745; border-radius: 10px; padding: 40px; margin-bottom: 30px;">
+            <h1 style="color: #28a745; margin-bottom: 20px;">✓ Payment Successful!</h1>
+            <p style="font-size: 18px; color: #666; margin-bottom: 20px;">
+                Your job posting payment has been processed successfully.
+            </p>
+            <p style="font-size: 16px; color: #666; margin-bottom: 30px;">
+                Your job is now <strong>active</strong> and visible to job seekers on CameroonTechJobs.
+            </p>
+        </div>
+
+        <div style="background-color: #f8f9fa; border-radius: 10px; padding: 30px; margin-bottom: 30px;">
+            <h3 style="margin-bottom: 15px;">What's Next?</h3>
+            <ul style="text-align: left; list-style: none; padding: 0;">
+                <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
+                    <strong>📧</strong> Check your email for a confirmation
+                </li>
+                <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
+                    <strong>👥</strong> Review applications as they come in
+                </li>
+                <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
+                    <strong>📊</strong> Track job performance in your dashboard
+                </li>
+                <li style="padding: 10px 0;">
+                    <strong>💬</strong> Communicate directly with candidates
+                </li>
+            </ul>
+        </div>
+    {% endif %}
 
     <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
         <a href="{% url 'dashboard' %}" style="padding: 12px 30px; background-color: #27ae60; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">

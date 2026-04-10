@@ -154,13 +154,14 @@ def initiate_payment(request, job_id):
         data = response.json()
         logger.info(f'✓ CamPay Payment Initiated Successfully')
         logger.info(f'   Reference: {data.get("reference")}')
-        logger.info(f'   Payment URL: {data.get("payment_url", "").split("?")[0]}...')
         
-        payment_url = data.get('payment_url')
         campay_reference = data.get('reference')
+        payment_url = data.get('payment_url')
+        ussd_code = data.get('ussd_code')
+        operator = data.get('operator', 'MTN')
 
-        if not payment_url or not campay_reference:
-            logger.error(f'Invalid CamPay response: {data}')
+        if not campay_reference:
+            logger.error(f'Invalid CamPay response - missing reference: {data}')
             messages.error(request, 'Payment initiation failed. Please try again.')
             return redirect('post_job')
 
@@ -173,8 +174,20 @@ def initiate_payment(request, job_id):
             status='pending'
         )
 
-        # Redirect to CamPay payment URL
-        return redirect(payment_url)
+        # Handle different response types
+        if payment_url:
+            # Production mode: redirect to payment URL
+            logger.info(f'   Payment URL: {payment_url.split("?")[0]}...')
+            return redirect(payment_url)
+        elif ussd_code:
+            # Demo/Sandbox mode: show USSD instructions
+            logger.info(f'   USSD Code: {ussd_code}')
+            logger.info(f'   Operator: {operator}')
+            return redirect(f'/payments/success/{payment.id}/?ussd={ussd_code}&operator={operator}')
+        else:
+            logger.error(f'Invalid CamPay response - no payment_url or ussd_code: {data}')
+            messages.error(request, 'Payment initiation failed. Please try again.')
+            return redirect('post_job')
 
     except requests.exceptions.RequestException as e:
         logger.error(f'CamPay request error: {str(e)}')
@@ -277,9 +290,29 @@ def webhook(request):
         return JsonResponse({'status': 'error', 'message': 'Internal server error'}, status=500)
 
 
-def payment_success(request):
-    """Display success page after payment"""
-    return render(request, 'payments/success.html')
+def payment_success(request, payment_id=None):
+    """Display success page after payment initiation"""
+    context = {}
+    
+    if payment_id:
+        try:
+            payment = Payment.objects.get(id=payment_id)
+            context['payment'] = payment
+            context['job'] = payment.job
+        except Payment.DoesNotExist:
+            messages.error(request, 'Payment record not found.')
+            return redirect('dashboard')
+    
+    # Get USSD code and operator from query params (demo mode)
+    ussd_code = request.GET.get('ussd', '')
+    operator = request.GET.get('operator', 'MTN')
+    
+    if ussd_code:
+        context['is_demo_mode'] = True
+        context['ussd_code'] = ussd_code
+        context['operator'] = operator
+    
+    return render(request, 'payments/success.html', context)
 
 
 def payment_failure(request):
