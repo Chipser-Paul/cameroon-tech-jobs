@@ -9,6 +9,15 @@
         Upgrade your job posting to reach top talent
     </p>
 
+    {% if is_sandbox %}
+    <!-- Sandbox Notice -->
+    <div style="background-color: #fff3cd; border-left: 4px solid #ff9800; padding: 15px 20px; margin-bottom: 20px; border-radius: 4px;">
+        <p style="margin: 0; color: #7f5a00; font-weight: 500;">
+            🧪 <strong>SANDBOX MODE:</strong> You are in test/demo mode. Prices shown are demo amounts for testing. Once in production, prices will be 5,000 FCFA (Basic) and 15,000 FCFA (Featured).
+        </p>
+    </div>
+    {% endif %}
+
     <!-- Important Note -->
     <div style="background-color: #e3f2fd; border-left: 4px solid #2196F3; padding: 15px 20px; margin-bottom: 40px; border-radius: 4px;">
         <p style="margin: 0; color: #1565c0; font-weight: 500;">
@@ -20,7 +29,13 @@
         <!-- Basic Plan -->
         <div style="border: 2px solid #e0e0e0; border-radius: 12px; padding: 40px; text-align: center; transition: all 0.3s;">
             <h2 style="color: #2c3e50; margin-bottom: 15px;">Basic</h2>
-            <p style="font-size: 32px; color: #27ae60; font-weight: bold; margin-bottom: 10px;">5,000 FCFA</p>
+            <p style="font-size: 32px; color: #27ae60; font-weight: bold; margin-bottom: 10px;">
+                {% if is_sandbox %}
+                    {{ basic_price }} XAF <span style="font-size: 14px; color: #999;">(demo)</span>
+                {% else %}
+                    {{ basic_price | floatformat:0 }} FCFA
+                {% endif %}
+            </p>
             <p style="color: #666; margin-bottom: 30px;">Perfect for getting started</p>
 
             <ul style="text-align: left; list-style: none; margin-bottom: 30px; padding: 0;">
@@ -53,7 +68,13 @@
             </div>
             
             <h2 style="color: #27ae60; margin-bottom: 15px; margin-top: 20px;">Featured</h2>
-            <p style="font-size: 32px; color: #27ae60; font-weight: bold; margin-bottom: 10px;">15,000 FCFA</p>
+            <p style="font-size: 32px; color: #27ae60; font-weight: bold; margin-bottom: 10px;">
+                {% if is_sandbox %}
+                    {{ featured_price }} XAF <span style="font-size: 14px; color: #999;">(demo)</span>
+                {% else %}
+                    {{ featured_price | floatformat:0 }} FCFA
+                {% endif %}
+            </p>
             <p style="color: #666; margin-bottom: 30px;">Get maximum visibility</p>
 
             <ul style="text-align: left; list-style: none; margin-bottom: 30px; padding: 0;">

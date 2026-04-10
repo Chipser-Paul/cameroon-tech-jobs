@@ -289,4 +289,21 @@ def payment_failure(request):
 
 def pricing(request):
     """Display pricing page with tier options"""
-    return render(request, 'payments/pricing.html')
+    campay_base_url = settings.CAMPAY_BASE_URL
+    is_sandbox = 'demo.campay.net' in campay_base_url
+    
+    if is_sandbox:
+        # Demo mode pricing (under 25 XAF max for sandbox)
+        basic_price = 10
+        featured_price = 20
+    else:
+        # Production pricing
+        basic_price = 5000
+        featured_price = 15000
+    
+    context = {
+        'is_sandbox': is_sandbox,
+        'basic_price': basic_price,
+        'featured_price': featured_price,
+    }
+    return render(request, 'payments/pricing.html', context)
