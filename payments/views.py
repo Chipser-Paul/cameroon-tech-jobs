@@ -65,13 +65,24 @@ def initiate_payment(request, job_id):
         return redirect('company_edit_profile')
 
     # Determine amount based on tier
-    amount = 5000 if tier == 'basic' else 15000
+    # For sandbox/demo: CamPay demo system has max 25 XAF limit
+    # For production: Use real amounts
+    campay_base_url = settings.CAMPAY_BASE_URL
+    is_sandbox = 'demo.campay.net' in campay_base_url
+    
+    if is_sandbox:
+        # Demo amounts (under 25 XAF max for sandbox)
+        amount = 10 if tier == 'basic' else 20
+        logger.info(f'Using sandbox demo amounts: {amount} XAF (sandbox mode)')
+    else:
+        # Production amounts
+        amount = 5000 if tier == 'basic' else 15000
+        logger.info(f'Using production amounts: {amount} XAF (production mode)')
 
     # Get CamPay credentials
     campay_username = settings.CAMPAY_USERNAME
     campay_password = settings.CAMPAY_PASSWORD
     campay_token = settings.CAMPAY_TOKEN
-    campay_base_url = settings.CAMPAY_BASE_URL
 
     if not all([campay_username, campay_password, campay_token, campay_base_url]):
         logger.error(f'CamPay credentials missing - username:{bool(campay_username)}, password:{bool(campay_password)}, token:{bool(campay_token)}, url:{bool(campay_base_url)}')
