@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
@@ -153,7 +154,8 @@ def post_job(request):
             form.save_custom_tech(job)
 
             messages.success(request, 'Great! Now proceed to payment to activate your listing.')
-            return redirect('initiate_payment', job_id=job.id) + f'?tier={tier}'
+            url = reverse('initiate_payment', args=[job.id]) + f'?tier={tier}'
+            return redirect(url)
     else:
         form = JobForm()
 
