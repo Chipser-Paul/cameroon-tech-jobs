@@ -39,14 +39,14 @@ def initiate_payment(request, job_id):
 
     # Check if company has a phone number for payment
     if not request.user.phone or not request.user.phone.strip():
-        messages.error(request, '📱 Please add your phone number (e.g., +237XXXXXXXXX) to your company account. Payment will be sent to this MTN/Orange number. You can add it by contacting support.')
-        return redirect('dashboard')
+        messages.error(request, '📱 Please add your phone number (e.g., +237XXXXXXXXX) to your company account. Payment will be sent to this MTN/Orange number.')
+        return redirect('company_edit_profile')
     
     # Validate phone number format (should be international format like +237...)
     phone = request.user.phone.strip()
     if not phone.startswith('+'):
-        messages.warning(request, '📱 Your phone number should be in international format (e.g., +237XXXXXXXXX). Please update your account details.')
-        return redirect('dashboard')
+        messages.warning(request, '📱 Your phone number should be in international format (e.g., +237XXXXXXXXX). Please update your profile.')
+        return redirect('company_edit_profile')
 
     # Determine amount based on tier
     amount = 5000 if tier == 'basic' else 15000

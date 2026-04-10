@@ -106,3 +106,32 @@ def payment_info(request):
         return redirect('seeker_dashboard')
 
     return render(request, 'companies/payment_info.html')
+
+
+@login_required
+def edit_profile(request):
+    """Allow companies to edit their profile, especially phone number for payments"""
+    if isinstance(request.user, Seeker):
+        return redirect('seeker_dashboard')
+
+    company = request.user
+    
+    if request.method == 'POST':
+        # Update company details
+        company.company_name = request.POST.get('company_name', company.company_name)
+        company.phone = request.POST.get('phone', company.phone)
+        company.website = request.POST.get('website', company.website)
+        company.location = request.POST.get('location', company.location)
+        company.description = request.POST.get('description', company.description)
+        
+        if request.FILES.get('logo'):
+            company.logo = request.FILES['logo']
+        
+        company.save()
+        messages.success(request, 'Profile updated successfully!')
+        return redirect('dashboard')
+
+    context = {
+        'company': company,
+    }
+    return render(request, 'companies/edit_profile.html', context)
