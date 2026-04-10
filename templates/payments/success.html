@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Successful - CameroonTechJobs{% endblock %}
+
+{% block content %}
+<div style="padding: 60px 20px; max-width: 600px; margin: 0 auto; text-align: center;">
+    <div style="background-color: #d4edda; border: 2px solid #28a745; border-radius: 10px; padding: 40px; margin-bottom: 30px;">
+        <h1 style="color: #28a745; margin-bottom: 20px;">✓ Payment Successful!</h1>
+        <p style="font-size: 18px; color: #666; margin-bottom: 20px;">
+            Your job posting payment has been processed successfully.
+        </p>
+        <p style="font-size: 16px; color: #666; margin-bottom: 30px;">
+            Your job is now <strong>active</strong> and visible to job seekers on CameroonTechJobs.
+        </p>
+    </div>
+
+    <div style="background-color: #f8f9fa; border-radius: 10px; padding: 30px; margin-bottom: 30px;">
+        <h3 style="margin-bottom: 15px;">What's Next?</h3>
+        <ul style="text-align: left; list-style: none; padding: 0;">
+            <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
+                <strong>📧</strong> Check your email for a confirmation
+            </li>
+            <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
+                <strong>👥</strong> Review applications as they come in
+            </li>
+            <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
+                <strong>📊</strong> Track job performance in your dashboard
+            </li>
+            <li style="padding: 10px 0;">
+                <strong>💬</strong> Communicate directly with candidates
+            </li>
+        </ul>
+    </div>
+
+    <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+        <a href="{% url 'dashboard' %}" style="padding: 12px 30px; background-color: #27ae60; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
+            Go to Dashboard
+        </a>
+        <a href="{% url 'job_list' %}" style="padding: 12px 30px; background-color: #3498db; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
+            Browse Other Jobs
+        </a>
+    </div>
+
+    <p style="color: #999; margin-top: 30px; font-size: 14px;">
+        Need help? <a href="{% url 'contact' %}" style="color: #3498db;">Contact our support team</a>
+    </p>
+</div>
+{% endblock %}

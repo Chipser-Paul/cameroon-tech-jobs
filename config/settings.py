@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'companies',
     'pages',
     'seekers',
+    'payments',
 ]
 
 MIDDLEWARE = [
@@ -154,7 +155,14 @@ elif CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
         secure=True,
     )
 
-# Stripe settings
+# CamPay settings for payment processing
+CAMPAY_USERNAME = os.getenv('CAMPAY_USERNAME', '')
+CAMPAY_PASSWORD = os.getenv('CAMPAY_PASSWORD', '')
+CAMPAY_TOKEN = os.getenv('CAMPAY_TOKEN', '')
+CAMPAY_WEBHOOK_KEY = os.getenv('CAMPAY_WEBHOOK_KEY', '')
+CAMPAY_BASE_URL = os.getenv('CAMPAY_BASE_URL', 'https://demo.campay.net/api')
+
+# Stripe settings (legacy - can be removed after migration complete)
 STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 

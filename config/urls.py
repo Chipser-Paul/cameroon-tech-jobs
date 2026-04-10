@@ -10,6 +10,7 @@ urlpatterns = [
     path('', include('jobs.urls')),
     path('', include('companies.urls')),
     path('', include('seekers.urls')),
+    path('payments/', include('payments.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if not settings.DEBUG:

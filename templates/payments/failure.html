@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Failed - CameroonTechJobs{% endblock %}
+
+{% block content %}
+<div style="padding: 60px 20px; max-width: 600px; margin: 0 auto; text-align: center;">
+    <div style="background-color: #f8d7da; border: 2px solid #dc3545; border-radius: 10px; padding: 40px; margin-bottom: 30px;">
+        <h1 style="color: #dc3545; margin-bottom: 20px;">✗ Payment Failed</h1>
+        <p style="font-size: 18px; color: #666; margin-bottom: 20px;">
+            Unfortunately, your payment could not be processed.
+        </p>
+        <p style="font-size: 16px; color: #666; margin-bottom: 30px;">
+            Your job posting was not activated. Please try again or contact support.
+        </p>
+    </div>
+
+    <div style="background-color: #f8f9fa; border-radius: 10px; padding: 30px; margin-bottom: 30px;">
+        <h3 style="margin-bottom: 15px;">Possible Reasons:</h3>
+        <ul style="text-align: left; list-style: none; padding: 0;">
+            <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
+                <strong>💳</strong> Insufficient balance in your account
+            </li>
+            <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
+                <strong>🚫</strong> Payment was declined by your mobile operator
+            </li>
+            <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
+                <strong>📱</strong> Network connection issue
+            </li>
+            <li style="padding: 10px 0;">
+                <strong>⏱️</strong> Transaction timeout
+            </li>
+        </ul>
+    </div>
+
+    <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+        <a href="{% url 'post_job' %}" style="padding: 12px 30px; background-color: #27ae60; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
+            Try Again
+        </a>
+        <a href="{% url 'contact' %}" style="padding: 12px 30px; background-color: #3498db; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
+            Contact Support
+        </a>
+    </div>
+
+    <p style="color: #999; margin-top: 30px; font-size: 14px;">
+        If you continue to experience issues, please <a href="{% url 'contact' %}" style="color: #3498db;">contact our support team</a> and we'll help you resolve this.
+    </p>
+</div>
+{% endblock %}

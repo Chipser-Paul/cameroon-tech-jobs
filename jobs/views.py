@@ -9,10 +9,9 @@ from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-import stripe
 
 from .forms import JobForm
-from .models import ApplicationInterview, ApplicationMessage, Job, Category, Notification, TechStack, JobApplication, Payment
+from .models import ApplicationInterview, ApplicationMessage, Job, Category, Notification, TechStack, JobApplication
 from .notifications import notify_company, notify_seeker
 from .tasks import send_job_alerts_task
 from companies.models import Company
@@ -140,9 +139,9 @@ def post_job(request):
 
             plan = form.cleaned_data['plan']
             if plan == 'basic':
-                amount = 5000
+                tier = 'basic'
             elif plan == 'featured':
-                amount = 15000
+                tier = 'featured'
             else:
                 messages.error(request, 'Please select a valid plan.')
                 return redirect('post_job')
@@ -153,41 +152,8 @@ def post_job(request):
             form.save_m2m()
             form.save_custom_tech(job)
 
-            # Create Stripe PaymentIntent
-            if not settings.STRIPE_SECRET_KEY:
-                messages.error(request, 'Payment processing is temporarily unavailable. Please try again later.')
-                job.delete()
-                return redirect('post_job')
-            
-            try:
-                stripe.api_key = settings.STRIPE_SECRET_KEY
-                intent = stripe.PaymentIntent.create(
-                    amount=amount,
-                    currency='xaf',
-                    metadata={'job_id': str(job.id)},
-                )
-
-                # Save Payment record
-                Payment.objects.create(
-                    job=job,
-                    stripe_payment_intent_id=intent.id,
-                    client_secret=intent.client_secret,
-                    amount=amount,
-                    status='pending'
-                )
-
-                messages.success(request, 'Job submitted! Complete payment to activate the listing.')
-                return redirect('payment', payment_intent_id=intent.id)
-            except stripe.error.StripeError as e:
-                job.delete()
-                messages.error(request, f'Payment processing failed: {str(e)}. Please try again.')
-                logger.error(f'Stripe error for job {job.id}: {str(e)}')
-                return redirect('post_job')
-            except Exception as e:
-                job.delete()
-                messages.error(request, 'An unexpected error occurred. Please try again.')
-                logger.error(f'Unexpected error creating payment for job {job.id}: {str(e)}')
-                return redirect('post_job')
+            messages.success(request, 'Great! Now proceed to payment to activate your listing.')
+            return redirect('initiate_payment', job_id=job.id) + f'?tier={tier}'
     else:
         form = JobForm()
 
@@ -204,54 +170,6 @@ def post_job(request):
 
 
 @login_required
-def payment(request, payment_intent_id):
-    if not isinstance(request.user, Company):
-        messages.error(request, 'Access denied.')
-        return redirect('seeker_dashboard')
-
-    try:
-        payment = Payment.objects.get(stripe_payment_intent_id=payment_intent_id, job__company=request.user)
-    except Payment.DoesNotExist:
-        messages.error(request, 'Payment not found.')
-        return redirect('dashboard')
-
-    context = {
-        'payment': payment,
-        'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
-        'client_secret': payment.client_secret,
-    }
-    return render(request, 'jobs/payment.html', context)
-
-
-@login_required
-def payment_success(request, payment_intent_id):
-    if not isinstance(request.user, Company):
-        messages.error(request, 'Access denied.')
-        return redirect('seeker_dashboard')
-
-    try:
-        payment = Payment.objects.get(stripe_payment_intent_id=payment_intent_id, job__company=request.user)
-    except Payment.DoesNotExist:
-        messages.error(request, 'Payment not found.')
-        return redirect('dashboard')
-
-    # Confirm payment with Stripe
-    stripe.api_key = settings.STRIPE_SECRET_KEY
-    intent = stripe.PaymentIntent.retrieve(payment_intent_id)
-
-    if intent.status == 'succeeded':
-        payment.status = 'completed'
-        payment.save()
-        payment.job.status = 'active'
-        payment.job.save()
-        send_job_alerts_task.delay(payment.job.pk)
-        messages.success(request, 'Payment successful! Your job is now active.')
-    else:
-        payment.status = 'failed'
-        payment.save()
-        messages.error(request, 'Payment failed. Please try again.')
-
-    return redirect('dashboard')
 
 
 @login_required

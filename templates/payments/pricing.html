@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Pricing - CameroonTechJobs{% endblock %}
+
+{% block content %}
+<div class="pricing-container" style="padding: 60px 20px; max-width: 1200px; margin: 0 auto;">
+    <h1 style="text-align: center; margin-bottom: 20px;">Choose Your Plan</h1>
+    <p style="text-align: center; color: #666; margin-bottom: 50px; font-size: 18px;">
+        Upgrade your job posting to reach top talent
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 50px;">
+        <!-- Basic Plan -->
+        <div style="border: 2px solid #e0e0e0; border-radius: 12px; padding: 40px; text-align: center; transition: all 0.3s;">
+            <h2 style="color: #2c3e50; margin-bottom: 15px;">Basic</h2>
+            <p style="font-size: 32px; color: #27ae60; font-weight: bold; margin-bottom: 10px;">5,000 FCFA</p>
+            <p style="color: #666; margin-bottom: 30px;">Perfect for getting started</p>
+
+            <ul style="text-align: left; list-style: none; margin-bottom: 30px; padding: 0;">
+                <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
+                    <span style="color: #27ae60;">✓</span> Featured for 30 days
+                </li>
+                <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
+                    <span style="color: #27ae60;">✓</span> Visible to all job seekers
+                </li>
+                <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
+                    <span style="color: #27ae60;">✓</span> Email notifications
+                </li>
+                <li style="padding: 10px 0;">
+                    <span style="color: #27ae60;">✓</span> Job analytics
+                </li>
+            </ul>
+
+            <form method="GET" action="{% url 'initiate_payment' 0 %}">
+                <input type="hidden" name="tier" value="basic">
+                <button type="submit" style="width: 100%; padding: 12px; background-color: #27ae60; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer;">
+                    Pay Now with MTN/Orange
+                </button>
+            </form>
+        </div>
+
+        <!-- Featured Plan -->
+        <div style="border: 3px solid #27ae60; border-radius: 12px; padding: 40px; text-align: center; background-color: #f0fdf4; position: relative;">
+            <div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background-color: #27ae60; color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold;">
+                MOST POPULAR
+            </div>
+            
+            <h2 style="color: #27ae60; margin-bottom: 15px; margin-top: 20px;">Featured</h2>
+            <p style="font-size: 32px; color: #27ae60; font-weight: bold; margin-bottom: 10px;">15,000 FCFA</p>
+            <p style="color: #666; margin-bottom: 30px;">Get maximum visibility</p>
+
+            <ul style="text-align: left; list-style: none; margin-bottom: 30px; padding: 0;">
+                <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
+                    <span style="color: #27ae60;">✓</span> Featured for 60 days
+                </li>
+                <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
+                    <span style="color: #27ae60;">✓</span> Priority listing placement
+                </li>
+                <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
+                    <span style="color: #27ae60;">✓</span> Email + SMS alerts
+                </li>
+                <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
+                    <span style="color: #27ae60;">✓</span> Advanced analytics
+                </li>
+                <li style="padding: 10px 0;">
+                    <span style="color: #27ae60;">✓</span> Candidate screening tools
+                </li>
+            </ul>
+
+            <form method="GET" action="{% url 'initiate_payment' 0 %}">
+                <input type="hidden" name="tier" value="featured">
+                <button type="submit" style="width: 100%; padding: 12px; background-color: #27ae60; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer;">
+                    Pay Now with MTN/Orange
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div style="text-align: center; background-color: #f8f9fa; padding: 30px; border-radius: 10px;">
+        <h3 style="margin-bottom: 15px;">Payment Methods</h3>
+        <p style="color: #666; margin-bottom: 10px;">
+            <strong>MTN Mobile Money</strong> | <strong>Orange Money</strong>
+        </p>
+        <p style="color: #666; font-size: 14px;">
+            Secure payments powered by <strong>CamPay</strong>
+        </p>
+    </div>
+</div>
+
+<style>
+    @media (max-width: 600px) {
+        .pricing-container h1 {
+            font-size: 24px !important;
+        }
+        
+        .pricing-container {
+            padding: 30px 15px !important;
+        }
+    }
+</style>
+{% endblock %}
