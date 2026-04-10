@@ -45,7 +45,14 @@ def initiate_payment(request, job_id):
     # Validate phone number format (should be international format like +237...)
     phone = request.user.phone.strip()
     if not phone.startswith('+'):
-        messages.warning(request, '📱 Your phone number should be in international format (e.g., +237XXXXXXXXX). Please update your profile.')
+        messages.warning(request, '📱 Your phone number should start with + (e.g., +237XXXXXXXXX). Please update your profile.')
+        return redirect('company_edit_profile')
+    
+    # Additional validation: Cameroon numbers should be +237 followed by 9 digits
+    import re
+    # Test if it matches the pattern: +237 followed by 9 digits
+    if not re.match(r'^\+237\d{9}$', phone.replace(' ', '')):
+        messages.warning(request, '📱 Cameroon phone numbers should be in format +237XXXXXXXXX (9 digits after +237). Please update your profile.')
         return redirect('company_edit_profile')
 
     # Determine amount based on tier
@@ -66,6 +73,14 @@ def initiate_payment(request, job_id):
         # Call CamPay collect endpoint
         collect_url = f'{campay_base_url}/collect/'
         
+        # Normalize phone number - CamPay requires international format
+        phone = request.user.phone.strip()
+        # Remove any spaces, dashes, or parentheses
+        phone = phone.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
+        
+        # Log what we're sending for debugging
+        logger.info(f'Initiating CamPay payment - Phone: {phone}, Amount: {amount}, Job: {job.id}')
+        
         payload = {
             'username': campay_username,
             'password': campay_password,
@@ -83,8 +98,16 @@ def initiate_payment(request, job_id):
         )
 
         if response.status_code != 200:
-            logger.error(f'CamPay collect request failed: {response.text}')
-            messages.error(request, 'Failed to initiate payment. Please try again.')
+            error_data = response.json() if response.text else {}
+            error_msg = error_data.get('message', 'Unknown error')
+            error_code = error_data.get('error_code', '')
+            logger.error(f'CamPay collect request failed ({error_code}): {error_msg}. Phone sent: {phone}')
+            
+            # Provide helpful error messages
+            if 'phone' in error_msg.lower() or error_code == 'ER101':
+                messages.error(request, '📱 The phone number format seems invalid to CamPay. Try using format like +237XXXXXXXXX (must have exactly 9 digits after +237).')
+            else:
+                messages.error(request, f'Payment processing error: {error_msg}. Please try again.')
             return redirect('post_job')
 
         data = response.json()
