@@ -50,18 +50,18 @@ def initiate_payment(request, job_id):
     
     logger.debug(f'Phone validation - Original: {phone}, Cleaned: {phone_clean}')
     
-    # Check if it's in valid format (10 digits after 237, not 9)
-    if re.match(r'^\+237\d{10}$', phone_clean):
-        # Format: +237XXXXXXXXXX - remove the + for CamPay
+    # Check if it's in valid format (9 digits after 237 per CamPay API docs)
+    if re.match(r'^\+237\d{9}$', phone_clean):
+        # Format: +237XXXXXXXXX - remove the + for CamPay
         phone_final = phone_clean[1:]  # Remove the + sign
         logger.debug(f'Phone matched +237 format, final: {phone_final}')
-    elif re.match(r'^237\d{10}$', phone_clean):
-        # Format: 237XXXXXXXXXX - already correct for CamPay
+    elif re.match(r'^237\d{9}$', phone_clean):
+        # Format: 237XXXXXXXXX - already correct for CamPay
         phone_final = phone_clean
         logger.debug(f'Phone matched 237 format, final: {phone_final}')
     else:
         logger.warning(f'Phone validation failed for: {phone_clean}')
-        messages.warning(request, '📱 Phone should be in format 237XXXXXXXXXX or +237XXXXXXXXXX (10 digits after 237). Please update your profile.')
+        messages.warning(request, '📱 Phone should be in format 237XXXXXXXXX or +237XXXXXXXXX (9 digits after 237). Please update your profile.')
         return redirect('company_edit_profile')
 
     # Determine amount based on tier
@@ -132,7 +132,7 @@ def initiate_payment(request, job_id):
             
             # Provide helpful error messages
             if error_code == 'ER101' or 'phone' in error_msg.lower():
-                messages.error(request, '📱 CamPay rejected the phone number. Phone must be exactly 13 digits: 237XXXXXXXXXX. Please verify your phone number is correct (e.g., 2376777777777).')
+                messages.error(request, '📱 CamPay rejected the phone number. Phone must be 237 + exactly 9 digits (e.g., 237677777777). Please verify your phone number is correct.')
             else:
                 messages.error(request, f'Payment error ({error_code}): {error_msg}')
             return redirect('post_job')
