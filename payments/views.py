@@ -43,20 +43,20 @@ def initiate_payment(request, job_id):
         messages.error(request, '📱 Please add your phone number (e.g., +237677777777 or 237677777777) to your company account. Payment will be sent to this MTN/Orange number.')
         return redirect('company_edit_profile')
     
-    # Validate phone number format - accept both +237XXXXXXXXX and 237XXXXXXXXX
+    # Validate phone number format - accept both +237XXXXXXXXXX and 237XXXXXXXXXX
     phone = request.user.phone.strip()
     # Remove any spaces, dashes, or parentheses
     phone_clean = phone.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
     
-    # Check if it's in valid format
-    if re.match(r'^\+237\d{9}$', phone_clean):
-        # Format: +237XXXXXXXXX - remove the + for CamPay
+    # Check if it's in valid format (10 digits after 237, not 9)
+    if re.match(r'^\+237\d{10}$', phone_clean):
+        # Format: +237XXXXXXXXXX - remove the + for CamPay
         phone_final = phone_clean[1:]  # Remove the + sign
-    elif re.match(r'^237\d{9}$', phone_clean):
-        # Format: 237XXXXXXXXX - already correct for CamPay
+    elif re.match(r'^237\d{10}$', phone_clean):
+        # Format: 237XXXXXXXXXX - already correct for CamPay
         phone_final = phone_clean
     else:
-        messages.warning(request, '📱 Phone should be in format 237XXXXXXXXX or +237XXXXXXXXX (9 digits after 237). Please update your profile.')
+        messages.warning(request, '📱 Phone should be in format 237XXXXXXXXXX or +237XXXXXXXXXX (10 digits after 237). Please update your profile.')
         return redirect('company_edit_profile')
 
     # Determine amount based on tier
@@ -105,7 +105,7 @@ def initiate_payment(request, job_id):
             
             # Provide helpful error messages
             if 'phone' in error_msg.lower() or error_code == 'ER101':
-                messages.error(request, '📱 The phone number format seems invalid to CamPay. Try using format like 237XXXXXXXXX (9 digits after 237).')
+                messages.error(request, '📱 The phone number format seems invalid to CamPay. Try using format like 237XXXXXXXXXX (10 digits after 237).')
             else:
                 messages.error(request, f'Payment processing error: {error_msg}. Please try again.')
             return redirect('post_job')
