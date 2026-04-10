@@ -86,10 +86,12 @@ def initiate_payment(request, job_id):
         collect_url = f'{campay_base_url}/collect/'
         
         # Use the cleaned phone number (CamPay expects format without +)
+        # Per CamPay API docs, the parameter is "from" not "phone"
         payload = {
             'username': campay_username,
             'password': campay_password,
-            'phone': phone_final,  # Format: 237XXXXXXXXXX (no +)
+            'from': phone_final,  # Format: 237XXXXXXXXX (9 digits after 237, no +)
+            'currency': 'XAF',  # Cameroon uses XAF
             'amount': amount,
             'description': f'Job posting: {job.title}',
             'external_reference': str(job.id),  # Reference back to job
@@ -98,10 +100,11 @@ def initiate_payment(request, job_id):
         # Log exactly what we're sending
         logger.info(f'=== CamPay Payment Request ===')
         logger.info(f'URL: {collect_url}')
-        logger.info(f'Phone format: {phone_final} (length: {len(phone_final)})')
-        logger.info(f'Amount: {amount} FCFA')
+        logger.info(f'Sender Phone (from): {phone_final} (length: {len(phone_final)})')
+        logger.info(f'Amount: {amount} XAF')
+        logger.info(f'Currency: XAF')
         logger.info(f'Job ID: {job.id}')
-        logger.debug(f'Full payload: {json.dumps({**payload, "password": "***"}, default=str)}')
+        logger.debug(f'Full payload: {json.dumps({**payload, "password": "***", "username": "***"}, default=str)}')
 
         response = requests.post(
             collect_url,
@@ -127,7 +130,7 @@ def initiate_payment(request, job_id):
             logger.error(f'   Status: {response.status_code}')
             logger.error(f'   Error Code: {error_code}')
             logger.error(f'   Error Message: {error_msg}')
-            logger.error(f'   Phone Sent: {phone_final}')
+            logger.error(f'   Sender Phone Sent (from): {phone_final}')
             logger.debug(f'   Full Error Response: {json.dumps(error_data, default=str)}')
             
             # Provide helpful error messages
