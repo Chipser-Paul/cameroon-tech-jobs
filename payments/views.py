@@ -3,6 +3,7 @@ import logging
 import hmac
 import hashlib
 import os
+import re
 import requests
 from decimal import Decimal
 
@@ -39,20 +40,23 @@ def initiate_payment(request, job_id):
 
     # Check if company has a phone number for payment
     if not request.user.phone or not request.user.phone.strip():
-        messages.error(request, '📱 Please add your phone number (e.g., +237XXXXXXXXX) to your company account. Payment will be sent to this MTN/Orange number.')
+        messages.error(request, '📱 Please add your phone number (e.g., +237677777777 or 237677777777) to your company account. Payment will be sent to this MTN/Orange number.')
         return redirect('company_edit_profile')
     
-    # Validate phone number format (should be international format like +237...)
+    # Validate phone number format - accept both +237XXXXXXXXX and 237XXXXXXXXX
     phone = request.user.phone.strip()
-    if not phone.startswith('+'):
-        messages.warning(request, '📱 Your phone number should start with + (e.g., +237XXXXXXXXX). Please update your profile.')
-        return redirect('company_edit_profile')
+    # Remove any spaces, dashes, or parentheses
+    phone_clean = phone.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
     
-    # Additional validation: Cameroon numbers should be +237 followed by 9 digits
-    import re
-    # Test if it matches the pattern: +237 followed by 9 digits
-    if not re.match(r'^\+237\d{9}$', phone.replace(' ', '')):
-        messages.warning(request, '📱 Cameroon phone numbers should be in format +237XXXXXXXXX (9 digits after +237). Please update your profile.')
+    # Check if it's in valid format
+    if re.match(r'^\+237\d{9}$', phone_clean):
+        # Format: +237XXXXXXXXX - remove the + for CamPay
+        phone_final = phone_clean[1:]  # Remove the + sign
+    elif re.match(r'^237\d{9}$', phone_clean):
+        # Format: 237XXXXXXXXX - already correct for CamPay
+        phone_final = phone_clean
+    else:
+        messages.warning(request, '📱 Phone should be in format 237XXXXXXXXX or +237XXXXXXXXX (9 digits after 237). Please update your profile.')
         return redirect('company_edit_profile')
 
     # Determine amount based on tier
@@ -73,22 +77,18 @@ def initiate_payment(request, job_id):
         # Call CamPay collect endpoint
         collect_url = f'{campay_base_url}/collect/'
         
-        # Normalize phone number - CamPay requires international format
-        phone = request.user.phone.strip()
-        # Remove any spaces, dashes, or parentheses
-        phone = phone.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
-        
-        # Log what we're sending for debugging
-        logger.info(f'Initiating CamPay payment - Phone: {phone}, Amount: {amount}, Job: {job.id}')
-        
+        # Use the cleaned phone number (CamPay expects format without +)
         payload = {
             'username': campay_username,
             'password': campay_password,
-            'phone': phone,  # Customer phone number (validated above in international format)
+            'phone': phone_final,  # Format: 237XXXXXXXXX (no +)
             'amount': amount,
             'description': f'Job posting: {job.title}',
             'external_reference': str(job.id),  # Reference back to job
         }
+        
+        # Log what we're sending for debugging
+        logger.info(f'Initiating CamPay payment - Phone: {phone_final}, Amount: {amount}, Job: {job.id}')
 
         response = requests.post(
             collect_url,
@@ -101,11 +101,11 @@ def initiate_payment(request, job_id):
             error_data = response.json() if response.text else {}
             error_msg = error_data.get('message', 'Unknown error')
             error_code = error_data.get('error_code', '')
-            logger.error(f'CamPay collect request failed ({error_code}): {error_msg}. Phone sent: {phone}')
+            logger.error(f'CamPay collect request failed ({error_code}): {error_msg}. Phone sent: {phone_final}')
             
             # Provide helpful error messages
             if 'phone' in error_msg.lower() or error_code == 'ER101':
-                messages.error(request, '📱 The phone number format seems invalid to CamPay. Try using format like +237XXXXXXXXX (must have exactly 9 digits after +237).')
+                messages.error(request, '📱 The phone number format seems invalid to CamPay. Try using format like 237XXXXXXXXX (9 digits after 237).')
             else:
                 messages.error(request, f'Payment processing error: {error_msg}. Please try again.')
             return redirect('post_job')
