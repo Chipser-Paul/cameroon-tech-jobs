@@ -172,9 +172,6 @@ def post_job(request):
 
 
 @login_required
-
-
-@login_required
 def apply_job(request, pk):
     if request.method != 'POST':
         return redirect('job_detail', pk=pk)
@@ -441,11 +438,11 @@ def mark_notification_read(request, pk):
     if request.method != 'POST':
         return redirect('notifications')
 
-    user = request.user
-    if isinstance(user, Company):
-        notification = get_object_or_404(Notification, pk=pk, recipient_company=user)
-    elif isinstance(user, Seeker):
-        notification = get_object_or_404(Notification, pk=pk, recipient_seeker=user)
+    # Unified lookup using Q objects or simple filtering based on user type
+    if isinstance(request.user, Company):
+        notification = get_object_or_404(Notification, pk=pk, recipient_company=request.user)
+    elif isinstance(request.user, Seeker):
+        notification = get_object_or_404(Notification, pk=pk, recipient_seeker=request.user)
     else:
         return redirect('home')
 
@@ -459,11 +456,10 @@ def mark_all_notifications_read(request):
     if request.method != 'POST':
         return redirect('notifications')
 
-    user = request.user
-    if isinstance(user, Company):
-        user.notifications.filter(is_read=False).update(is_read=True)
-    elif isinstance(user, Seeker):
-        user.notifications.filter(is_read=False).update(is_read=True)
-
+    # Since both models have a 'notifications' related_name (via Seeker's custom fields),
+    # we can call it directly on the user object.
+    if hasattr(request.user, 'notifications'):
+        request.user.notifications.filter(is_read=False).update(is_read=True)
+        
     messages.success(request, 'All notifications marked as read.')
     return redirect('notifications')
