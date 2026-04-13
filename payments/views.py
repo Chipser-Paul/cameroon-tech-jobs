@@ -217,6 +217,10 @@ def webhook(request):
         # Get the signature from headers
         signature = request.headers.get('Signature', '')
         
+        logger.info(f'📩 Webhook received from CamPay')
+        logger.debug(f'   Signature: {signature[:20]}...')
+        logger.debug(f'   Body: {body.decode() if isinstance(body, bytes) else body}')
+        
         # Verify signature
         expected_signature = hmac.new(
             webhook_key.encode(),
@@ -225,8 +229,10 @@ def webhook(request):
         ).hexdigest()
 
         if not hmac.compare_digest(signature, expected_signature):
-            logger.warning(f'Invalid webhook signature: {signature}')
+            logger.warning(f'❌ Invalid webhook signature: {signature}')
             return JsonResponse({'status': 'error', 'message': 'Invalid signature'}, status=403)
+
+        logger.info(f'✓ Webhook signature verified')
 
         # Parse payload
         data = json.loads(body)
@@ -235,15 +241,25 @@ def webhook(request):
         external_reference = data.get('external_reference')
         status = data.get('status')
         
+        logger.info(f'📋 Webhook Data:')
+        logger.info(f'   Reference: {reference}')
+        logger.info(f'   External Reference (Job ID): {external_reference}')
+        logger.info(f'   Status: {status}')
+        
         if not reference or not external_reference:
-            logger.error(f'Missing required fields in webhook: {data}')
+            logger.error(f'❌ Missing required fields in webhook: {data}')
             return JsonResponse({'status': 'error', 'message': 'Missing required fields'}, status=400)
 
         # Get payment record
-        payment = get_object_or_404(Payment, campay_reference=reference)
+        try:
+            payment = Payment.objects.get(campay_reference=reference)
+        except Payment.DoesNotExist:
+            logger.error(f'❌ Payment not found for reference: {reference}')
+            return JsonResponse({'status': 'error', 'message': 'Payment not found'}, status=404)
         
         # Update payment status
-        if status == 'success':
+        if status == 'success' or status == 'SUCCESSFUL':
+            logger.info(f'✓ Payment successful - activating job')
             payment.status = 'successful'
             payment.save()
 
@@ -251,6 +267,8 @@ def webhook(request):
             job = payment.job
             job.status = 'active'
             job.save()
+            
+            logger.info(f'✅ Job activated: {job.id} - {job.title}')
 
             # Send confirmation email to company
             try:
@@ -261,12 +279,14 @@ def webhook(request):
                     [job.company.email],
                     fail_silently=True,
                 )
+                logger.info(f'📧 Confirmation email sent to {job.company.email}')
             except Exception as e:
                 logger.error(f'Failed to send confirmation email: {str(e)}')
 
-            logger.info(f'Payment {reference} successful, job {job.id} activated')
+            logger.info(f'✅ Payment {reference} successful, job {job.id} activated')
             
-        elif status == 'failed' or status == 'declined':
+        elif status == 'failed' or status == 'FAILED' or status == 'declined' or status == 'DECLINED':
+            logger.warning(f'❌ Payment failed - deleting job')
             payment.status = 'failed'
             payment.save()
             
@@ -275,19 +295,70 @@ def webhook(request):
             job_title = job.title
             job.delete()
             
-            logger.info(f'Payment {reference} failed, job deleted')
+            logger.info(f'Job deleted: {job_title}')
+        
+        else:
+            logger.warning(f'⚠️ Unknown payment status: {status}')
+            payment.status = status
+            payment.save()
 
         return JsonResponse({'status': 'success'}, status=200)
-
-    except Payment.DoesNotExist:
-        logger.error(f'Payment with reference {reference} not found')
-        return JsonResponse({'status': 'error', 'message': 'Payment not found'}, status=404)
-    except json.JSONDecodeError:
-        logger.error('Invalid JSON in webhook request')
+    
+    except json.JSONDecodeError as e:
+        logger.error(f'❌ Invalid JSON in webhook: {str(e)}')
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
     except Exception as e:
-        logger.error(f'Webhook error: {str(e)}')
-        return JsonResponse({'status': 'error', 'message': 'Internal server error'}, status=500)
+        logger.error(f'❌ Webhook processing error: {str(e)}')
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+def check_payment_status(request, payment_id):
+    """Check payment status and manually activate job if needed (for testing)"""
+    try:
+        payment = Payment.objects.get(id=payment_id, job__company=request.user)
+        
+        logger.info(f'Payment status check - Payment ID: {payment_id}, Status: {payment.status}')
+        
+        # If payment is marked successful but job is not active, activate it
+        if payment.status == 'successful' and payment.job.status != 'active':
+            logger.info(f'Manually activating job {payment.job.id} based on successful payment')
+            job = payment.job
+            job.status = 'active'
+            job.save()
+            messages.success(request, f'✅ Job "{job.title}" has been activated!')
+            
+            # Send email
+            try:
+                send_mail(
+                    'Your Job Posting is Now Active',
+                    f'Hi {job.company.company_name},\n\nYour job posting "{job.title}" has been successfully paid and is now active on CameroonTechJobs.\n\nBest regards,\nCameroonTechJobs Team',
+                    settings.DEFAULT_FROM_EMAIL,
+                    [job.company.email],
+                    fail_silently=True,
+                )
+            except:
+                pass
+        
+        elif payment.status == 'successful':
+            messages.info(request, f'✓ Job "{payment.job.title}" is already active!')
+        elif payment.status == 'pending':
+            messages.info(request, f'⏳ Payment is still pending. Please check back in a few moments.')
+        elif payment.status == 'failed':
+            messages.error(request, f'❌ Payment failed. Please try again.')
+        else:
+            messages.info(request, f'Payment status: {payment.status}')
+        
+        return redirect('dashboard')
+    
+    except Payment.DoesNotExist:
+        messages.error(request, 'Payment record not found.')
+        return redirect('dashboard')
+    except Exception as e:
+        logger.error(f'Error checking payment status: {str(e)}')
+        messages.error(request, 'An error occurred while checking payment status.')
+        return redirect('dashboard')
+
 
 
 def payment_success(request, payment_id=None):
