@@ -65,19 +65,9 @@ def initiate_payment(request, job_id):
         return redirect('company_edit_profile')
 
     # Determine amount based on tier
-    # For sandbox/demo: CamPay demo system has max 25 XAF limit
-    # For production: Use real amounts
-    campay_base_url = settings.CAMPAY_BASE_URL
-    is_sandbox = 'demo.campay.net' in campay_base_url
-    
-    if is_sandbox:
-        # Demo amounts (under 25 XAF max for sandbox)
-        amount = 10 if tier == 'basic' else 20
-        logger.info(f'Using sandbox demo amounts: {amount} XAF (sandbox mode)')
-    else:
-        # Production amounts
-        amount = 5000 if tier == 'basic' else 15000
-        logger.info(f'Using production amounts: {amount} XAF (production mode)')
+    # Using production amounts
+    amount = 5000 if tier == 'basic' else 15000
+    logger.info(f'Payment amount: {amount} XAF for tier: {tier}')
 
     # Get CamPay credentials
     campay_username = settings.CAMPAY_USERNAME
@@ -393,21 +383,8 @@ def payment_failure(request):
 
 def pricing(request):
     """Display pricing page with tier options"""
-    campay_base_url = settings.CAMPAY_BASE_URL
-    is_sandbox = 'demo.campay.net' in campay_base_url
-    
-    if is_sandbox:
-        # Demo mode pricing (under 25 XAF max for sandbox)
-        basic_price = 10
-        featured_price = 20
-    else:
-        # Production pricing
-        basic_price = 5000
-        featured_price = 15000
-    
     context = {
-        'is_sandbox': is_sandbox,
-        'basic_price': basic_price,
-        'featured_price': featured_price,
+        'basic_price': 5000,
+        'featured_price': 15000,
     }
     return render(request, 'payments/pricing.html', context)
