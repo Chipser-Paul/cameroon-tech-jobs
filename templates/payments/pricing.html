@@ -3,110 +3,86 @@
 {% block title %}Pricing - CameroonTechJobs{% endblock %}
 
 {% block content %}
-<div class="pricing-container" style="padding: 60px 20px; max-width: 1200px; margin: 0 auto;">
-    <h1 style="text-align: center; margin-bottom: 20px;">Choose Your Plan</h1>
-    <p style="text-align: center; color: #666; margin-bottom: 30px; font-size: 18px;">
-        Upgrade your job posting to reach top talent
-    </p>
-
-    <!-- Important Note -->
-    <div style="background-color: #e3f2fd; border-left: 4px solid #2196F3; padding: 15px 20px; margin-bottom: 40px; border-radius: 4px;">
-        <p style="margin: 0; color: #1565c0; font-weight: 500;">
-            📱 <strong>Important:</strong> Make sure your company phone number is set (in format 237XXXXXXXXX or +237XXXXXXXXX with 9 digits after 237) in your account. Payment will be sent to this MTN/Orange number.
+<section class="page-hero">
+    <div class="container text-center">
+        <h1>Choose Your Hiring Plan</h1>
+        <p style="color:rgba(255,255,255,0.78);max-width:720px;margin:0 auto;">
+            Payments are processed securely with Tranzak. Pick a plan, complete checkout, and we will activate your listing as soon as payment is confirmed.
         </p>
     </div>
+</section>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 50px;">
-        <!-- Basic Plan -->
-        <div style="border: 2px solid #e0e0e0; border-radius: 12px; padding: 40px; text-align: center; transition: all 0.3s;">
-            <h2 style="color: #2c3e50; margin-bottom: 15px;">Basic</h2>
-            <p style="font-size: 32px; color: #27ae60; font-weight: bold; margin-bottom: 10px;">
-                5,000 FCFA
+<section class="py-5">
+    <div class="container">
+        {% if job %}
+        <div class="form-card mb-4" style="border:1px solid rgba(11,114,77,0.15);">
+            <div style="font-size:0.82rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--green);font-weight:800;">Pending listing</div>
+            <h3 style="margin:0.4rem 0 0.3rem;">{{ job.title }}</h3>
+            <p style="margin:0;color:var(--gray);">
+                Company: {{ job.company.company_name }} | Current plan: {{ job.get_plan_display }}
             </p>
-            <p style="color: #666; margin-bottom: 30px;">Perfect for getting started</p>
-
-            <ul style="text-align: left; list-style: none; margin-bottom: 30px; padding: 0;">
-                <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
-                    <span style="color: #27ae60;">✓</span> Featured for 30 days
-                </li>
-                <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
-                    <span style="color: #27ae60;">✓</span> Visible to all job seekers
-                </li>
-                <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
-                    <span style="color: #27ae60;">✓</span> Email notifications
-                </li>
-                <li style="padding: 10px 0;">
-                    <span style="color: #27ae60;">✓</span> Job analytics
-                </li>
-            </ul>
-
-            <form method="GET" action="{% url 'initiate_payment' 0 %}">
-                <input type="hidden" name="tier" value="basic">
-                <button type="submit" style="width: 100%; padding: 12px; background-color: #27ae60; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer;">
-                    Pay Now with MTN/Orange
-                </button>
-            </form>
         </div>
+        {% endif %}
 
-        <!-- Featured Plan -->
-        <div style="border: 3px solid #27ae60; border-radius: 12px; padding: 40px; text-align: center; background-color: #f0fdf4; position: relative;">
-            <div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background-color: #27ae60; color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold;">
-                MOST POPULAR
+        {% if not job %}
+        <div class="alert alert-warning" style="border-radius:16px;">
+            Create your paid job listing first, then return here to complete payment.
+        </div>
+        {% endif %}
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="form-card h-100" style="border:2px solid rgba(11,114,77,0.18);">
+                    <div style="font-size:0.82rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--green);font-weight:800;">Basic</div>
+                    <h2 style="margin-top:0.75rem;">5,000 FCFA</h2>
+                    <p style="color:var(--gray);">A solid plan for a single standard listing.</p>
+                    <ul style="list-style:none;padding:0;margin:1.5rem 0 2rem;">
+                        <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--green);"></i>1 job posting</li>
+                        <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--green);"></i>30 days visibility</li>
+                        <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--green);"></i>Visible to all job seekers</li>
+                    </ul>
+                    <form method="post" action="{% url 'initiate_payment' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="tier" value="{{ basic_price }}">
+                        {% if job_id %}<input type="hidden" name="job_id" value="{{ job_id }}">{% endif %}
+                        <button type="submit" class="btn-green w-100" {% if not job %}disabled{% endif %}>
+                            Pay Now
+                        </button>
+                    </form>
+                </div>
             </div>
-            
-            <h2 style="color: #27ae60; margin-bottom: 15px; margin-top: 20px;">Featured</h2>
-            <p style="font-size: 32px; color: #27ae60; font-weight: bold; margin-bottom: 10px;">
-                15,000 FCFA
+
+            <div class="col-lg-6">
+                <div class="form-card h-100" style="border:2px solid rgba(194,139,0,0.2);background:linear-gradient(180deg,#fffdf6 0%,#ffffff 100%);">
+                    <div style="font-size:0.82rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);font-weight:800;">Premium</div>
+                    <h2 style="margin-top:0.75rem;">15,000 FCFA</h2>
+                    <p style="color:var(--gray);">For employers who want more reach and stronger visibility.</p>
+                    <ul style="list-style:none;padding:0;margin:1.5rem 0 2rem;">
+                        <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--gold);"></i>3 job postings</li>
+                        <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--gold);"></i>60 days visibility</li>
+                        <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--gold);"></i>Featured badge and stronger placement</li>
+                    </ul>
+                    <form method="post" action="{% url 'initiate_payment' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="tier" value="{{ premium_price }}">
+                        {% if job_id %}<input type="hidden" name="job_id" value="{{ job_id }}">{% endif %}
+                        <button type="submit" class="btn-green w-100" {% if not job %}disabled{% endif %}>
+                            Pay Now
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-card mt-4">
+            <h3 style="margin-bottom:0.75rem;">Before you continue</h3>
+            <p style="margin-bottom:0.5rem;color:var(--gray);">
+                Tranzak checkout will open in a secure hosted page. After payment, CameroonTechJobs will confirm the transaction through the webhook and activate your listing.
             </p>
-            <p style="color: #666; margin-bottom: 30px;">Get maximum visibility</p>
-
-            <ul style="text-align: left; list-style: none; margin-bottom: 30px; padding: 0;">
-                <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
-                    <span style="color: #27ae60;">✓</span> Featured for 60 days
-                </li>
-                <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
-                    <span style="color: #27ae60;">✓</span> Priority listing placement
-                </li>
-                <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
-                    <span style="color: #27ae60;">✓</span> Email + SMS alerts
-                </li>
-                <li style="padding: 10px 0; border-bottom: 1px solid #ddd;">
-                    <span style="color: #27ae60;">✓</span> Advanced analytics
-                </li>
-                <li style="padding: 10px 0;">
-                    <span style="color: #27ae60;">✓</span> Candidate screening tools
-                </li>
-            </ul>
-
-            <form method="GET" action="{% url 'initiate_payment' 0 %}">
-                <input type="hidden" name="tier" value="featured">
-                <button type="submit" style="width: 100%; padding: 12px; background-color: #27ae60; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer;">
-                    Pay Now with MTN/Orange
-                </button>
-            </form>
+            <p style="margin:0;color:var(--gray);">
+                If you do not have a pending paid listing yet, go back and submit your job first.
+            </p>
         </div>
     </div>
-
-    <div style="text-align: center; background-color: #f8f9fa; padding: 30px; border-radius: 10px;">
-        <h3 style="margin-bottom: 15px;">Payment Methods</h3>
-        <p style="color: #666; margin-bottom: 10px;">
-            <strong>MTN Mobile Money</strong> | <strong>Orange Money</strong>
-        </p>
-        <p style="color: #666; font-size: 14px;">
-            Secure payments powered by <strong>CamPay</strong>
-        </p>
-    </div>
-</div>
-
-<style>
-    @media (max-width: 600px) {
-        .pricing-container h1 {
-            font-size: 24px !important;
-        }
-        
-        .pricing-container {
-            padding: 30px 15px !important;
-        }
-    }
-</style>
+</section>
 {% endblock %}

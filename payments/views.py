@@ -1,390 +1,285 @@
-import json
 import logging
-import hmac
-import hashlib
-import os
-import re
-import requests
-from decimal import Decimal
+import uuid
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
-from django.http import JsonResponse
-from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 
 from companies.models import Company
 from jobs.models import Job
+from jobs.tasks import send_job_alerts_task
+
 from .models import Payment
+from .tranzak_service import (
+    TranzakServiceError,
+    create_payment_request,
+    fetch_request_details,
+)
+
 
 logger = logging.getLogger(__name__)
 
 
-@login_required
-def initiate_payment(request, job_id):
-    """Initiate a CamPay payment for a job posting"""
-    if not isinstance(request.user, Company):
-        messages.error(request, 'Only companies can make payments.')
-        return redirect('dashboard')
+def _tier_to_plan(tier):
+    return 'basic' if tier == Payment.BASIC_TIER else 'featured'
 
-    job = get_object_or_404(Job, pk=job_id, company=request.user)
-    tier = request.GET.get('tier', 'basic')
 
-    # Validate tier
-    if tier not in ['basic', 'featured']:
-        messages.error(request, 'Invalid tier selected.')
-        return redirect('post_job')
+def _tier_description(tier):
+    if tier == Payment.BASIC_TIER:
+        return 'CameroonTechJobs - Basic Job Posting'
+    return 'CameroonTechJobs - Premium Job Posting'
 
-    # Check if company has a phone number for payment
-    if not request.user.phone or not request.user.phone.strip():
-        messages.error(request, '📱 Please add your phone number (e.g., +237677777777 or 237677777777) to your company account. Payment will be sent to this MTN/Orange number.')
-        return redirect('company_edit_profile')
-    
-    # Validate phone number format - accept both +237XXXXXXXXXX and 237XXXXXXXXXX
-    phone = request.user.phone.strip()
-    # Remove any spaces, dashes, or parentheses
-    phone_clean = phone.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
-    
-    logger.debug(f'Phone validation - Original: {phone}, Cleaned: {phone_clean}')
-    
-    # Check if it's in valid format (9 digits after 237 per CamPay API docs)
-    if re.match(r'^\+237\d{9}$', phone_clean):
-        # Format: +237XXXXXXXXX - remove the + for CamPay
-        phone_final = phone_clean[1:]  # Remove the + sign
-        logger.debug(f'Phone matched +237 format, final: {phone_final}')
-    elif re.match(r'^237\d{9}$', phone_clean):
-        # Format: 237XXXXXXXXX - already correct for CamPay
-        phone_final = phone_clean
-        logger.debug(f'Phone matched 237 format, final: {phone_final}')
-    else:
-        logger.warning(f'Phone validation failed for: {phone_clean}')
-        messages.warning(request, '📱 Phone should be in format 237XXXXXXXXX or +237XXXXXXXXX (9 digits after 237). Please update your profile.')
-        return redirect('company_edit_profile')
 
-    # Determine amount based on tier
-    # Using production amounts
-    amount = 5000 if tier == 'basic' else 15000
-    logger.info(f'Payment amount: {amount} XAF for tier: {tier}')
+def _payment_urls():
+    base_url = settings.SITE_URL.rstrip('/')
+    return {
+        'returnUrl': f'{base_url}{reverse("payment_success")}',
+        'cancelUrl': f'{base_url}{reverse("payment_cancel")}',
+        'callbackUrl': f'{base_url}{reverse("payment_webhook")}',
+    }
 
-    # Get CamPay credentials
-    campay_username = settings.CAMPAY_USERNAME
-    campay_password = settings.CAMPAY_PASSWORD
-    campay_token = settings.CAMPAY_TOKEN
 
-    if not all([campay_username, campay_password, campay_token, campay_base_url]):
-        logger.error(f'CamPay credentials missing - username:{bool(campay_username)}, password:{bool(campay_password)}, token:{bool(campay_token)}, url:{bool(campay_base_url)}')
-        messages.error(request, 'Payment processing is not configured. Please contact support.')
-        return redirect('post_job')
+def _resolve_job_for_payment(company, tier, job_id=None):
+    if job_id:
+        return get_object_or_404(Job, pk=job_id, company=company)
+
+    return (
+        Job.objects.filter(
+            company=company,
+            status='pending',
+            plan=_tier_to_plan(tier),
+        )
+        .order_by('-date_posted')
+        .first()
+    )
+
+
+def _activate_job_from_payment(payment):
+    if not payment.job:
+        return
+
+    job = payment.job
+    job.status = 'active'
+    job.is_featured = payment.tier == Payment.PREMIUM_TIER
+    duration_days = 60 if payment.tier == Payment.PREMIUM_TIER else 30
+    job.date_expires = timezone.now() + timezone.timedelta(days=duration_days)
+    job.save(update_fields=['status', 'is_featured', 'date_expires'])
 
     try:
-        # Log credentials presence for debugging
-        logger.info(f'CamPay credentials loaded - Username: {campay_username.split("@")[0] if "@" in campay_username else campay_username[:10]}..., Base URL: {campay_base_url}')
-        
-        # Call CamPay collect endpoint
-        collect_url = f'{campay_base_url}/collect/'
-        
-        # Use the cleaned phone number (CamPay expects format without +)
-        # Per CamPay API docs, the parameter is "from" not "phone"
-        payload = {
-            'username': campay_username,
-            'password': campay_password,
-            'from': phone_final,  # Format: 237XXXXXXXXX (9 digits after 237, no +)
-            'currency': 'XAF',  # Cameroon uses XAF
-            'amount': amount,
-            'description': f'Job posting: {job.title}',
-            'external_reference': str(job.id),  # Reference back to job
-        }
-        
-        # Log exactly what we're sending
-        logger.info(f'=== CamPay Payment Request ===')
-        logger.info(f'URL: {collect_url}')
-        logger.info(f'Sender Phone (from): {phone_final} (length: {len(phone_final)})')
-        logger.info(f'Amount: {amount} XAF')
-        logger.info(f'Currency: XAF')
-        logger.info(f'Job ID: {job.id}')
-        logger.debug(f'Full payload: {json.dumps({**payload, "password": "***", "username": "***"}, default=str)}')
+        send_job_alerts_task.delay(job.pk)
+    except Exception:
+        logger.exception('Unable to queue job alert notifications for job %s.', job.pk)
 
-        response = requests.post(
-            collect_url,
-            json=payload,
-            headers={'Authorization': f'Token {campay_token}'},
-            timeout=10
+    try:
+        send_mail(
+            'Your Job Posting is Now Active',
+            (
+                f'Hi {job.company.company_name},\n\n'
+                f'Your payment for "{job.title}" was confirmed and the listing is now active.\n\n'
+                f'Plan: {job.get_plan_display()}\n'
+                f'Expires on: {job.date_expires:%d %b %Y}\n\n'
+                'Best regards,\nCameroonTechJobs Team'
+            ),
+            settings.DEFAULT_FROM_EMAIL,
+            [job.company.email],
+            fail_silently=True,
         )
+    except Exception:
+        logger.exception('Unable to send payment confirmation email for job %s.', job.pk)
 
-        logger.info(f'CamPay Response Status: {response.status_code}')
-        logger.debug(f'CamPay Response Headers: {dict(response.headers)}')
-        logger.debug(f'CamPay Response Body: {response.text}')
 
-        if response.status_code != 200:
-            try:
-                error_data = response.json()
-            except:
-                error_data = {'message': response.text, 'response_body': response.text}
-            
-            error_msg = error_data.get('message', error_data.get('error', 'Unknown error'))
-            error_code = error_data.get('error_code', error_data.get('code', ''))
-            
-            logger.error(f'❌ CamPay Payment Failed')
-            logger.error(f'   Status: {response.status_code}')
-            logger.error(f'   Error Code: {error_code}')
-            logger.error(f'   Error Message: {error_msg}')
-            logger.error(f'   Sender Phone Sent (from): {phone_final}')
-            logger.debug(f'   Full Error Response: {json.dumps(error_data, default=str)}')
-            
-            # Provide helpful error messages
-            if error_code == 'ER101' or 'phone' in error_msg.lower():
-                messages.error(request, '📱 CamPay rejected the phone number. Phone must be 237 + exactly 9 digits (e.g., 237677777777). Please verify your phone number is correct.')
-            else:
-                messages.error(request, f'Payment error ({error_code}): {error_msg}')
-            return redirect('post_job')
+def _update_payment_from_status(payment, status):
+    normalized = (status or '').upper()
+    valid_statuses = {
+        Payment.STATUS_PENDING,
+        Payment.STATUS_SUCCESSFUL,
+        Payment.STATUS_FAILED,
+        Payment.STATUS_CANCELLED,
+    }
+    payment.status = normalized if normalized in valid_statuses else Payment.STATUS_PENDING
+    payment.save(update_fields=['status', 'updated_at'])
 
-        data = response.json()
-        logger.info(f'✓ CamPay Payment Initiated Successfully')
-        logger.info(f'   Reference: {data.get("reference")}')
-        
-        campay_reference = data.get('reference')
-        payment_url = data.get('payment_url')
-        ussd_code = data.get('ussd_code')
-        operator = data.get('operator', 'MTN')
+    if payment.status == Payment.STATUS_SUCCESSFUL:
+        _activate_job_from_payment(payment)
 
-        if not campay_reference:
-            logger.error(f'Invalid CamPay response - missing reference: {data}')
-            messages.error(request, 'Payment initiation failed. Please try again.')
-            return redirect('post_job')
 
-        # Save Payment record
-        payment = Payment.objects.create(
-            job=job,
-            tier=tier,
-            amount=Decimal(amount),
-            campay_reference=campay_reference,
-            status='pending'
-        )
+@login_required
+@require_POST
+def initiate_payment(request):
+    if not isinstance(request.user, Company):
+        messages.error(request, 'Only company accounts can make payments.')
+        return redirect('seeker_dashboard')
 
-        # Handle different response types
-        if payment_url:
-            # Production mode: redirect to payment URL
-            logger.info(f'   Payment URL: {payment_url.split("?")[0]}...')
-            return redirect(payment_url)
-        elif ussd_code:
-            # Demo/Sandbox mode: show USSD instructions
-            logger.info(f'   USSD Code: {ussd_code}')
-            logger.info(f'   Operator: {operator}')
-            return redirect(f'/payments/success/{payment.id}/?ussd={ussd_code}&operator={operator}')
-        else:
-            logger.error(f'Invalid CamPay response - no payment_url or ussd_code: {data}')
-            messages.error(request, 'Payment initiation failed. Please try again.')
-            return redirect('post_job')
+    try:
+        tier = int(request.POST.get('tier', '0'))
+    except ValueError:
+        tier = 0
 
-    except requests.exceptions.RequestException as e:
-        logger.error(f'CamPay request error: {str(e)}')
-        messages.error(request, 'Payment service temporarily unavailable. Please try again.')
+    if tier not in {Payment.BASIC_TIER, Payment.PREMIUM_TIER}:
+        messages.error(request, 'Please choose a valid payment tier.')
+        return redirect('pricing')
+
+    job_id = request.POST.get('job_id')
+    job = _resolve_job_for_payment(request.user, tier, job_id)
+    if not job:
+        messages.error(request, 'Create a pending paid job first before starting payment.')
         return redirect('post_job')
-    except Exception as e:
-        logger.error(f'Unexpected error in initiate_payment: {str(e)}')
-        messages.error(request, 'An unexpected error occurred. Please try again.')
-        return redirect('post_job')
+
+    mch_transaction_ref = uuid.uuid4().hex
+    payload = {
+        'amount': tier,
+        'currencyCode': 'XAF',
+        'description': _tier_description(tier),
+        'mchTransactionRef': mch_transaction_ref,
+        **_payment_urls(),
+    }
+
+    try:
+        response_data = create_payment_request(payload)
+    except TranzakServiceError as exc:
+        messages.error(request, str(exc))
+        return redirect('pricing')
+
+    data = response_data.get('data', {})
+    payment_auth_url = data.get('links', {}).get('paymentAuthUrl')
+    request_id = data.get('requestId')
+
+    if not payment_auth_url or not request_id:
+        messages.error(request, 'Tranzak did not return a payment authorization link.')
+        return redirect('pricing')
+
+    payment = Payment.objects.create(
+        company=request.user,
+        job=job,
+        tier=tier,
+        amount=tier,
+        currency='XAF',
+        status=Payment.STATUS_PENDING,
+        tranzak_request_id=request_id,
+        mch_transaction_ref=mch_transaction_ref,
+    )
+
+    request.session['latest_payment_id'] = payment.id
+    return redirect(payment_auth_url)
 
 
 @csrf_exempt
 @require_POST
 def webhook(request):
-    """Handle CamPay webhook callbacks"""
     try:
-        # Get webhook key from settings
-        webhook_key = settings.CAMPAY_WEBHOOK_KEY
-        
-        if not webhook_key:
-            logger.error('CAMPAY_WEBHOOK_KEY not configured')
-            return JsonResponse({'status': 'error', 'message': 'Webhook key not configured'}, status=400)
+        payload = request.POST.dict() if request.POST else None
+        if not payload:
+            import json
 
-        # Get the raw body
-        body = request.body
-        
-        # Get the signature from headers
-        signature = request.headers.get('Signature', '')
-        
-        logger.info(f'📩 Webhook received from CamPay')
-        logger.debug(f'   Signature: {signature[:20]}...')
-        logger.debug(f'   Body: {body.decode() if isinstance(body, bytes) else body}')
-        
-        # Verify signature
-        expected_signature = hmac.new(
-            webhook_key.encode(),
-            body,
-            hashlib.sha256
-        ).hexdigest()
+            payload = json.loads(request.body.decode('utf-8') or '{}')
+    except Exception:
+        logger.exception('Invalid Tranzak webhook payload.')
+        return HttpResponse(status=200)
 
-        if not hmac.compare_digest(signature, expected_signature):
-            logger.warning(f'❌ Invalid webhook signature: {signature}')
-            return JsonResponse({'status': 'error', 'message': 'Invalid signature'}, status=403)
+    auth_key = payload.get('authKey')
+    resource = payload.get('resource') or {}
+    request_id = resource.get('requestId') or payload.get('resourceId')
+    status = resource.get('status')
 
-        logger.info(f'✓ Webhook signature verified')
+    if settings.TRANZAK_WEBHOOK_KEY and auth_key != settings.TRANZAK_WEBHOOK_KEY:
+        logger.warning('Ignored Tranzak webhook with invalid authKey for request %s.', request_id)
+        return HttpResponse(status=200)
 
-        # Parse payload
-        data = json.loads(body)
-        
-        reference = data.get('reference')
-        external_reference = data.get('external_reference')
-        status = data.get('status')
-        
-        logger.info(f'📋 Webhook Data:')
-        logger.info(f'   Reference: {reference}')
-        logger.info(f'   External Reference (Job ID): {external_reference}')
-        logger.info(f'   Status: {status}')
-        
-        if not reference or not external_reference:
-            logger.error(f'❌ Missing required fields in webhook: {data}')
-            return JsonResponse({'status': 'error', 'message': 'Missing required fields'}, status=400)
+    if payload.get('eventType') != 'REQUEST.COMPLETED' or not request_id:
+        logger.info('Ignored Tranzak webhook event %s.', payload.get('eventType'))
+        return HttpResponse(status=200)
 
-        # Get payment record
-        try:
-            payment = Payment.objects.get(campay_reference=reference)
-        except Payment.DoesNotExist:
-            logger.error(f'❌ Payment not found for reference: {reference}')
-            return JsonResponse({'status': 'error', 'message': 'Payment not found'}, status=404)
-        
-        # Update payment status
-        if status == 'success' or status == 'SUCCESSFUL':
-            logger.info(f'✓ Payment successful - activating job')
-            payment.status = 'successful'
-            payment.save()
+    payment = Payment.objects.filter(tranzak_request_id=request_id).select_related('job', 'company').first()
+    if not payment:
+        logger.warning('No payment record found for Tranzak request %s.', request_id)
+        return HttpResponse(status=200)
 
-            # Activate the job
-            job = payment.job
-            job.status = 'active'
-            job.save()
-            
-            logger.info(f'✅ Job activated: {job.id} - {job.title}')
-
-            # Send confirmation email to company
-            try:
-                send_mail(
-                    'Your Job Posting is Now Active',
-                    f'Hi {job.company.company_name},\n\nYour job posting "{job.title}" has been successfully paid and is now active on CameroonTechJobs.\n\nCompany: {job.company.company_name}\nLocation: {job.location}\nJob Type: {job.job_type}\n\nView your job: {request.build_absolute_uri(f"/jobs/{job.id}/")}\n\nBest regards,\nCameroonTechJobs Team',
-                    settings.DEFAULT_FROM_EMAIL,
-                    [job.company.email],
-                    fail_silently=True,
-                )
-                logger.info(f'📧 Confirmation email sent to {job.company.email}')
-            except Exception as e:
-                logger.error(f'Failed to send confirmation email: {str(e)}')
-
-            logger.info(f'✅ Payment {reference} successful, job {job.id} activated')
-            
-        elif status == 'failed' or status == 'FAILED' or status == 'declined' or status == 'DECLINED':
-            logger.warning(f'❌ Payment failed - deleting job')
-            payment.status = 'failed'
-            payment.save()
-            
-            # Delete the pending job
-            job = payment.job
-            job_title = job.title
-            job.delete()
-            
-            logger.info(f'Job deleted: {job_title}')
-        
-        else:
-            logger.warning(f'⚠️ Unknown payment status: {status}')
-            payment.status = status
-            payment.save()
-
-        return JsonResponse({'status': 'success'}, status=200)
-    
-    except json.JSONDecodeError as e:
-        logger.error(f'❌ Invalid JSON in webhook: {str(e)}')
-        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    except Exception as e:
-        logger.error(f'❌ Webhook processing error: {str(e)}')
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    _update_payment_from_status(payment, status)
+    return HttpResponse(status=200)
 
 
 @login_required
-def check_payment_status(request, payment_id):
-    """Check payment status and manually activate job if needed (for testing)"""
+@require_GET
+def check_payment_status(request, request_id):
+    payment = get_object_or_404(
+        Payment.objects.select_related('job', 'company'),
+        tranzak_request_id=request_id,
+        company=request.user,
+    )
+
     try:
-        payment = Payment.objects.get(id=payment_id, job__company=request.user)
-        
-        logger.info(f'Payment status check - Payment ID: {payment_id}, Status: {payment.status}')
-        
-        # If payment is marked successful but job is not active, activate it
-        if payment.status == 'successful' and payment.job.status != 'active':
-            logger.info(f'Manually activating job {payment.job.id} based on successful payment')
-            job = payment.job
-            job.status = 'active'
-            job.save()
-            messages.success(request, f'✅ Job "{job.title}" has been activated!')
-            
-            # Send email
-            try:
-                send_mail(
-                    'Your Job Posting is Now Active',
-                    f'Hi {job.company.company_name},\n\nYour job posting "{job.title}" has been successfully paid and is now active on CameroonTechJobs.\n\nBest regards,\nCameroonTechJobs Team',
-                    settings.DEFAULT_FROM_EMAIL,
-                    [job.company.email],
-                    fail_silently=True,
-                )
-            except:
-                pass
-        
-        elif payment.status == 'successful':
-            messages.info(request, f'✓ Job "{payment.job.title}" is already active!')
-        elif payment.status == 'pending':
-            messages.info(request, f'⏳ Payment is still pending. Please check back in a few moments.')
-        elif payment.status == 'failed':
-            messages.error(request, f'❌ Payment failed. Please try again.')
-        else:
-            messages.info(request, f'Payment status: {payment.status}')
-        
-        return redirect('dashboard')
-    
-    except Payment.DoesNotExist:
-        messages.error(request, 'Payment record not found.')
-        return redirect('dashboard')
-    except Exception as e:
-        logger.error(f'Error checking payment status: {str(e)}')
-        messages.error(request, 'An error occurred while checking payment status.')
+        response_data = fetch_request_details(request_id)
+    except TranzakServiceError as exc:
+        messages.error(request, str(exc))
+        return redirect('payment_success')
+
+    status = response_data.get('data', {}).get('status')
+    _update_payment_from_status(payment, status)
+
+    if payment.status == Payment.STATUS_SUCCESSFUL:
+        messages.success(request, 'Payment confirmed and your listing is now active.')
         return redirect('dashboard')
 
+    if payment.status == Payment.STATUS_FAILED:
+        messages.error(request, 'Payment failed. Please try again.')
+        return redirect('payment_cancel')
+
+    if payment.status == Payment.STATUS_CANCELLED:
+        messages.info(request, 'Payment was cancelled.')
+        return redirect('payment_cancel')
+
+    messages.info(request, 'Payment is still pending. Please check again in a moment.')
+    return redirect('payment_success')
 
 
-def payment_success(request, payment_id=None):
-    """Display success page after payment initiation"""
-    context = {}
-    
-    if payment_id:
-        try:
-            payment = Payment.objects.get(id=payment_id)
-            context['payment'] = payment
-            context['job'] = payment.job
-        except Payment.DoesNotExist:
-            messages.error(request, 'Payment record not found.')
-            return redirect('dashboard')
-    
-    # Get USSD code and operator from query params (demo mode)
-    ussd_code = request.GET.get('ussd', '')
-    operator = request.GET.get('operator', 'MTN')
-    
-    if ussd_code:
-        context['is_demo_mode'] = True
-        context['ussd_code'] = ussd_code
-        context['operator'] = operator
-    
-    return render(request, 'payments/success.html', context)
-
-
-def payment_failure(request):
-    """Display failure page if payment failed"""
-    return render(request, 'payments/failure.html')
-
-
+@login_required
 def pricing(request):
-    """Display pricing page with tier options"""
-    context = {
-        'basic_price': 5000,
-        'featured_price': 15000,
-    }
-    return render(request, 'payments/pricing.html', context)
+    job_id = request.GET.get('job_id')
+    selected_tier = request.GET.get('tier')
+    job = None
+
+    if isinstance(request.user, Company) and job_id:
+        job = Job.objects.filter(pk=job_id, company=request.user).first()
+
+    return render(
+        request,
+        'payments/pricing.html',
+        {
+            'job': job,
+            'job_id': job_id,
+            'selected_tier': selected_tier,
+            'basic_price': Payment.BASIC_TIER,
+            'premium_price': Payment.PREMIUM_TIER,
+        },
+    )
+
+
+def payment_success(request):
+    payment = None
+    payment_id = request.session.get('latest_payment_id')
+    if request.user.is_authenticated and payment_id:
+        payment = Payment.objects.filter(
+            id=payment_id,
+            company=request.user,
+        ).select_related('job').first()
+
+    return render(request, 'payments/success.html', {'payment': payment})
+
+
+def payment_cancel(request):
+    payment = None
+    payment_id = request.session.get('latest_payment_id')
+    if request.user.is_authenticated and payment_id:
+        payment = Payment.objects.filter(
+            id=payment_id,
+            company=request.user,
+        ).select_related('job').first()
+
+    return render(request, 'payments/cancel.html', {'payment': payment})

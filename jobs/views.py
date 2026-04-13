@@ -153,8 +153,8 @@ def post_job(request):
             form.save_m2m()
             form.save_custom_tech(job)
 
-            messages.success(request, 'Great! Now proceed to payment to activate your listing.')
-            url = reverse('initiate_payment', args=[job.id]) + f'?tier={tier}'
+            messages.success(request, 'Great! Now choose your Tranzak payment plan to activate the listing.')
+            url = reverse('pricing') + f'?job_id={job.id}&tier={tier}'
             return redirect(url)
     else:
         form = JobForm()

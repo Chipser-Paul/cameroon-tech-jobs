@@ -105,7 +105,7 @@ def payment_info(request):
     if isinstance(request.user, Seeker):
         return redirect('seeker_dashboard')
 
-    return render(request, 'companies/payment_info.html')
+    return redirect('pricing')
 
 
 @login_required

@@ -155,12 +155,11 @@ elif CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
         secure=True,
     )
 
-# CamPay settings for payment processing
-CAMPAY_USERNAME = os.getenv('CAMPAY_USERNAME', '')
-CAMPAY_PASSWORD = os.getenv('CAMPAY_PASSWORD', '')
-CAMPAY_TOKEN = os.getenv('CAMPAY_TOKEN', '')
-CAMPAY_WEBHOOK_KEY = os.getenv('CAMPAY_WEBHOOK_KEY', '')
-CAMPAY_BASE_URL = os.getenv('CAMPAY_BASE_URL', 'https://demo.campay.net/api')
+# Tranzak settings for payment processing
+TRANZAK_APP_ID = os.getenv('TRANZAK_APP_ID', '')
+TRANZAK_APP_KEY = os.getenv('TRANZAK_APP_KEY', '')
+TRANZAK_WEBHOOK_KEY = os.getenv('TRANZAK_WEBHOOK_KEY', '')
+TRANZAK_BASE_URL = os.getenv('TRANZAK_BASE_URL', 'https://sandbox.dsapi.tranzak.me')
 
 # Stripe settings (legacy - can be removed after migration complete)
 STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY')
