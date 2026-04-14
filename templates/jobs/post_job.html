@@ -1,14 +1,16 @@
 {% extends 'base.html' %}
 
-{% block title %}Post a Job - CameroonTechJobs{% endblock %}
+{% block title %}{% if is_edit_mode %}Edit Job{% else %}Post a Job{% endif %} - CameroonTechJobs{% endblock %}
 
 {% block content %}
 
 <section class="page-hero">
     <div class="container">
-        <h1>Post a Job</h1>
+        <h1>{% if is_edit_mode %}Edit Job{% else %}Post a Job{% endif %}</h1>
         <p style="color:rgba(255,255,255,0.75);">
-            {% if is_free %}
+            {% if is_edit_mode %}
+            Update the details below and keep your pending listing accurate before it goes live.
+            {% elif is_free %}
             This is your <strong>free listing</strong> - no payment required!
             {% else %}
             Fill in the details below. Activate with payment after submission.
@@ -22,7 +24,15 @@
         <div class="row justify-content-center">
             <div class="col-lg-8">
 
-                {% if is_free %}
+                {% if is_edit_mode %}
+                <div class="alert mb-4" style="background:rgba(13,110,253,0.08);border:1.5px solid rgba(13,110,253,0.18);border-radius:12px;color:#0d4f9e;">
+                    <i class="fas fa-pen me-2"></i>
+                    <strong>Editing pending job.</strong> Save your corrections here.
+                    {% if plan_locked %}
+                    The selected paid plan stays locked while the listing is pending.
+                    {% endif %}
+                </div>
+                {% elif is_free %}
                 <div class="alert mb-4" style="background:var(--green-light);border:1.5px solid var(--green);border-radius:12px;color:var(--green-dark);">
                     <i class="fas fa-gift me-2"></i>
                     <strong>Free listing!</strong> Your job will be reviewed and activated within 24 hours at no cost.
@@ -36,7 +46,7 @@
                 {% endif %}
 
                 <div class="form-card">
-                    <h4 style="font-weight:800;margin-bottom:1.5rem;">Job Details</h4>
+                    <h4 style="font-weight:800;margin-bottom:1.5rem;">{% if is_edit_mode %}Update Job Details{% else %}Job Details{% endif %}</h4>
 
                     <form method="POST">
                         {% csrf_token %}
@@ -148,15 +158,19 @@
                                 <label class="form-label">Listing Plan</label>
                                 {{ form.plan }}
                                 <div style="font-size:0.82rem;color:var(--gray);margin-top:0.3rem;">
+                                    {% if plan_locked %}
+                                    This paid plan is locked while the listing is pending.
+                                    {% else %}
                                     Basic = 5,000 XAF | Featured = 15,000 XAF (top placement + gold highlight)
+                                    {% endif %}
                                 </div>
                             </div>
                             {% endif %}
 
                             <div class="col-12 mt-3">
                                 <button type="submit" class="btn-green w-100" style="padding:0.9rem;font-size:1rem;">
-                                    <i class="fas fa-paper-plane me-2"></i>
-                                    {% if is_free %}Submit Free Listing{% else %}Submit Job Listing{% endif %}
+                                    <i class="fas {% if is_edit_mode %}fa-save{% else %}fa-paper-plane{% endif %} me-2"></i>
+                                    {% if is_edit_mode %}Save Changes{% elif is_free %}Submit Free Listing{% else %}Submit Job Listing{% endif %}
                                 </button>
                             </div>
 

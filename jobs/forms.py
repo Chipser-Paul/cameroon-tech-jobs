@@ -41,12 +41,18 @@ class JobForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        lock_plan = kwargs.pop('lock_plan', False)
+        custom_tech_initial = kwargs.pop('custom_tech_initial', '')
         super().__init__(*args, **kwargs)
         self.fields['plan'].required = False
         self.fields['salary_range'].required = False
         self.fields['apply_email'].required = False
         self.fields['apply_link'].required = False
         self.fields['experience_level'].required = False
+        self.fields['custom_tech'].initial = custom_tech_initial
+
+        if lock_plan:
+            self.fields['plan'].disabled = True
 
     def save(self, commit=True):
         return super().save(commit=commit)

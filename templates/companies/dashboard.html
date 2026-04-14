@@ -212,6 +212,10 @@
                                         </form>
                                         {% endif %}
 
+                                        {% if job.status == 'pending' %}
+                                        <a href="{% url 'edit_job' job.pk %}" class="action-chip-pro">Edit</a>
+                                        {% endif %}
+
                                         {% if job.status == 'pending' or job.status == 'rejected' or job.status == 'expired' %}
                                         <form method="post" action="{% url 'delete_job' job.pk %}" class="action-inline-form" onsubmit="return confirm('Delete this job permanently? This cannot be undone.');">
                                             {% csrf_token %}

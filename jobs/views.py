@@ -168,6 +168,59 @@ def post_job(request):
     context = {
         'form': form,
         'is_free': is_free,
+        'is_edit_mode': False,
+        'plan_locked': False,
+    }
+    return render(request, 'jobs/post_job.html', context)
+
+
+@login_required
+def edit_job(request, pk):
+    if not isinstance(request.user, Company):
+        messages.error(request, 'Only company accounts can edit job listings.')
+        return redirect('seeker_dashboard')
+
+    job = get_object_or_404(
+        Job.objects.prefetch_related('tech_stacks'),
+        pk=pk,
+        company=request.user,
+    )
+
+    if job.status != 'pending':
+        messages.error(request, 'Only pending jobs can be edited.')
+        return redirect('dashboard')
+
+    locked_plan = job.plan != 'free'
+
+    if request.method == 'POST':
+        form = JobForm(
+            request.POST,
+            instance=job,
+            lock_plan=locked_plan,
+        )
+        if form.is_valid():
+            updated_job = form.save(commit=False)
+            updated_job.company = request.user
+            updated_job.status = 'pending'
+            if locked_plan:
+                updated_job.plan = job.plan
+            updated_job.save()
+            form.save_m2m()
+            form.save_custom_tech(updated_job)
+            messages.success(request, f'"{updated_job.title}" was updated successfully.')
+            return redirect('dashboard')
+    else:
+        form = JobForm(
+            instance=job,
+            lock_plan=locked_plan,
+        )
+
+    context = {
+        'form': form,
+        'is_free': job.plan == 'free',
+        'is_edit_mode': True,
+        'job': job,
+        'plan_locked': locked_plan,
     }
     return render(request, 'jobs/post_job.html', context)
 
