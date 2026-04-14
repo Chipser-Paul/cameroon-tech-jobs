@@ -10,6 +10,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
+from django.db.models import Count
 
 from .forms import JobForm
 from .models import ApplicationInterview, ApplicationMessage, Job, Category, Notification, TechStack, JobApplication
@@ -169,6 +170,56 @@ def post_job(request):
         'is_free': is_free,
     }
     return render(request, 'jobs/post_job.html', context)
+
+
+@login_required
+def close_job(request, pk):
+    if request.method != 'POST':
+        return redirect('dashboard')
+
+    if not isinstance(request.user, Company):
+        messages.error(request, 'Only company accounts can manage job listings.')
+        return redirect('seeker_dashboard')
+
+    job = get_object_or_404(Job, pk=pk, company=request.user)
+
+    if job.status != 'active':
+        messages.error(request, 'Only active jobs can be closed.')
+        return redirect('dashboard')
+
+    job.status = 'expired'
+    job.save(update_fields=['status'])
+    messages.success(request, f'"{job.title}" has been closed and removed from public listings.')
+    return redirect('dashboard')
+
+
+@login_required
+def delete_job(request, pk):
+    if request.method != 'POST':
+        return redirect('dashboard')
+
+    if not isinstance(request.user, Company):
+        messages.error(request, 'Only company accounts can manage job listings.')
+        return redirect('seeker_dashboard')
+
+    job = get_object_or_404(
+        Job.objects.annotate(applicant_total=Count('applications')),
+        pk=pk,
+        company=request.user,
+    )
+
+    if job.status not in {'pending', 'rejected', 'expired'}:
+        messages.error(request, 'Only pending, rejected, or expired jobs can be deleted.')
+        return redirect('dashboard')
+
+    if job.applicant_total:
+        messages.error(request, 'Jobs with applicants cannot be deleted. Close them instead to keep the history intact.')
+        return redirect('dashboard')
+
+    job_title = job.title
+    job.delete()
+    messages.success(request, f'"{job_title}" was deleted from your dashboard.')
+    return redirect('dashboard')
 
 
 @login_required

@@ -68,6 +68,17 @@
         display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.8rem; border-radius: 999px;
         background: rgba(26, 122, 74, 0.1); color: var(--green); text-decoration: none; font-weight: 700; font-size: 0.84rem;
     }
+    .dashboard-actions-pro { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .action-chip-pro, .action-chip-danger {
+        display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+        padding: 0.5rem 0.75rem; border-radius: 999px; font-size: 0.82rem; font-weight: 800;
+        border: 1px solid transparent; background: transparent; text-decoration: none;
+    }
+    .action-chip-pro { color: #7a5a00; background: rgba(212, 165, 62, 0.14); border-color: rgba(212, 165, 62, 0.28); }
+    .action-chip-danger { color: #a52834; background: rgba(220, 53, 69, 0.08); border-color: rgba(220, 53, 69, 0.2); }
+    .action-chip-pro:hover, .action-chip-danger:hover { opacity: 0.92; }
+    .action-inline-form { margin: 0; }
+    .job-meta-note { margin-top: 0.35rem; font-size: 0.78rem; color: #7a8d9e; }
     .profile-grid-pro { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 1.2rem; margin-top: 1.4rem; }
     .profile-card-pro { padding: 1.5rem; }
     .company-profile-head { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.1rem; }
@@ -160,22 +171,55 @@
                                 <th>Views</th>
                                 <th>Applicants</th>
                                 <th>Posted</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for job in jobs %}
                             <tr>
                                 <td>
+                                    {% if job.status == 'active' %}
                                     <a href="{% url 'job_detail' job.pk %}" class="job-title-link-pro">{{ job.title }}</a>
+                                    {% else %}
+                                    <span class="job-title-link-pro">{{ job.title }}</span>
+                                    {% endif %}
                                     {% if job.is_featured %}<div style="margin-top:0.35rem;"><span class="featured-badge">Featured</span></div>{% endif %}
+                                    {% if job.status == 'pending' %}
+                                    <div class="job-meta-note">Still waiting for approval or payment review.</div>
+                                    {% elif job.status == 'expired' %}
+                                    <div class="job-meta-note">Closed to new candidates but kept for your records.</div>
+                                    {% endif %}
                                 </td>
                                 <td style="color:#5e7082;">{{ job.category.name|default:"Uncategorized" }}</td>
                                 <td style="color:#5e7082;">{{ job.get_location_display }}</td>
                                 <td><span style="font-size:0.82rem;font-weight:800;color:var(--green);">{{ job.get_plan_display }}</span></td>
                                 <td><span class="status-badge status-{{ job.status }}">{{ job.get_status_display }}</span></td>
                                 <td style="font-weight:700;color:#152033;">{{ job.views_count }}</td>
-                                <td><a href="{% url 'job_applicants' job.pk %}" class="applicant-pill"><i class="fas fa-users"></i>{{ job.applicant_count }}</a></td>
+                                <td>
+                                    {% if job.applicant_count %}
+                                    <a href="{% url 'job_applicants' job.pk %}" class="applicant-pill"><i class="fas fa-users"></i>{{ job.applicant_count }}</a>
+                                    {% else %}
+                                    <span class="applicant-pill"><i class="fas fa-users"></i>{{ job.applicant_count }}</span>
+                                    {% endif %}
+                                </td>
                                 <td style="color:#5e7082;">{{ job.date_posted|date:"M d, Y" }}</td>
+                                <td>
+                                    <div class="dashboard-actions-pro">
+                                        {% if job.status == 'active' %}
+                                        <form method="post" action="{% url 'close_job' job.pk %}" class="action-inline-form" onsubmit="return confirm('Close this job? It will stop showing to candidates but remain in your dashboard.');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="action-chip-pro">Close Job</button>
+                                        </form>
+                                        {% endif %}
+
+                                        {% if job.status == 'pending' or job.status == 'rejected' or job.status == 'expired' %}
+                                        <form method="post" action="{% url 'delete_job' job.pk %}" class="action-inline-form" onsubmit="return confirm('Delete this job permanently? This cannot be undone.');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="action-chip-danger">Delete</button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
