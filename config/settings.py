@@ -4,6 +4,7 @@ from pathlib import Path
 import cloudinary
 import dj_database_url
 from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
 
 load_dotenv()
 
@@ -73,13 +74,17 @@ if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600),
     }
-else:
+elif DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+else:
+    raise ImproperlyConfigured(
+        'DATABASE_URL must be set when DEBUG is False. Production must use the Render database.'
+    )
 
 AUTH_PASSWORD_VALIDATORS = [
     {
