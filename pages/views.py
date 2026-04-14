@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.contrib import messages
+from django.http import HttpResponse
 from django.conf import settings
 from django.core.mail import send_mail
 from jobs.models import Job, Category
@@ -10,31 +10,62 @@ logger = logging.getLogger(__name__)
 
 
 def home(request):
-    featured_jobs = Job.objects.filter(status='active', is_featured=True)[:4]
-    latest_jobs = Job.objects.filter(status='active')[:6]
-    categories = Category.objects.all()
-    total_jobs = Job.objects.filter(status='active').count()
-    total_companies = Company.objects.exclude(company_name='Admin').count()
-    total_categories = Category.objects.count()
+    try:
+        featured_jobs = Job.objects.filter(status='active', is_featured=True)[:4]
+        latest_jobs = Job.objects.filter(status='active')[:6]
+        categories = Category.objects.all()
+        total_jobs = Job.objects.filter(status='active').count()
+        total_companies = Company.objects.exclude(company_name='Admin').count()
+        total_categories = Category.objects.count()
 
-    context = {
-        'featured_jobs': featured_jobs,
-        'latest_jobs': latest_jobs,
-        'categories': categories,
-        'total_jobs': total_jobs,
-        'total_companies': total_companies,
-        'total_categories': total_categories,
-    }
-    return render(request, 'pages/home.html', context)
+        context = {
+            'featured_jobs': featured_jobs,
+            'latest_jobs': latest_jobs,
+            'categories': categories,
+            'total_jobs': total_jobs,
+            'total_companies': total_companies,
+            'total_categories': total_categories,
+        }
+        return render(request, 'pages/home.html', context)
+    except Exception as e:
+        logger.error(f'Home page error: {str(e)}', exc_info=True)
+        return render(request, 'pages/home.html', {
+            'featured_jobs': [],
+            'latest_jobs': [],
+            'categories': [],
+            'total_jobs': 0,
+            'total_companies': 0,
+            'total_categories': 0,
+        })
 
 
 def about(request):
-    return render(request, 'pages/about.html')
+    try:
+        return render(request, 'pages/about.html')
+    except Exception as e:
+        logger.error(f'About page error: {str(e)}', exc_info=True)
+        return HttpResponse("""
+        <!DOCTYPE html>
+        <html>
+        <head><title>About Us - CameroonTechJobs</title></head>
+        <body style="font-family: Arial, sans-serif; padding: 40px; text-align: center;">
+            <h1>Oops! Something went wrong</h1>
+            <p>We're having trouble loading this page.</p>
+            <a href="/" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background: #1a7a4a; color: white; text-decoration: none; border-radius: 5px;">Go to Homepage</a>
+        </body>
+        </html>
+        """, status=500)
 
 
 def contact(request):
-    sent = False
-    error_message = None
+    """
+    Contact page view with bulletproof error handling.
+    Even if email fails or database errors occur, the page will still render.
+    """
+    context = {
+        'sent': False,
+        'error_message': None,
+    }
     
     if request.method == 'POST':
         try:
@@ -52,12 +83,8 @@ def contact(request):
                     'other': 'Other',
                 }
                 subject_label = subject_labels.get(subject, 'General Inquiry')
-                
-                # Always send to admin email, fallback if EMAIL_HOST_USER not set
                 recipient = settings.EMAIL_HOST_USER or 'chipseremmanuel@gmail.com'
                 
-                # Use fail_silently=True to absolutely prevent 500 errors
-                # This is critical for Render free tier where SMTP may be blocked
                 try:
                     sent_count = send_mail(
                         subject=f'CameroonTechJobs Contact: {subject_label}',
@@ -73,21 +100,35 @@ def contact(request):
                     )
                     
                     if sent_count and sent_count > 0:
-                        sent = True
-                        logger.info(f'Contact form email sent successfully to {recipient}')
+                        context['sent'] = True
+                        logger.info(f'Contact email sent to {recipient}')
                     else:
-                        # Email failed but we don't crash - show friendly error
-                        error_message = 'Message received but email delivery failed. Please contact us directly via WhatsApp (+237 675 952 537) or email.'
-                        logger.warning(f'Contact form email not delivered (sent_count={sent_count})')
-                except Exception as email_error:
-                    # Ultra-safe fallback - should never reach here with fail_silently=True
-                    error_message = 'Message received but email delivery failed. Please contact us directly via WhatsApp (+237 675 952 537) or email.'
-                    logger.error(f'Contact form email exception: {str(email_error)}')
+                        context['error_message'] = 'Message received but email delivery failed. Please contact us via WhatsApp (+237 675 952 537).'
+                except Exception as e:
+                    context['error_message'] = 'Message received but email delivery failed. Please contact us via WhatsApp (+237 675 952 537).'
+                    logger.error(f'Contact form email error: {str(e)}')
             else:
-                error_message = 'Please fill in all required fields.'
+                context['error_message'] = 'Please fill in all required fields.'
         except Exception as e:
-            # Catch-all to absolutely prevent 500 errors
-            error_message = 'An unexpected error occurred. Please try again or contact us via WhatsApp.'
-            logger.error(f'Contact form unexpected error: {str(e)}', exc_info=True)
+            context['error_message'] = 'An error occurred. Please try again or contact us via WhatsApp.'
+            logger.error(f'Contact form error: {str(e)}', exc_info=True)
     
-    return render(request, 'pages/contact.html', {'sent': sent, 'error_message': error_message})
+    try:
+        return render(request, 'pages/contact.html', context)
+    except Exception as e:
+        # If even template rendering fails, return a simple HTML response
+        logger.error(f'Contact page render error: {str(e)}', exc_info=True)
+        error_html = """
+        <!DOCTYPE html>
+        <html>
+        <head><title>Contact Us - CameroonTechJobs</title></head>
+        <body style="font-family: Arial, sans-serif; padding: 40px; text-align: center;">
+            <h1>Oops! Something went wrong</h1>
+            <p>We're having trouble loading this page. Please contact us directly:</p>
+            <p><strong>WhatsApp:</strong> +237 675 952 537</p>
+            <p><strong>Email:</strong> chipseremmanuel@gmail.com</p>
+            <a href="/" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background: #1a7a4a; color: white; text-decoration: none; border-radius: 5px;">Go to Homepage</a>
+        </body>
+        </html>
+        """
+        return HttpResponse(error_html, status=500)
