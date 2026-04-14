@@ -33,22 +33,25 @@ def contact(request):
     sent = False
     error_message = None
     if request.method == 'POST':
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        subject = request.POST.get('subject')
-        message = request.POST.get('message')
-        if name and email and message:
-            subject_labels = {
-                'job_posting': 'Job Posting Question',
-                'payment': 'Payment Issue',
-                'technical': 'Technical Problem',
-                'partnership': 'Partnership',
-                'other': 'Other',
-            }
-            subject_label = subject_labels.get(subject, 'General Inquiry')
-            recipient = settings.EMAIL_HOST_USER or 'chipseremmanuel@gmail.com'
-            try:
-                send_mail(
+        try:
+            name = request.POST.get('name')
+            email = request.POST.get('email')
+            subject = request.POST.get('subject')
+            message = request.POST.get('message')
+            if name and email and message:
+                subject_labels = {
+                    'job_posting': 'Job Posting Question',
+                    'payment': 'Payment Issue',
+                    'technical': 'Technical Problem',
+                    'partnership': 'Partnership',
+                    'other': 'Other',
+                }
+                subject_label = subject_labels.get(subject, 'General Inquiry')
+                recipient = settings.EMAIL_HOST_USER or 'chipseremmanuel@gmail.com'
+                
+                # Use fail_silently=True to prevent 500 errors on network/SMTP issues.
+                # Render free tier often blocks outbound SMTP, so we handle failures gracefully.
+                sent_count = send_mail(
                     subject=f'CameroonTechJobs Contact: {subject_label}',
                     message=(
                         f'Name: {name}\n'
@@ -58,13 +61,16 @@ def contact(request):
                     ),
                     from_email=settings.DEFAULT_FROM_EMAIL,
                     recipient_list=[recipient],
-                    fail_silently=False,
+                    fail_silently=True,
                 )
-                sent = True
-            except Exception as e:
-                error_message = 'We encountered an issue sending your message. Please try again or contact us directly via WhatsApp or email.'
-                # Log the error for debugging
-                import logging
-                logger = logging.getLogger(__name__)
-                logger.error(f'Contact form email failed: {str(e)}')
+                
+                if sent_count > 0:
+                    sent = True
+                else:
+                    error_message = 'We encountered an issue sending your message. Please try again or contact us directly via WhatsApp or email.'
+        except Exception as e:
+            error_message = 'We encountered an issue sending your message. Please try again or contact us directly via WhatsApp or email.'
+            import logging
+            logging.getLogger(__name__).error(f'Contact form failed: {str(e)}')
+            
     return render(request, 'pages/contact.html', {'sent': sent, 'error_message': error_message})
