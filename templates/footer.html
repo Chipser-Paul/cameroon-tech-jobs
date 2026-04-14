@@ -9,14 +9,14 @@
     }
 
     .footer-brand {
-        font-size: 2rem;
-        font-weight: 800;
-        letter-spacing: -0.03em;
-        color: #fff;
+        display: inline-flex;
+        align-items: center;
     }
 
-    .footer-brand span {
-        color: #9fe2b9;
+    .footer-brand img {
+        height: 54px;
+        width: auto;
+        display: block;
     }
 
     .footer-copy {
@@ -63,7 +63,9 @@
     <div class="container">
         <div class="row g-4">
             <div class="col-lg-5">
-                <div class="footer-brand">Cameroon<span>Tech</span>Jobs</div>
+                <div class="footer-brand">
+                    <img src="{% static 'images/ctj-logo.svg' %}" alt="CameroonTechJobs">
+                </div>
                 <p class="footer-copy">
                     A focused hiring platform for Cameroon tech. Post jobs, review applicants, message talent, schedule interviews, and build trust with a cleaner recruiting workflow.
                 </p>
