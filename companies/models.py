@@ -47,23 +47,6 @@ class Company(AbstractBaseUser, PermissionsMixin):
 
 
 class CompanyVerificationToken(models.Model):
-    company = models.OneToOneField(Company, on_delete=models.CASCADE, related_name='verification_token')
-    token = models.UUIDField(unique=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_used = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f'Verification token for {self.company.company_name}'
-
-    class Meta:
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f'Verification token for {self.company.company_name}'
-
-
-
-class CompanyVerificationToken(models.Model):
     company = models.ForeignKey(
         Company,
         on_delete=models.CASCADE,
