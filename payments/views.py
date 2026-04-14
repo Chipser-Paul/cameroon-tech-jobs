@@ -61,21 +61,37 @@ def _resolve_job_for_payment(company, tier, job_id=None):
     )
 
 
+def _queue_job_alerts(job):
+    # Without Redis, Celery runs eagerly and would send all alerts inside the web request.
+    # That can block payment confirmation on hosts with restricted outbound email access.
+    if getattr(settings, 'CELERY_TASK_ALWAYS_EAGER', False):
+        logger.info(
+            'Skipping inline job alert fanout for job %s because Celery is running eagerly.',
+            job.pk,
+        )
+        return
+
+    try:
+        send_job_alerts_task.delay(job.pk)
+    except Exception:
+        logger.exception('Unable to queue job alert notifications for job %s.', job.pk)
+
+
 def _activate_job_from_payment(payment):
     if not payment.job:
         return
 
     job = payment.job
+    already_active = job.status == 'active'
+
     job.status = 'active'
     job.is_featured = payment.tier == Payment.PREMIUM_TIER
     duration_days = 60 if payment.tier == Payment.PREMIUM_TIER else 30
     job.date_expires = timezone.now() + timezone.timedelta(days=duration_days)
     job.save(update_fields=['status', 'is_featured', 'date_expires'])
 
-    try:
-        send_job_alerts_task.delay(job.pk)
-    except Exception:
-        logger.exception('Unable to queue job alert notifications for job %s.', job.pk)
+    if not already_active:
+        _queue_job_alerts(job)
 
     try:
         send_mail(
@@ -103,7 +119,11 @@ def _update_payment_from_status(payment, status):
         Payment.STATUS_FAILED,
         Payment.STATUS_CANCELLED,
     }
-    payment.status = normalized if normalized in valid_statuses else Payment.STATUS_PENDING
+    new_status = normalized if normalized in valid_statuses else Payment.STATUS_PENDING
+    if payment.status == new_status == Payment.STATUS_SUCCESSFUL and payment.job and payment.job.status == 'active':
+        return
+
+    payment.status = new_status
     payment.save(update_fields=['status', 'updated_at'])
 
     if payment.status == Payment.STATUS_SUCCESSFUL:
