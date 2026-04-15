@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Terms of Service - CameroonTechJobs{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container text-center">
+        <h1>Terms of Service</h1>
+        <p style="color:rgba(255,255,255,0.75);">The basic terms that govern use of CameroonTechJobs.</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="form-card">
+                    <p style="color:var(--gray);line-height:1.8;">By using CameroonTechJobs, you agree to use the platform lawfully and provide accurate information when creating an employer or seeker account.</p>
+
+                    <h4 style="font-weight:800;margin-top:2rem;">Employer responsibilities</h4>
+                    <p style="color:var(--gray);line-height:1.8;">Employers must post legitimate openings, avoid misleading salary or hiring claims, and must not upload unlawful, discriminatory, or deceptive job content.</p>
+
+                    <h4 style="font-weight:800;margin-top:2rem;">Platform access</h4>
+                    <p style="color:var(--gray);line-height:1.8;">We may suspend or remove accounts, listings, or applications that violate platform rules, create abuse risk, or harm trust in the marketplace.</p>
+
+                    <h4 style="font-weight:800;margin-top:2rem;">Payments</h4>
+                    <p style="color:var(--gray);line-height:1.8;">Paid listings are processed through our checkout provider. A listing is considered purchased once payment is confirmed and the listing is activated on the platform.</p>
+
+                    <h4 style="font-weight:800;margin-top:2rem;">Content and availability</h4>
+                    <p style="color:var(--gray);line-height:1.8;">We aim to keep the service available and accurate, but we do not guarantee uninterrupted access or applicant volume for any listing.</p>
+
+                    <h4 style="font-weight:800;margin-top:2rem;">Contact</h4>
+                    <p style="color:var(--gray);line-height:1.8;margin-bottom:0;">For support or policy questions, contact us via the <a href="{% url 'contact' %}">contact page</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

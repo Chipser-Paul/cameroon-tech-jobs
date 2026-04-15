@@ -259,13 +259,12 @@ def check_payment_status(request, request_id):
     return redirect('payment_success')
 
 
-@login_required
 def pricing(request):
     job_id = request.GET.get('job_id')
     selected_tier = request.GET.get('tier')
     job = None
 
-    if isinstance(request.user, Company) and job_id:
+    if request.user.is_authenticated and isinstance(request.user, Company) and job_id:
         job = Job.objects.filter(pk=job_id, company=request.user).first()
 
     return render(

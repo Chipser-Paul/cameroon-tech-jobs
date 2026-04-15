@@ -132,3 +132,15 @@ def contact(request):
         </html>
         """
         return HttpResponse(error_html, status=500)
+
+
+def terms(request):
+    return render(request, 'pages/terms.html')
+
+
+def privacy(request):
+    return render(request, 'pages/privacy.html')
+
+
+def refunds(request):
+    return render(request, 'pages/refunds.html')

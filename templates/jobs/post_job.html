@@ -35,13 +35,13 @@
                 {% elif is_free %}
                 <div class="alert mb-4" style="background:var(--green-light);border:1.5px solid var(--green);border-radius:12px;color:var(--green-dark);">
                     <i class="fas fa-gift me-2"></i>
-                    <strong>Free listing!</strong> Your job will be reviewed and activated within 24 hours at no cost.
+                    <strong>Free listing!</strong> Your first role is free. Verified companies can activate it immediately after submission.
                 </div>
                 {% else %}
                 <div class="alert mb-4" style="background:var(--gold-light);border:1.5px solid var(--gold);border-radius:12px;color:#856404;">
                     <i class="fas fa-info-circle me-2"></i>
-                    <strong>Paid listing.</strong> After submitting, send payment via MoMo/Orange/UBA to activate.
-                    <a href="{% url 'payment_info' %}" style="color:#856404;font-weight:700;margin-left:0.5rem;">View payment details -></a>
+                    <strong>Paid listing.</strong> After submitting, continue to secure Tranzak checkout to activate your role.
+                    <a href="{% url 'pricing' %}" style="color:#856404;font-weight:700;margin-left:0.5rem;">View pricing -></a>
                 </div>
                 {% endif %}
 

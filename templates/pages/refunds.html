@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Refund Policy - CameroonTechJobs{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container text-center">
+        <h1>Refund Policy</h1>
+        <p style="color:rgba(255,255,255,0.75);">How refunds and payment disputes are handled for paid listings.</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="form-card">
+                    <p style="color:var(--gray);line-height:1.8;">As a general rule, paid listing fees are non-refundable once payment has been confirmed and the listing has been activated on the platform.</p>
+
+                    <h4 style="font-weight:800;margin-top:2rem;">Eligible cases</h4>
+                    <p style="color:var(--gray);line-height:1.8;">We may review refund requests in limited cases such as duplicate charges, confirmed technical errors that prevented activation, or billing mistakes caused by the platform.</p>
+
+                    <h4 style="font-weight:800;margin-top:2rem;">Non-refundable cases</h4>
+                    <p style="color:var(--gray);line-height:1.8;">We generally do not refund listings that were correctly activated, used, closed by the employer, or purchased by mistake after successful confirmation on the checkout page.</p>
+
+                    <h4 style="font-weight:800;margin-top:2rem;">How to request review</h4>
+                    <p style="color:var(--gray);line-height:1.8;">To request a refund review, contact us promptly with your company name, payment reference, listing title, and a short explanation of the issue.</p>
+
+                    <h4 style="font-weight:800;margin-top:2rem;">Support</h4>
+                    <p style="color:var(--gray);line-height:1.8;margin-bottom:0;">Send refund questions through the <a href="{% url 'contact' %}">contact page</a> so we can review the payment record.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

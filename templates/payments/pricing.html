@@ -24,9 +24,15 @@
         </div>
         {% endif %}
 
-        {% if not job %}
+        {% if not job and request.user.is_authenticated %}
         <div class="alert alert-warning" style="border-radius:16px;">
             Create your paid job listing first, then return here to complete payment.
+        </div>
+        {% elif not request.user.is_authenticated %}
+        <div class="form-card mb-4" style="border:1px solid rgba(11,114,77,0.15);">
+            <div style="font-size:0.82rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--green);font-weight:800;">For employers</div>
+            <h3 style="margin:0.4rem 0 0.5rem;">See the plans before you create your account</h3>
+            <p style="margin:0;color:var(--gray);">Create a company account, post your role, and complete checkout only when you are ready to go live.</p>
         </div>
         {% endif %}
 
@@ -45,9 +51,11 @@
                         {% csrf_token %}
                         <input type="hidden" name="tier" value="{{ basic_price }}">
                         {% if job_id %}<input type="hidden" name="job_id" value="{{ job_id }}">{% endif %}
-                        <button type="submit" class="btn-green w-100" {% if not job %}disabled{% endif %}>
-                            Pay Now
-                        </button>
+                        {% if request.user.is_authenticated %}
+                        <button type="submit" class="btn-green w-100" {% if not job %}disabled{% endif %}>Pay Now</button>
+                        {% else %}
+                        <a href="{% url 'register' %}" class="btn-green w-100 text-center" style="padding:0.9rem;">Create Company Account</a>
+                        {% endif %}
                     </form>
                 </div>
             </div>
@@ -56,19 +64,21 @@
                 <div class="form-card h-100" style="border:2px solid rgba(194,139,0,0.2);background:linear-gradient(180deg,#fffdf6 0%,#ffffff 100%);">
                     <div style="font-size:0.82rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);font-weight:800;">Premium</div>
                     <h2 style="margin-top:0.75rem;">15,000 FCFA</h2>
-                    <p style="color:var(--gray);">For employers who want more reach and stronger visibility.</p>
+                    <p style="color:var(--gray);">For employers who want one role to get stronger reach and better placement.</p>
                     <ul style="list-style:none;padding:0;margin:1.5rem 0 2rem;">
-                        <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--gold);"></i>3 job postings</li>
+                        <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--gold);"></i>1 featured job posting</li>
                         <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--gold);"></i>60 days visibility</li>
-                        <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--gold);"></i>Featured badge and stronger placement</li>
+                        <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--gold);"></i>Featured badge, homepage visibility, and stronger placement</li>
                     </ul>
                     <form method="post" action="{% url 'initiate_payment' %}">
                         {% csrf_token %}
                         <input type="hidden" name="tier" value="{{ premium_price }}">
                         {% if job_id %}<input type="hidden" name="job_id" value="{{ job_id }}">{% endif %}
-                        <button type="submit" class="btn-green w-100" {% if not job %}disabled{% endif %}>
-                            Pay Now
-                        </button>
+                        {% if request.user.is_authenticated %}
+                        <button type="submit" class="btn-green w-100" {% if not job %}disabled{% endif %}>Pay Now</button>
+                        {% else %}
+                        <a href="{% url 'register' %}" class="btn-green w-100 text-center" style="padding:0.9rem;">Create Company Account</a>
+                        {% endif %}
                     </form>
                 </div>
             </div>
@@ -80,7 +90,11 @@
                 Tranzak checkout will open in a secure hosted page. After payment, CameroonTechJobs will confirm the transaction through the webhook and activate your listing.
             </p>
             <p style="margin:0;color:var(--gray);">
+                {% if request.user.is_authenticated %}
                 If you do not have a pending paid listing yet, go back and submit your job first.
+                {% else %}
+                You can explore pricing now, then create a company account when you are ready to publish a role.
+                {% endif %}
             </p>
         </div>
     </div>

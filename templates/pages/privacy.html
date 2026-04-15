@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Privacy Policy - CameroonTechJobs{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="container text-center">
+        <h1>Privacy Policy</h1>
+        <p style="color:rgba(255,255,255,0.75);">How CameroonTechJobs handles user and employer data.</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="form-card">
+                    <p style="color:var(--gray);line-height:1.8;">We collect the information needed to operate the hiring platform, including account details, listing content, application data, and communication records created inside the product.</p>
+
+                    <h4 style="font-weight:800;margin-top:2rem;">What we collect</h4>
+                    <p style="color:var(--gray);line-height:1.8;">This may include names, email addresses, phone numbers, company profiles, candidate profiles, application content, interview details, and payment references.</p>
+
+                    <h4 style="font-weight:800;margin-top:2rem;">How we use it</h4>
+                    <p style="color:var(--gray);line-height:1.8;">We use your data to run accounts, publish listings, deliver applications, process payments, send operational notifications, and improve platform reliability.</p>
+
+                    <h4 style="font-weight:800;margin-top:2rem;">Payment processing</h4>
+                    <p style="color:var(--gray);line-height:1.8;">Payment transactions are handled by our checkout provider. We store payment references and status information needed for activation, support, and reconciliation.</p>
+
+                    <h4 style="font-weight:800;margin-top:2rem;">Data sharing</h4>
+                    <p style="color:var(--gray);line-height:1.8;">We share candidate data with employers only as part of the application and hiring workflow, and we share operational data with service providers only when needed to run the platform.</p>
+
+                    <h4 style="font-weight:800;margin-top:2rem;">Contact</h4>
+                    <p style="color:var(--gray);line-height:1.8;margin-bottom:0;">Questions about privacy can be sent through the <a href="{% url 'contact' %}">contact page</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

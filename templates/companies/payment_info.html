@@ -3,11 +3,10 @@
 {% block title %}Payment Information — CameroonTechJobs{% endblock %}
 
 {% block content %}
-
 <section class="page-hero">
     <div class="container text-center">
         <h1>Payment Information</h1>
-        <p style="color:rgba(255,255,255,0.75);">Simple and flexible payment options for Cameroonian businesses.</p>
+        <p style="color:rgba(255,255,255,0.75);">Clear pricing and secure checkout for Cameroonian employers.</p>
     </div>
 </section>
 
@@ -15,127 +14,54 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
+                <div class="form-card mb-4">
+                    <h4 style="font-weight:800;margin-bottom:1rem;">How paid listings work</h4>
+                    <p style="color:var(--gray);line-height:1.8;margin-bottom:0;">
+                        CameroonTechJobs uses secure Tranzak checkout for paid listings. Create your role, choose a plan, and complete checkout when you are ready to activate the listing.
+                    </p>
+                </div>
 
-                <!-- Pricing -->
-                <div class="row g-4 mb-5">
+                <div class="row g-4 mb-4">
                     <div class="col-md-6">
                         <div class="form-card text-center" style="border:2px solid var(--green);">
-                            <div style="font-size:2rem;margin-bottom:0.5rem;">📋</div>
                             <h5 style="font-weight:800;">Basic Listing</h5>
                             <div style="font-size:2rem;font-weight:800;color:var(--green);margin:1rem 0;">5,000 XAF</div>
-                            <ul style="list-style:none;padding:0;text-align:left;font-size:0.9rem;">
-                                <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--green);"></i>Standard listing position</li>
-                                <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--green);"></i>Active for 30 days</li>
-                                <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--green);"></i>Visible to all job seekers</li>
-                                <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--green);"></i>View & apply tracking</li>
-                            </ul>
+                            <p style="color:var(--gray);margin:0;">1 job posting, 30 days visibility.</p>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-card text-center" style="border:2px solid var(--gold);background:var(--gold-light);">
-                            <div style="font-size:2rem;margin-bottom:0.5rem;">⭐</div>
-                            <h5 style="font-weight:800;">Featured Listing</h5>
+                            <h5 style="font-weight:800;">Premium Featured Listing</h5>
                             <div style="font-size:2rem;font-weight:800;color:var(--gold);margin:1rem 0;">15,000 XAF</div>
-                            <ul style="list-style:none;padding:0;text-align:left;font-size:0.9rem;">
-                                <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--gold);"></i>Top of all listings</li>
-                                <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--gold);"></i>Gold highlighted card</li>
-                                <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--gold);"></i>Active for 30 days</li>
-                                <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--gold);"></i>Featured badge on listing</li>
-                                <li class="mb-2"><i class="fas fa-check me-2" style="color:var(--gold);"></i>Homepage visibility</li>
-                            </ul>
+                            <p style="color:var(--gray);margin:0;">1 featured job posting, 60 days visibility, stronger placement.</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- How to Pay -->
                 <div class="form-card mb-4">
-                    <h5 style="font-weight:800;margin-bottom:1.5rem;">
-                        <i class="fas fa-money-bill-wave me-2" style="color:var(--green);"></i>
-                        How to Pay
-                    </h5>
-                    <p style="color:var(--gray);margin-bottom:1.5rem;">
-                        After submitting your job post, send your payment using any of the methods below,
-                        then send us your payment confirmation via WhatsApp or email. Your listing will be
-                        activated within <strong>24 hours</strong>.
+                    <h5 style="font-weight:800;margin-bottom:1rem;">Need help?</h5>
+                    <p style="color:var(--gray);line-height:1.8;">
+                        If checkout fails or a payment looks incorrect, contact support with your company name and payment reference.
                     </p>
-
-                    <!-- MTN MoMo -->
-                    <div class="p-3 mb-3" style="background:#FFF3CC;border-radius:12px;border:1.5px solid #FFD700;">
-                        <div class="d-flex align-items-center gap-3">
-                            <div style="font-size:2rem;">📱</div>
-                            <div>
-                                <div style="font-weight:700;font-size:1rem;">MTN Mobile Money</div>
-                                <div style="font-size:1.2rem;font-weight:800;color:#333;margin-top:0.2rem;">
-                                    +237 675 952 537
-                                </div>
-                                <div style="font-size:0.85rem;color:var(--gray);">Name: Fokoua Paul Emmanuel</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Orange Money -->
-                    <div class="p-3 mb-3" style="background:#FFF0E6;border-radius:12px;border:1.5px solid #FF8C00;">
-                        <div class="d-flex align-items-center gap-3">
-                            <div style="font-size:2rem;">🟠</div>
-                            <div>
-                                <div style="font-weight:700;font-size:1rem;">Orange Money</div>
-                                <div style="font-size:0.9rem;color:var(--gray);margin-top:0.3rem;">
-                                    Coming soon. For now please use MTN MoMo or bank transfer.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <!-- Bank Transfer -->
-                    <div class="p-3 mb-3" style="background:#E8F0FE;border-radius:12px;border:1.5px solid #4285F4;">
-                        <div class="d-flex align-items-center gap-3">
-                            <div style="font-size:2rem;">🏦</div>
-                            <div>
-                                <div style="font-weight:700;font-size:1rem;">Bank Transfer (UBA)</div>
-                                <div style="font-size:0.9rem;color:#333;margin-top:0.3rem;">
-                                    <strong>Account Name:</strong> Fokoua Paul Emmanuel<br>
-                                    <strong>Bank:</strong> United Bank for Africa (UBA) Cameroon<br>
-                                    <strong>Account details:</strong> Contact us on WhatsApp to receive your transfer details privately.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- After Payment -->
-                    <div class="p-3" style="background:var(--green-light);border-radius:12px;border:1.5px solid var(--green);">
-                        <div style="font-weight:700;color:var(--green-dark);margin-bottom:0.5rem;">
-                            <i class="fas fa-check-circle me-2"></i>After Payment
-                        </div>
-                        <p style="font-size:0.9rem;color:var(--green-dark);margin:0;">
-                            Send your payment screenshot + your company name to our WhatsApp:
-                            <strong>
-                                <a href="https://wa.me/237675952537" target="_blank" style="color:var(--green-dark);">
-                                    +237 675 952 537
-                                </a>
-                            </strong>
-                            or email
-                            <strong>
-                                <a href="mailto:chipseremmanuel@gmail.com" style="color:var(--green-dark);">
-                                    chipseremmanuel@gmail.com
-                                </a>
-                            </strong>.
-                            Your listing will be activated within 24 hours.
-                        </p>
-                    </div>
+                    <p style="color:var(--gray);line-height:1.8;margin-bottom:0;">
+                        WhatsApp:
+                        <a href="https://wa.me/237675952537" target="_blank" style="color:var(--green);text-decoration:none;font-weight:700;">+237 675 952 537</a>
+                        <br>
+                        Email:
+                        <a href="mailto:chipseremmanuel@gmail.com" style="color:var(--green);text-decoration:none;font-weight:700;">chipseremmanuel@gmail.com</a>
+                    </p>
+                </div>
 
                 <div class="text-center">
-                    <a href="{% url 'post_job' %}" class="btn-green me-3">
-                        <i class="fas fa-plus me-2"></i>Post a Job
+                    <a href="{% url 'pricing' %}" class="btn-green me-3">
+                        <i class="fas fa-wallet me-2"></i>View Pricing
                     </a>
                     <a href="{% url 'dashboard' %}" class="btn-outline-green">
                         Back to Dashboard
                     </a>
                 </div>
-
             </div>
         </div>
     </div>
 </section>
-
 {% endblock %}
