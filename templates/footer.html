@@ -12,12 +12,39 @@
     .footer-brand {
         display: inline-flex;
         align-items: center;
+        gap: 1rem;
     }
 
     .footer-brand img {
-        height: 54px;
+        height: 58px;
         width: auto;
         display: block;
+        filter: drop-shadow(0 0 12px rgba(53, 240, 106, 0.24));
+        flex: 0 0 auto;
+    }
+
+    .footer-wordmark {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0;
+        font-size: 2.05rem;
+        font-weight: 800;
+        letter-spacing: -0.045em;
+        line-height: 1;
+        color: #ffffff;
+        white-space: nowrap;
+    }
+
+    .footer-wordmark .brand-cameroon {
+        color: #ffffff;
+    }
+
+    .footer-wordmark .brand-tech {
+        color: #9fe2b9;
+    }
+
+    .footer-wordmark .brand-jobs {
+        color: #dbe5f2;
     }
 
     .footer-copy {
@@ -58,6 +85,20 @@
         color: rgba(255,255,255,0.56);
         font-size: 0.92rem;
     }
+
+    @media (max-width: 767px) {
+        .footer-brand {
+            gap: 0.75rem;
+        }
+
+        .footer-brand img {
+            height: 46px;
+        }
+
+        .footer-wordmark {
+            font-size: 1.45rem;
+        }
+    }
 </style>
 
 <footer class="site-footer-pro">
@@ -65,7 +106,10 @@
         <div class="row g-4">
             <div class="col-lg-5">
                 <div class="footer-brand">
-                    <img src="{% static 'images/ctj-logo.svg' %}" alt="CameroonTechJobs">
+                    <img src="{% static 'images/ctj-mark.svg' %}" alt="CameroonTechJobs">
+                    <span class="footer-wordmark" aria-label="CameroonTechJobs">
+                        <span class="brand-cameroon">Cameroon</span><span class="brand-tech">Tech</span><span class="brand-jobs">Jobs</span>
+                    </span>
                 </div>
                 <p class="footer-copy">
                     A focused hiring platform for Cameroon tech. Post jobs, review applicants, message talent, schedule interviews, and build trust with a cleaner recruiting workflow.
