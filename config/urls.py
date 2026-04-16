@@ -14,8 +14,8 @@ handler403 = 'pages.views.error_403'
 from jobs.admin import analytics_view
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('admin/analytics/', staff_member_required(analytics_view), name='admin_analytics'),
+    path('admin/', admin.site.urls),
     path('', include('pages.urls')),
     path('', include('jobs.urls')),
     path('', include('companies.urls')),
