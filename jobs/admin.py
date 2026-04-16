@@ -75,7 +75,7 @@ def analytics_view(request):
         
         # Popular categories
         popular_categories = Category.objects.annotate(
-            job_count=Count('job', filter=Q(job__status='active'))
+            job_count=Count('jobs', filter=Q(jobs__status='active'))
         ).order_by('-job_count')[:5]
         
         # Top spending companies
@@ -84,7 +84,10 @@ def analytics_view(request):
         ).filter(total_spent__isnull=False).order_by('-total_spent')[:5]
         
         # Recent activity
-        recent_payments = Payment.objects.select_related('job', 'job__company').order_by('-created_at')[:10]
+        # Filter out payments with no job associated to safely access job properties in template
+        recent_payments = Payment.objects.filter(
+            job__isnull=False
+        ).select_related('job', 'job__company').order_by('-created_at')[:10]
         recent_jobs = Job.objects.select_related('company').order_by('-date_posted')[:10]
         
         context = {

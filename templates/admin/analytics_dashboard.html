@@ -301,8 +301,13 @@
             <div class="activity-item">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
+                        {% if payment.job %}
                         <strong>{{ payment.job.title|truncatechars:30 }}</strong>
-                        <div class="activity-time">{{ payment.job.company.company_name }}</div>
+                        <div class="activity-time">{{ payment.job.company.company_name|default:"Unknown Company" }}</div>
+                        {% else %}
+                        <strong>Job Deleted</strong>
+                        <div class="activity-time">Payment ID: {{ payment.id }}</div>
+                        {% endif %}
                     </div>
                     <div style="text-align: right;">
                         <div style="font-weight: 600; color: #0b724d;">{{ payment.amount|floatformat:0 }} XAF</div>
@@ -325,7 +330,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
                         <strong>{{ job.title|truncatechars:30 }}</strong>
-                        <div class="activity-time">{{ job.company.company_name }}</div>
+                        <div class="activity-time">{{ job.company.company_name|default:"Unknown Company" }}</div>
                     </div>
                     <div style="text-align: right;">
                         <span class="badge {% if job.status == 'active' %}badge-success{% elif job.status == 'pending' %}badge-warning{% else %}badge-danger{% endif %}">
