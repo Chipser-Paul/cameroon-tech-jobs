@@ -323,19 +323,3 @@ class NotificationAdmin(admin.ModelAdmin):
     def mark_as_unread(self, request, queryset):
         updated = queryset.update(is_read=False)
         self.message_user(request, f'{updated} notification(s) marked as unread.')
-
-
-# Add analytics URL to admin site
-from django.urls import path
-
-def get_admin_urls():
-    """Add custom analytics URL to admin"""
-    return [
-        path('analytics/', admin.site.admin_view(analytics_view), name='analytics'),
-    ]
-
-# Monkey-patch admin site to include analytics URL
-original_get_urls = admin.site.get_urls
-def custom_get_urls():
-    return original_get_urls() + get_admin_urls()
-admin.site.get_urls = custom_get_urls
