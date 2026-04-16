@@ -1,0 +1,31 @@
+{% extends "admin/index.html" %}
+{% load i18n static %}
+
+{% block content %}
+<!-- Analytics Dashboard Card -->
+<div style="margin-bottom: 2rem;">
+    <a href="{% url 'admin_analytics' %}" style="text-decoration: none; display: block;">
+        <div style="background: linear-gradient(135deg, #0b724d 0%, #198754 100%); 
+                    border-radius: 8px; 
+                    padding: 2rem; 
+                    color: white; 
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                    transition: transform 0.2s, box-shadow 0.2s;
+                    cursor: pointer;"
+             onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.15)'"
+             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)'">
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                <div style="font-size: 3rem;">📊</div>
+                <div style="flex: 1;">
+                    <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem; font-weight: 600;">Analytics Dashboard</h2>
+                    <p style="margin: 0; opacity: 0.9;">Track revenue, user growth, job statistics, and platform performance</p>
+                </div>
+                <div style="font-size: 2rem; opacity: 0.8;">→</div>
+            </div>
+        </div>
+    </a>
+</div>
+
+<!-- Original Admin Content -->
+{{ block.super }}
+{% endblock %}
