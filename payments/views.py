@@ -95,16 +95,42 @@ def _activate_job_from_payment(payment):
 
     try:
         send_mail(
-            'Your Job Posting is Now Active',
-            (
+            subject='✅ Payment Confirmed - Your Job is Now Active',
+            message=(
                 f'Hi {job.company.company_name},\n\n'
-                f'Your payment for "{job.title}" was confirmed and the listing is now active.\n\n'
+                f'Great news! Your payment for "{job.title}" has been confirmed.\n\n'
+                f'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
+                f'📋 PAYMENT DETAILS\n'
+                f'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
+                f'Reference: {payment.mch_transaction_ref}\n'
+                f'Amount: {payment.amount} {payment.currency}\n'
                 f'Plan: {job.get_plan_display()}\n'
-                f'Expires on: {job.date_expires:%d %b %Y}\n\n'
-                'Best regards,\nCameroonTechJobs Team'
+                f'Status: Active ✅\n\n'
+                f'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
+                f'📅 LISTING DETAILS\n'
+                f'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
+                f'Job Title: {job.title}\n'
+                f'Posted: {job.date_posted:%d %b %Y}\n'
+                f'Expires: {job.date_expires:%d %b %Y}\n'
+                f'Duration: {duration_days} days\n\n'
+                f'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
+                f'💡 WHAT HAPPENS NEXT?\n'
+                f'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
+                f'• Your job is now visible to all job seekers\n'
+                f'• Job alerts have been sent to matching candidates\n'
+                f'• You can track applications in your dashboard\n'
+                f'• Applications will appear in real-time\n\n'
+                f'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
+                f'📞 NEED HELP?\n'
+                f'━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
+                f'Email: chipseremmanuel@gmail.com\n'
+                f'WhatsApp: +237 675 952 537\n\n'
+                f'Thank you for choosing CameroonTechJobs!\n\n'
+                f'Best regards,\nCameroonTechJobs Team\n'
+                f'https://cameroon-tech-jobs.onrender.com'
             ),
-            settings.DEFAULT_FROM_EMAIL,
-            [job.company.email],
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[job.company.email],
             fail_silently=True,
         )
     except Exception:

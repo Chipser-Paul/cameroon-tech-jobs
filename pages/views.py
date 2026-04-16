@@ -1,9 +1,9 @@
 from django.shortcuts import render
-from django.http import HttpResponse
 from django.conf import settings
 from django.core.mail import send_mail
 from jobs.models import Job, Category
 from companies.models import Company
+from datetime import datetime
 import logging
 
 logger = logging.getLogger(__name__)
@@ -40,21 +40,7 @@ def home(request):
 
 
 def about(request):
-    try:
-        return render(request, 'pages/about.html')
-    except Exception as e:
-        logger.error(f'About page error: {str(e)}', exc_info=True)
-        return HttpResponse("""
-        <!DOCTYPE html>
-        <html>
-        <head><title>About Us - CameroonTechJobs</title></head>
-        <body style="font-family: Arial, sans-serif; padding: 40px; text-align: center;">
-            <h1>Oops! Something went wrong</h1>
-            <p>We're having trouble loading this page.</p>
-            <a href="/" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background: #1a7a4a; color: white; text-decoration: none; border-radius: 5px;">Go to Homepage</a>
-        </body>
-        </html>
-        """, status=500)
+    return render(request, 'pages/about.html')
 
 
 def contact(request):
@@ -118,6 +104,7 @@ def contact(request):
     except Exception as e:
         # If even template rendering fails, return a simple HTML response
         logger.error(f'Contact page render error: {str(e)}', exc_info=True)
+        from django.http import HttpResponse
         error_html = """
         <!DOCTYPE html>
         <html>
@@ -135,12 +122,24 @@ def contact(request):
 
 
 def terms(request):
-    return render(request, 'pages/terms.html')
+    """Terms of Service page"""
+    context = {
+        'current_date': datetime.now().strftime('%B %d, %Y')
+    }
+    return render(request, 'pages/terms.html', context)
 
 
 def privacy(request):
-    return render(request, 'pages/privacy.html')
+    """Privacy Policy page"""
+    context = {
+        'current_date': datetime.now().strftime('%B %d, %Y')
+    }
+    return render(request, 'pages/privacy.html', context)
 
 
 def refunds(request):
-    return render(request, 'pages/refunds.html')
+    """Refund Policy page"""
+    context = {
+        'current_date': datetime.now().strftime('%B %d, %Y')
+    }
+    return render(request, 'pages/refunds.html', context)

@@ -6,32 +6,156 @@
 <section class="page-hero">
     <div class="container text-center">
         <h1>Privacy Policy</h1>
-        <p style="color:rgba(255,255,255,0.75);">How CameroonTechJobs handles user and employer data.</p>
+        <p style="color:rgba(255,255,255,0.75);">Last updated: {{ current_date }}</p>
     </div>
 </section>
 
 <section class="py-5">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-9">
-                <div class="form-card">
-                    <p style="color:var(--gray);line-height:1.8;">We collect the information needed to operate the hiring platform, including account details, listing content, application data, and communication records created inside the product.</p>
+    <div class="container" style="max-width:900px;">
+        <div class="form-card">
+            <h2 style="margin-bottom:1.5rem;">Your Privacy Matters</h2>
+            <p style="color:var(--gray);line-height:1.8;">
+                At CameroonTechJobs, we respect your privacy and are committed to protecting your personal data. This Privacy Policy explains how we collect, use, and safeguard your information when you use our platform.
+            </p>
 
-                    <h4 style="font-weight:800;margin-top:2rem;">What we collect</h4>
-                    <p style="color:var(--gray);line-height:1.8;">This may include names, email addresses, phone numbers, company profiles, candidate profiles, application content, interview details, and payment references.</p>
+            <h3 style="margin-top:2rem;margin-bottom:1rem;">1. Information We Collect</h3>
+            
+            <h4 style="margin-top:1.5rem;margin-bottom:0.75rem;color:var(--green);">For Job Seekers:</h4>
+            <ul style="color:var(--gray);line-height:1.8;margin-left:1.5rem;">
+                <li>Full name, email address, phone number</li>
+                <li>Professional profile (bio, experience, skills)</li>
+                <li>Profile photo (stored securely on Cloudinary)</li>
+                <li>Work history and education details</li>
+                <li>Social media links (GitHub, LinkedIn, portfolio)</li>
+                <li>Job applications and cover notes</li>
+                <li>Communication with employers</li>
+            </ul>
 
-                    <h4 style="font-weight:800;margin-top:2rem;">How we use it</h4>
-                    <p style="color:var(--gray);line-height:1.8;">We use your data to run accounts, publish listings, deliver applications, process payments, send operational notifications, and improve platform reliability.</p>
+            <h4 style="margin-top:1.5rem;margin-bottom:0.75rem;color:var(--green);">For Companies:</h4>
+            <ul style="color:var(--gray);line-height:1.8;margin-left:1.5rem;">
+                <li>Company name, email address, phone number</li>
+                <li>Company logo and description</li>
+                <li>Website URL and location</li>
+                <li>Job postings and requirements</li>
+                <li>Payment information (processed by Tranzak)</li>
+                <li>Communication with applicants</li>
+            </ul>
 
-                    <h4 style="font-weight:800;margin-top:2rem;">Payment processing</h4>
-                    <p style="color:var(--gray);line-height:1.8;">Payment transactions are handled by our checkout provider. We store payment references and status information needed for activation, support, and reconciliation.</p>
+            <h4 style="margin-top:1.5rem;margin-bottom:0.75rem;color:var(--green);">Automatically Collected:</h4>
+            <ul style="color:var(--gray);line-height:1.8;margin-left:1.5rem;">
+                <li>IP address and browser information</li>
+                <li>Pages visited and time spent on platform</li>
+                <li>Device type and operating system</li>
+                <li>Cookies and similar tracking technologies</li>
+            </ul>
 
-                    <h4 style="font-weight:800;margin-top:2rem;">Data sharing</h4>
-                    <p style="color:var(--gray);line-height:1.8;">We share candidate data with employers only as part of the application and hiring workflow, and we share operational data with service providers only when needed to run the platform.</p>
+            <h3 style="margin-top:2rem;margin-bottom:1rem;">2. How We Use Your Information</h3>
+            <p style="color:var(--gray);line-height:1.8;">We use your data to:</p>
+            <ul style="color:var(--gray);line-height:1.8;margin-left:1.5rem;">
+                <li>Create and manage your account</li>
+                <li>Display job listings and candidate profiles</li>
+                <li>Facilitate job applications and employer-candidate communication</li>
+                <li>Process payments for job postings</li>
+                <li>Send job alerts and platform notifications</li>
+                <li>Improve our platform and user experience</li>
+                <li>Prevent fraud and ensure platform security</li>
+                <li>Comply with legal obligations</li>
+            </ul>
 
-                    <h4 style="font-weight:800;margin-top:2rem;">Contact</h4>
-                    <p style="color:var(--gray);line-height:1.8;margin-bottom:0;">Questions about privacy can be sent through the <a href="{% url 'contact' %}">contact page</a>.</p>
-                </div>
+            <h3 style="margin-top:2rem;margin-bottom:1rem;">3. Data Storage and Security</h3>
+            <p style="color:var(--gray);line-height:1.8;">
+                <strong>Storage Location:</strong> Your data is stored on secure servers hosted on Render (cloud infrastructure) and Cloudinary (for images). All data is encrypted in transit using SSL/TLS.
+            </p>
+            <p style="color:var(--gray);line-height:1.8;">
+                <strong>Security Measures:</strong> We implement industry-standard security practices including password hashing, secure authentication, and regular security updates.
+            </p>
+            <p style="color:var(--gray);line-height:1.8;">
+                <strong>Payment Data:</strong> We do NOT store your payment card information. All payments are processed securely by Tranzak, a licensed payment processor.
+            </p>
+
+            <h3 style="margin-top:2rem;margin-bottom:1rem;">4. Data Sharing</h3>
+            <p style="color:var(--gray);line-height:1.8;">
+                We do NOT sell your personal information. We only share data in these circumstances:
+            </p>
+            <ul style="color:var(--gray);line-height:1.8;margin-left:1.5rem;">
+                <li><strong>With Employers:</strong> When you apply for a job, your profile and application are shared with the posting company</li>
+                <li><strong>With Job Seekers:</strong> Company information and job details are publicly visible on the platform</li>
+                <li><strong>With Service Providers:</strong> Tranzak (payments), Cloudinary (images), Render (hosting) - only data necessary for their services</li>
+                <li><strong>Legal Requirements:</strong> If required by Cameroonian law or court order</li>
+            </ul>
+
+            <h3 style="margin-top:2rem;margin-bottom:1rem;">5. Cookies</h3>
+            <p style="color:var(--gray);line-height:1.8;">
+                We use cookies to:
+            </p>
+            <ul style="color:var(--gray);line-height:1.8;margin-left:1.5rem;">
+                <li>Maintain your login session</li>
+                <li>Remember your preferences</li>
+                <li>Analyze platform usage (anonymized)</li>
+            </ul>
+            <p style="color:var(--gray);line-height:1.8;">
+                You can disable cookies in your browser settings, but some features may not work properly.
+            </p>
+
+            <h3 style="margin-top:2rem;margin-bottom:1rem;">6. Your Rights</h3>
+            <p style="color:var(--gray);line-height:1.8;">You have the right to:</p>
+            <ul style="color:var(--gray);line-height:1.8;margin-left:1.5rem;">
+                <li><strong>Access:</strong> Request a copy of your personal data</li>
+                <li><strong>Correction:</strong> Update inaccurate information in your profile</li>
+                <li><strong>Deletion:</strong> Request account deletion (contact us)</li>
+                <li><strong>Portability:</strong> Export your data in a machine-readable format</li>
+                <li><strong>Objection:</strong> Opt out of non-essential communications</li>
+            </ul>
+            <p style="color:var(--gray);line-height:1.8;">
+                To exercise these rights, contact us at chipseremmanuel@gmail.com
+            </p>
+
+            <h3 style="margin-top:2rem;margin-bottom:1rem;">7. Data Retention</h3>
+            <p style="color:var(--gray);line-height:1.8;">
+                We retain your data for as long as your account is active. After account deletion:
+            </p>
+            <ul style="color:var(--gray);line-height:1.8;margin-left:1.5rem;">
+                <li>Personal data is deleted within 30 days</li>
+                <li>Job postings are anonymized or removed</li>
+                <li>Payment records are retained for 5 years (legal requirement)</li>
+                <li>Anonymized analytics data may be retained indefinitely</li>
+            </ul>
+
+            <h3 style="margin-top:2rem;margin-bottom:1rem;">8. Third-Party Services</h3>
+            <p style="color:var(--gray);line-height:1.8;">Our platform uses:</p>
+            <ul style="color:var(--gray);line-height:1.8;margin-left:1.5rem;">
+                <li><strong>Tranzak:</strong> Payment processing (<a href="https://tranzak.me" target="_blank" style="color:var(--green);">Privacy Policy</a>)</li>
+                <li><strong>Cloudinary:</strong> Image storage (<a href="https://cloudinary.com/privacy" target="_blank" style="color:var(--green);">Privacy Policy</a>)</li>
+                <li><strong>Render:</strong> Hosting infrastructure (<a href="https://render.com/legal/privacy" target="_blank" style="color:var(--green);">Privacy Policy</a>)</li>
+            </ul>
+
+            <h3 style="margin-top:2rem;margin-bottom:1rem;">9. Children's Privacy</h3>
+            <p style="color:var(--gray);line-height:1.8;">
+                Our platform is intended for users 18 years and older. We do not knowingly collect data from minors. If you believe a child has provided us with personal information, please contact us immediately.
+            </p>
+
+            <h3 style="margin-top:2rem;margin-bottom:1rem;">10. Changes to This Policy</h3>
+            <p style="color:var(--gray);line-height:1.8;">
+                We may update this Privacy Policy periodically. We will notify users of significant changes via email or platform notification. Your continued use of the platform after changes constitutes acceptance.
+            </p>
+
+            <h3 style="margin-top:2rem;margin-bottom:1rem;">11. Contact Us</h3>
+            <p style="color:var(--gray);line-height:1.8;">
+                For privacy-related questions or requests:
+            </p>
+            <ul style="color:var(--gray);line-height:1.8;margin-left:1.5rem;">
+                <li><strong>Email:</strong> chipseremmanuel@gmail.com</li>
+                <li><strong>WhatsApp:</strong> +237 675 952 537</li>
+                <li><strong>Location:</strong> Douala, Cameroon</li>
+            </ul>
+            <p style="color:var(--gray);line-height:1.8;">
+                We respond to privacy requests within 48 hours.
+            </p>
+
+            <div style="margin-top:3rem;padding-top:2rem;border-top:2px solid #f0f0f0;">
+                <p style="color:var(--gray);font-style:italic;">
+                    By using CameroonTechJobs, you consent to the data practices described in this Privacy Policy.
+                </p>
             </div>
         </div>
     </div>

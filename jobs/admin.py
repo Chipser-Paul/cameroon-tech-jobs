@@ -1,105 +1,204 @@
 from django.contrib import admin
-from django.contrib import messages
-
-from .tasks import send_job_alerts_task
-from .models import ApplicationInterview, ApplicationMessage, Category, Job, JobApplication, Notification, TechStack
-from companies.models import Company
+from django.contrib import messages as admin_messages
+from django.utils.html import format_html
+from django.urls import reverse, path
+from django.shortcuts import redirect
+from .models import Job, JobApplication, ApplicationMessage, ApplicationInterview, Notification, Category, TechStack
 
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'slug']
+    list_display = ('name', 'slug')
     prepopulated_fields = {'slug': ('name',)}
 
 
 @admin.register(TechStack)
 class TechStackAdmin(admin.ModelAdmin):
-    list_display = ['name']
-    search_fields = ['name']
+    list_display = ('name',)
+    search_fields = ('name',)
 
 
 @admin.register(Job)
 class JobAdmin(admin.ModelAdmin):
-    list_display = ['title', 'company', 'category', 'experience_level', 'location', 'job_type', 'plan', 'status', 'is_featured', 'date_posted']
-    list_filter = ['status', 'job_type', 'location', 'plan', 'is_featured', 'experience_level']
-    search_fields = ['title', 'company__company_name']
-    list_editable = ['status', 'is_featured']
-    filter_horizontal = ['tech_stacks']
-    ordering = ['-date_posted']
-    actions = ['approve_jobs', 'reject_jobs']
+    list_display = (
+        'title',
+        'company',
+        'plan_badge',
+        'status_badge',
+        'is_featured',
+        'location',
+        'job_type',
+        'views_count',
+        'applicant_count',
+        'date_posted',
+        'date_expires',
+    )
+    list_filter = ('status', 'plan', 'is_featured', 'location', 'job_type', 'date_posted')
+    search_fields = ('title', 'company__company_name', 'description')
+    list_select_related = ('company', 'category')
+    ordering = ('-date_posted',)
+    readonly_fields = ('date_posted', 'views_count')
+    actions = ('approve_jobs', 'reject_jobs', 'feature_jobs', 'unfeature_jobs')
 
-    def save_model(self, request, obj, form, change):
-        is_newly_activated = False
-        if change:
-            try:
-                old_obj = Job.objects.get(pk=obj.pk)
-                if old_obj.status != 'active' and obj.status == 'active':
-                    is_newly_activated = True
-            except Job.DoesNotExist:
-                pass
+    fieldsets = (
+        ('Job Information', {
+            'fields': ('company', 'title', 'category', 'tech_stacks')
+        }),
+        ('Job Details', {
+            'fields': ('description', 'requirements', 'experience_level', 'location', 'job_type', 'salary_range')
+        }),
+        ('Application', {
+            'fields': ('apply_link', 'apply_email')
+        }),
+        ('Status & Plan', {
+            'fields': ('plan', 'status', 'is_featured', 'date_expires')
+        }),
+        ('Analytics', {
+            'fields': ('views_count', 'date_posted'),
+            'classes': ('collapse',)
+        }),
+    )
 
-        super().save_model(request, obj, form, change)
+    @admin.display(description='Plan')
+    def plan_badge(self, obj):
+        colors = {
+            'free': '#6c757d',
+            'basic': '#0b724d',
+            'featured': '#c28b00',
+        }
+        color = colors.get(obj.plan, '#6c757d')
+        return format_html(
+            '<span style="background:{};color:white;padding:4px 12px;border-radius:12px;font-weight:600;font-size:0.85rem;">{}</span>',
+            color,
+            obj.get_plan_display()
+        )
 
-        if is_newly_activated:
-            send_job_alerts_task.delay(obj.pk)
-            self.message_user(
-                request,
-                'Job activated successfully and job alert delivery has been queued.',
-                messages.SUCCESS,
+    @admin.display(description='Status')
+    def status_badge(self, obj):
+        colors = {
+            'pending': '#ffc107',
+            'active': '#198754',
+            'expired': '#6c757d',
+            'rejected': '#dc3545',
+        }
+        color = colors.get(obj.status, '#6c757d')
+        return format_html(
+            '<span style="background:{};color:white;padding:4px 12px;border-radius:12px;font-weight:600;font-size:0.85rem;">{}</span>',
+            color,
+            obj.get_status_display()
+        )
+
+    @admin.display(description='Applicants')
+    def applicant_count(self, obj):
+        count = obj.applications.count()
+        if count > 0:
+            return format_html(
+                '<a href="{}" style="font-weight:600;color:#0b724d;">{} applicants</a>',
+                reverse('admin:jobs_jobapplication_changelist') + f'?job__id__exact={obj.id}',
+                count
             )
+        return '0'
 
+    @admin.action(description='✅ Approve selected jobs')
     def approve_jobs(self, request, queryset):
-        activated = 0
-        for job in queryset:
-            if job.status != 'active':
-                job.status = 'active'
-                job.save()
-                activated += 1
-        if activated:
-            self.message_user(request, f'{activated} job(s) approved and alerts queued.', messages.SUCCESS)
+        approved = queryset.filter(status='pending').update(status='active')
+        if approved:
+            self.message_user(request, f'{approved} job(s) approved and are now active!')
         else:
-            self.message_user(request, 'No jobs were approved.', messages.INFO)
+            self.message_user(request, 'No pending jobs selected.', level=admin_messages.WARNING)
 
-    approve_jobs.short_description = 'Approve selected jobs'
-
+    @admin.action(description='❌ Reject selected jobs')
     def reject_jobs(self, request, queryset):
-        rejected = queryset.update(status='rejected')
-        self.message_user(request, f'{rejected} job(s) rejected.', messages.SUCCESS)
+        rejected = queryset.filter(status='pending').update(status='rejected')
+        if rejected:
+            self.message_user(request, f'{rejected} job(s) rejected.')
+        else:
+            self.message_user(request, 'No pending jobs selected.', level=admin_messages.WARNING)
 
-    reject_jobs.short_description = 'Reject selected jobs'
+    @admin.action(description='⭐ Feature selected jobs')
+    def feature_jobs(self, request, queryset):
+        updated = queryset.update(is_featured=True)
+        self.message_user(request, f'{updated} job(s) marked as featured.')
+
+    @admin.action(description='Remove featured status')
+    def unfeature_jobs(self, request, queryset):
+        updated = queryset.update(is_featured=False)
+        self.message_user(request, f'{updated} job(s) unmarked as featured.')
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related('applications')
 
 
 @admin.register(JobApplication)
 class JobApplicationAdmin(admin.ModelAdmin):
-    list_display = ['job', 'seeker', 'status', 'date_applied']
-    list_filter = ['status', 'date_applied', 'job__company']
-    search_fields = ['job__title', 'seeker__full_name', 'seeker__email']
-    autocomplete_fields = ['job', 'seeker']
-    ordering = ['-date_applied']
+    list_display = (
+        'seeker',
+        'job',
+        'job_company',
+        'status',
+        'date_applied',
+    )
+    list_filter = ('status', 'date_applied')
+    search_fields = ('seeker__full_name', 'job__title', 'job__company__company_name')
+    list_select_related = ('seeker', 'job', 'job__company')
+    ordering = ('-date_applied',)
+
+    @admin.display(description='Company')
+    def job_company(self, obj):
+        return obj.job.company.company_name
 
 
 @admin.register(ApplicationMessage)
 class ApplicationMessageAdmin(admin.ModelAdmin):
-    list_display = ['application', 'sender_name', 'created_at']
-    list_filter = ['created_at']
-    search_fields = ['application__job__title', 'application__seeker__full_name', 'body']
-    autocomplete_fields = ['application', 'sender_seeker']
-    ordering = ['-created_at']
+    list_display = ('application', 'sender_name', 'sender_role', 'created_at')
+    list_filter = ('sender_role', 'created_at')
+    search_fields = ('body', 'application__job__title')
+    list_select_related = ('application', 'application__job', 'sender_company', 'sender_seeker')
+    ordering = ('-created_at',)
 
 
 @admin.register(ApplicationInterview)
 class ApplicationInterviewAdmin(admin.ModelAdmin):
-    list_display = ['application', 'scheduled_for', 'meeting_type', 'status', 'created_at']
-    list_filter = ['status', 'meeting_type', 'scheduled_for', 'created_at']
-    search_fields = ['application__job__title', 'application__seeker__full_name', 'location', 'notes']
-    autocomplete_fields = ['application']
-    ordering = ['-scheduled_for']
+    list_display = (
+        'application',
+        'scheduled_for',
+        'meeting_type',
+        'status',
+        'created_at',
+    )
+    list_filter = ('status', 'meeting_type', 'scheduled_for')
+    search_fields = ('application__job__title', 'application__seeker__full_name')
+    list_select_related = ('application', 'application__job', 'application__seeker')
+    ordering = ('-scheduled_for',)
 
 
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
-    list_display = ['title', 'recipient_company', 'recipient_seeker', 'is_read', 'created_at']
-    list_filter = ['is_read', 'created_at']
-    search_fields = ['title', 'body']
-    autocomplete_fields = ['recipient_seeker']
-    ordering = ['-created_at']
+    list_display = (
+        'title',
+        'recipient',
+        'is_read',
+        'created_at',
+    )
+    list_filter = ('is_read', 'created_at')
+    search_fields = ('title', 'body')
+    ordering = ('-created_at',)
+    actions = ('mark_as_read', 'mark_as_unread')
+
+    @admin.display(description='Recipient')
+    def recipient(self, obj):
+        if obj.recipient_company:
+            return f'Company: {obj.recipient_company.company_name}'
+        if obj.recipient_seeker:
+            return f'Seeker: {obj.recipient_seeker.full_name}'
+        return 'Unknown'
+
+    @admin.action(description='Mark selected as read')
+    def mark_as_read(self, request, queryset):
+        updated = queryset.update(is_read=True)
+        self.message_user(request, f'{updated} notification(s) marked as read.')
+
+    @admin.action(description='Mark selected as unread')
+    def mark_as_unread(self, request, queryset):
+        updated = queryset.update(is_read=False)
+        self.message_user(request, f'{updated} notification(s) marked as unread.')

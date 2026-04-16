@@ -41,6 +41,15 @@ class Company(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.company_name
 
+    @property
+    def logo_url(self):
+        """Safely get logo URL for both Cloudinary and legacy values."""
+        if self.logo:
+            if hasattr(self.logo, 'url'):
+                return self.logo.url
+            return str(self.logo)
+        return None
+
     class Meta:
         verbose_name = 'Company'
         verbose_name_plural = 'Companies'

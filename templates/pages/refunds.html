@@ -6,29 +6,131 @@
 <section class="page-hero">
     <div class="container text-center">
         <h1>Refund Policy</h1>
-        <p style="color:rgba(255,255,255,0.75);">How refunds and payment disputes are handled for paid listings.</p>
+        <p style="color:rgba(255,255,255,0.75);">Last updated: {{ current_date }}</p>
     </div>
 </section>
 
 <section class="py-5">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-9">
-                <div class="form-card">
-                    <p style="color:var(--gray);line-height:1.8;">As a general rule, paid listing fees are non-refundable once payment has been confirmed and the listing has been activated on the platform.</p>
+    <div class="container" style="max-width:900px;">
+        <div class="form-card">
+            <h2 style="margin-bottom:1.5rem;">Our Commitment to Fair Refunds</h2>
+            <p style="color:var(--gray);line-height:1.8;">
+                We understand that circumstances change. This policy outlines when and how refunds are processed for payments made on CameroonTechJobs.
+            </p>
 
-                    <h4 style="font-weight:800;margin-top:2rem;">Eligible cases</h4>
-                    <p style="color:var(--gray);line-height:1.8;">We may review refund requests in limited cases such as duplicate charges, confirmed technical errors that prevented activation, or billing mistakes caused by the platform.</p>
+            <h3 style="margin-top:2rem;margin-bottom:1rem;">1. Free Listing Policy</h3>
+            <p style="color:var(--gray);line-height:1.8;">
+                The first job listing for each company is completely free. No payment is required, and therefore no refunds apply.
+            </p>
 
-                    <h4 style="font-weight:800;margin-top:2rem;">Non-refundable cases</h4>
-                    <p style="color:var(--gray);line-height:1.8;">We generally do not refund listings that were correctly activated, used, closed by the employer, or purchased by mistake after successful confirmation on the checkout page.</p>
+            <h3 style="margin-top:2rem;margin-bottom:1rem;">2. Paid Listing Refunds</h3>
+            
+            <h4 style="margin-top:1.5rem;margin-bottom:0.75rem;color:var(--green);">✅ Full Refund Eligibility:</h4>
+            <p style="color:var(--gray);line-height:1.8;">You are eligible for a <strong>100% refund</strong> if:</p>
+            <ul style="color:var(--gray);line-height:1.8;margin-left:1.5rem;">
+                <li>Payment was charged but job was never activated due to our technical error</li>
+                <li>Job was activated but removed by us within 24 hours due to policy violation (no refund for policy violations)</li>
+                <li>Duplicate charge occurred due to system error</li>
+                <li>Payment was processed but Tranzak transaction failed</li>
+            </ul>
 
-                    <h4 style="font-weight:800;margin-top:2rem;">How to request review</h4>
-                    <p style="color:var(--gray);line-height:1.8;">To request a refund review, contact us promptly with your company name, payment reference, listing title, and a short explanation of the issue.</p>
+            <h4 style="margin-top:1.5rem;margin-bottom:0.75rem;color:var(--gold);">⚠️ Partial Refund Eligibility:</h4>
+            <p style="color:var(--gray);line-height:1.8;">You may receive a <strong>pro-rated refund</strong> if:</p>
+            <ul style="color:var(--gray);line-height:1.8;margin-left:1.5rem;">
+                <li>You request cancellation within 7 days of purchase (unused days refunded)</li>
+                <li>Platform downtime exceeds 48 consecutive hours during your listing period</li>
+                <li>Significant feature malfunction prevents job visibility (verified by our team)</li>
+            </ul>
+            <p style="color:var(--gray);line-height:1.8;margin-top:1rem;">
+                <strong>Calculation:</strong> Refund = (Amount Paid ÷ Total Days) × Remaining Days
+            </p>
 
-                    <h4 style="font-weight:800;margin-top:2rem;">Support</h4>
-                    <p style="color:var(--gray);line-height:1.8;margin-bottom:0;">Send refund questions through the <a href="{% url 'contact' %}">contact page</a> so we can review the payment record.</p>
-                </div>
+            <h4 style="margin-top:1.5rem;margin-bottom:0.75rem;color:#dc3545;">❌ No Refund Eligibility:</h4>
+            <p style="color:var(--gray);line-height:1.8;">Refunds are <strong>NOT</strong> provided for:</p>
+            <ul style="color:var(--gray);line-height:1.8;margin-left:1.5rem;">
+                <li>Changed mind after job activation</li>
+                <li>Low number of applicants (we do not guarantee hiring outcomes)</li>
+                <li>Job expired after the agreed duration (30 or 60 days)</li>
+                <li>Company closed the job voluntarily</li>
+                <li>Violation of our <a href="/terms/" style="color:var(--green);">Terms of Service</a></li>
+                <li>More than 7 days have passed since purchase</li>
+                <li>Incorrect information provided during job posting</li>
+            </ul>
+
+            <h3 style="margin-top:2rem;margin-bottom:1rem;">3. Refund Request Process</h3>
+            <p style="color:var(--gray);line-height:1.8;">
+                To request a refund:
+            </p>
+            <ol style="color:var(--gray);line-height:1.8;margin-left:1.5rem;">
+                <li>Contact us via email (chipseremmanuel@gmail.com) or WhatsApp (+237 675 952 537)</li>
+                <li>Include your company name, job title, and transaction reference ID</li>
+                <li>Explain the reason for your refund request</li>
+                <li>We will review your request within <strong>48 hours</strong></li>
+                <li>If approved, refund will be processed within <strong>5-7 business days</strong></li>
+            </ol>
+
+            <h3 style="margin-top:2rem;margin-bottom:1rem;">4. Refund Method</h3>
+            <p style="color:var(--gray);line-height:1.8;">
+                Refunds are processed to the original payment method:
+            </p>
+            <ul style="color:var(--gray);line-height:1.8;margin-left:1.5rem;">
+                <li><strong>MTN Mobile Money:</strong> Refunded to the same mobile money account</li>
+                <li><strong>Orange Money:</strong> Refunded to the same mobile money account</li>
+                <li><strong>Bank Transfer:</strong> Refunded to the same bank account (may take 3-5 additional business days)</li>
+            </ul>
+            <p style="color:var(--gray);line-height:1.8;">
+                Processing fees charged by Tranzak may be deducted from partial refunds.
+            </p>
+
+            <h3 style="margin-top:2rem;margin-bottom:1rem;">5. Platform Downtime Compensation</h3>
+            <p style="color:var(--gray);line-height:1.8;">
+                If CameroonTechJobs experiences unplanned downtime exceeding 48 consecutive hours:
+            </p>
+            <ul style="color:var(--gray);line-height:1.8;margin-left:1.5rem;">
+                <li>You will receive automatic listing extension equal to the downtime period</li>
+                <li>Alternatively, you may request a pro-rated refund</li>
+                <li>Scheduled maintenance (announced 24 hours in advance) is not eligible</li>
+            </ul>
+
+            <h3 style="margin-top:2rem;margin-bottom:1rem;">6. Disputed Charges</h3>
+            <p style="color:var(--gray);line-height:1.8;">
+                If you believe you were charged incorrectly:
+            </p>
+            <ol style="color:var(--gray);line-height:1.8;margin-left:1.5rem;">
+                <li>Contact us first - we can often resolve issues faster than chargebacks</li>
+                <li>Provide transaction details and payment receipt</li>
+                <li>We will investigate and respond within 48 hours</li>
+                <li>If unresolved, you may file a dispute with Tranzak or your payment provider</li>
+            </ol>
+
+            <h3 style="margin-top:2rem;margin-bottom:1rem;">7. Account Termination</h3>
+            <p style="color:var(--gray);line-height:1.8;">
+                If your account is terminated due to Terms of Service violations:
+            </p>
+            <ul style="color:var(--gray);line-height:1.8;margin-left:1.5rem;">
+                <li>Active job listings will be removed</li>
+                <li>No refunds will be issued for unused listing time</li>
+                <li>Outstanding balances remain due</li>
+            </ul>
+
+            <h3 style="margin-top:2rem;margin-bottom:1rem;">8. Contact Us</h3>
+            <p style="color:var(--gray);line-height:1.8;">
+                For refund requests or questions:
+            </p>
+            <ul style="color:var(--gray);line-height:1.8;margin-left:1.5rem;">
+                <li><strong>Email:</strong> chipseremmanuel@gmail.com</li>
+                <li><strong>WhatsApp:</strong> +237 675 952 537</li>
+                <li><strong>Response Time:</strong> Within 48 hours</li>
+                <li><strong>Hours:</strong> Monday - Friday, 8:00 AM - 6:00 PM (GMT+1)</li>
+            </ul>
+
+            <div style="margin-top:3rem;padding:1.5rem;background:var(--green-light);border-radius:12px;">
+                <p style="color:var(--green-dark);font-weight:700;margin-bottom:0.5rem;">
+                    <i class="fas fa-info-circle me-2"></i>Important Note
+                </p>
+                <p style="color:var(--green-dark);margin:0;">
+                    We strive to provide excellent service and fair refund practices. If you're unsatisfied, please contact us before requesting a chargeback - we're committed to finding a solution that works for both parties.
+                </p>
             </div>
         </div>
     </div>
