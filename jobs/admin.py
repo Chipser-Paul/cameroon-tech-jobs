@@ -15,112 +15,125 @@ from payments.models import Payment
 # Custom analytics view that integrates with default admin
 def analytics_view(request):
     """Custom analytics dashboard view"""
-    now = timezone.now()
-    
-    # Time periods
-    today = now.date()
-    yesterday = today - timedelta(days=1)
-    week_ago = today - timedelta(days=7)
-    month_ago = today - timedelta(days=30)
-    
-    # Revenue metrics
-    total_revenue = Payment.objects.filter(status='completed').aggregate(
-        total=Sum('amount')
-    )['total'] or 0
-    
-    revenue_today = Payment.objects.filter(
-        status='completed',
-        created_at__date=today
-    ).aggregate(total=Sum('amount'))['total'] or 0
-    
-    revenue_week = Payment.objects.filter(
-        status='completed',
-        created_at__date__gte=week_ago
-    ).aggregate(total=Sum('amount'))['total'] or 0
-    
-    revenue_month = Payment.objects.filter(
-        status='completed',
-        created_at__date__gte=month_ago
-    ).aggregate(total=Sum('amount'))['total'] or 0
-    
-    # Conversion rates
-    total_payments = Payment.objects.count()
-    completed_payments = Payment.objects.filter(status='completed').count()
-    conversion_rate = (completed_payments / total_payments * 100) if total_payments > 0 else 0
-    
-    # User metrics
-    total_companies = Company.objects.exclude(company_name='Admin').count()
-    companies_this_month = Company.objects.filter(
-        date_joined__date__gte=month_ago
-    ).exclude(company_name='Admin').count()
-    
-    total_seekers = Seeker.objects.count()
-    seekers_this_month = Seeker.objects.filter(
-        date_joined__date__gte=month_ago
-    ).count()
-    
-    # Job metrics
-    total_jobs = Job.objects.count()
-    active_jobs = Job.objects.filter(status='active').count()
-    pending_jobs = Job.objects.filter(status='pending').count()
-    expired_jobs = Job.objects.filter(status='expired').count()
-    jobs_this_month = Job.objects.filter(date_posted__date__gte=month_ago).count()
-    
-    # Applications
-    total_applications = JobApplication.objects.count()
-    applications_this_month = JobApplication.objects.filter(
-        date_applied__date__gte=month_ago
-    ).count()
-    
-    # Popular categories
-    popular_categories = Category.objects.annotate(
-        job_count=Count('job', filter=Q(job__status='active'))
-    ).order_by('-job_count')[:5]
-    
-    # Top spending companies
-    top_companies = Company.objects.annotate(
-        total_spent=Sum('payment__amount', filter=Q(payment__status='completed'))
-    ).filter(total_spent__isnull=False).order_by('-total_spent')[:5]
-    
-    # Recent activity
-    recent_payments = Payment.objects.select_related('job', 'job__company').order_by('-created_at')[:10]
-    recent_jobs = Job.objects.select_related('company').order_by('-date_posted')[:10]
-    
-    context = {
-        **admin.site.each_context(request),
-        'title': 'Analytics Dashboard',
-        # Revenue
-        'total_revenue': total_revenue,
-        'revenue_today': revenue_today,
-        'revenue_week': revenue_week,
-        'revenue_month': revenue_month,
-        # Conversions
-        'total_payments': total_payments,
-        'completed_payments': completed_payments,
-        'conversion_rate': round(conversion_rate, 2),
-        # Users
-        'total_companies': total_companies,
-        'companies_this_month': companies_this_month,
-        'total_seekers': total_seekers,
-        'seekers_this_month': seekers_this_month,
-        # Jobs
-        'total_jobs': total_jobs,
-        'active_jobs': active_jobs,
-        'pending_jobs': pending_jobs,
-        'expired_jobs': expired_jobs,
-        'jobs_this_month': jobs_this_month,
+    try:
+        now = timezone.now()
+        
+        # Time periods
+        today = now.date()
+        yesterday = today - timedelta(days=1)
+        week_ago = today - timedelta(days=7)
+        month_ago = today - timedelta(days=30)
+        
+        # Revenue metrics
+        total_revenue = Payment.objects.filter(status='completed').aggregate(
+            total=Sum('amount')
+        )['total'] or 0
+        
+        revenue_today = Payment.objects.filter(
+            status='completed',
+            created_at__date=today
+        ).aggregate(total=Sum('amount'))['total'] or 0
+        
+        revenue_week = Payment.objects.filter(
+            status='completed',
+            created_at__date__gte=week_ago
+        ).aggregate(total=Sum('amount'))['total'] or 0
+        
+        revenue_month = Payment.objects.filter(
+            status='completed',
+            created_at__date__gte=month_ago
+        ).aggregate(total=Sum('amount'))['total'] or 0
+        
+        # Conversion rates
+        total_payments = Payment.objects.count()
+        completed_payments = Payment.objects.filter(status='completed').count()
+        conversion_rate = (completed_payments / total_payments * 100) if total_payments > 0 else 0
+        
+        # User metrics
+        total_companies = Company.objects.exclude(company_name='Admin').count()
+        companies_this_month = Company.objects.filter(
+            date_joined__date__gte=month_ago
+        ).exclude(company_name='Admin').count()
+        
+        total_seekers = Seeker.objects.count()
+        seekers_this_month = Seeker.objects.filter(
+            date_joined__date__gte=month_ago
+        ).count()
+        
+        # Job metrics
+        total_jobs = Job.objects.count()
+        active_jobs = Job.objects.filter(status='active').count()
+        pending_jobs = Job.objects.filter(status='pending').count()
+        expired_jobs = Job.objects.filter(status='expired').count()
+        jobs_this_month = Job.objects.filter(date_posted__date__gte=month_ago).count()
+        
         # Applications
-        'total_applications': total_applications,
-        'applications_this_month': applications_this_month,
-        # Categories & Companies
-        'popular_categories': popular_categories,
-        'top_companies': top_companies,
+        total_applications = JobApplication.objects.count()
+        applications_this_month = JobApplication.objects.filter(
+            date_applied__date__gte=month_ago
+        ).count()
+        
+        # Popular categories
+        popular_categories = Category.objects.annotate(
+            job_count=Count('job', filter=Q(job__status='active'))
+        ).order_by('-job_count')[:5]
+        
+        # Top spending companies
+        top_companies = Company.objects.annotate(
+            total_spent=Sum('payment__amount', filter=Q(payment__status='completed'))
+        ).filter(total_spent__isnull=False).order_by('-total_spent')[:5]
+        
         # Recent activity
-        'recent_payments': recent_payments,
-        'recent_jobs': recent_jobs,
-    }
-    
-    return render(request, 'admin/analytics_dashboard.html', context)
+        recent_payments = Payment.objects.select_related('job', 'job__company').order_by('-created_at')[:10]
+        recent_jobs = Job.objects.select_related('company').order_by('-date_posted')[:10]
+        
+        context = {
+            **admin.site.each_context(request),
+            'title': 'Analytics Dashboard',
+            # Revenue
+            'total_revenue': total_revenue,
+            'revenue_today': revenue_today,
+            'revenue_week': revenue_week,
+            'revenue_month': revenue_month,
+            # Conversions
+            'total_payments': total_payments,
+            'completed_payments': completed_payments,
+            'conversion_rate': round(conversion_rate, 2),
+            # Users
+            'total_companies': total_companies,
+            'companies_this_month': companies_this_month,
+            'total_seekers': total_seekers,
+            'seekers_this_month': seekers_this_month,
+            # Jobs
+            'total_jobs': total_jobs,
+            'active_jobs': active_jobs,
+            'pending_jobs': pending_jobs,
+            'expired_jobs': expired_jobs,
+            'jobs_this_month': jobs_this_month,
+            # Applications
+            'total_applications': total_applications,
+            'applications_this_month': applications_this_month,
+            # Categories & Companies
+            'popular_categories': popular_categories,
+            'top_companies': top_companies,
+            # Recent activity
+            'recent_payments': recent_payments,
+            'recent_jobs': recent_jobs,
+        }
+        
+        return render(request, 'admin/analytics_dashboard.html', context)
+    except Exception as e:
+        # Fallback to simple error message if analytics fails
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f'Analytics dashboard error: {str(e)}', exc_info=True)
+        
+        context = {
+            **admin.site.each_context(request),
+            'title': 'Analytics Dashboard - Error',
+            'error_message': f'Error loading analytics: {str(e)}',
+        }
+        return render(request, 'admin/analytics_dashboard.html', context)
 
 
 @admin.register(Category)

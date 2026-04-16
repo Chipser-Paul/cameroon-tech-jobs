@@ -123,6 +123,13 @@
 {% endblock %}
 
 {% block content %}
+{% if error_message %}
+<div class="analytics-header" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
+    <h1>⚠️ Analytics Dashboard Error</h1>
+    <p>{{ error_message }}</p>
+    <p style="margin-top: 1rem;"><a href="{% url 'admin:index' %}" style="color: white; text-decoration: underline;">← Back to Admin</a></p>
+</div>
+{% else %}
 <div class="analytics-header">
     <h1>📊 Analytics Dashboard</h1>
     <p>Track your platform's performance and growth</p>
@@ -239,7 +246,7 @@
 </div>
 
 <!-- Popular Categories -->
-<div class="section-title"> Most Popular Job Categories</div>
+<div class="section-title">🏷️ Most Popular Job Categories</div>
 <table class="data-table" style="margin-bottom: 2rem;">
     <thead>
         <tr>
@@ -343,4 +350,5 @@
     <a href="{% url 'admin:payments_payment_changelist' %}" class="button" style="padding: 0.75rem 1.5rem; background: #ffc107; color: #333; text-decoration: none; border-radius: 4px;">View Payments</a>
     <a href="{% url 'admin:index' %}" class="button" style="padding: 0.75rem 1.5rem; background: #6c757d; color: white; text-decoration: none; border-radius: 4px;">Back to Admin</a>
 </div>
+{% endif %}
 {% endblock %}
