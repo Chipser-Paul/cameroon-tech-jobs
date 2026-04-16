@@ -214,29 +214,6 @@ class NotificationAdmin(admin.ModelAdmin):
         self.message_user(request, f'{updated} notification(s) marked as unread.')
 
 
-@admin.register(Payment)
-class PaymentAdmin(admin.ModelAdmin):
-    list_display = (
-        'mch_transaction_ref',
-        'job',
-        'company',
-        'tier',
-        'amount',
-        'currency',
-        'status',
-        'created_at',
-    )
-    list_filter = ('status', 'tier', 'created_at')
-    search_fields = ('mch_transaction_ref', 'job__title', 'job__company__company_name')
-    list_select_related = ('job', 'job__company')
-    ordering = ('-created_at',)
-    readonly_fields = ('created_at', 'updated_at')
-
-    @admin.display(description='Company')
-    def company(self, obj):
-        return obj.job.company.company_name if obj.job else 'N/A'
-
-
 # Custom Admin Index with Analytics Link
 class CustomAdminSite(admin.AdminSite):
     def each_context(self, request):
