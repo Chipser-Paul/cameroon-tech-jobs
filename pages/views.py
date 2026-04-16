@@ -143,3 +143,19 @@ def refunds(request):
         'current_date': datetime.now().strftime('%B %d, %Y')
     }
     return render(request, 'pages/refunds.html', context)
+
+
+# Custom Error Views
+def error_404(request, exception):
+    """Custom 404 error page"""
+    return render(request, '404.html', status=404)
+
+
+def error_500(request):
+    """Custom 500 error page"""
+    return render(request, '500.html', status=500)
+
+
+def error_403(request, exception):
+    """Custom 403 error page"""
+    return render(request, '403.html', status=403)

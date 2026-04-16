@@ -4,6 +4,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
 
+# Custom error handlers
+handler404 = 'pages.views.error_404'
+handler500 = 'pages.views.error_500'
+handler403 = 'pages.views.error_403'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('pages.urls')),

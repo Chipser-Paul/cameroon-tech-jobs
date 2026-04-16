@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Access Denied - CameroonTechJobs{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4 py-16">
+    <div class="max-w-2xl w-full text-center">
+        <!-- Lock Icon -->
+        <div class="mb-8">
+            <svg class="mx-auto h-32 w-32 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+        </div>
+        
+        <!-- Error Code -->
+        <h1 class="text-8xl font-bold text-yellow-500 mb-4">403</h1>
+        
+        <!-- Error Message -->
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Access Denied</h2>
+        
+        <p class="text-lg text-gray-600 mb-8">
+            Sorry, you don't have permission to access this page. This area is restricted to authorized users only.
+        </p>
+        
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            {% if user.is_authenticated %}
+            <a href="{% url 'home' %}" class="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
+                Go to Homepage
+            </a>
+            {% if user.company %}
+            <a href="{% url 'dashboard' %}" class="px-8 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                Company Dashboard
+            </a>
+            {% elif user.seeker %}
+            <a href="{% url 'seeker_dashboard' %}" class="px-8 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                Seeker Dashboard
+            </a>
+            {% endif %}
+            {% else %}
+            <a href="{% url 'home' %}" class="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
+                Go to Homepage
+            </a>
+            <a href="{% url 'company_login' %}" class="px-8 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                Login
+            </a>
+            {% endif %}
+        </div>
+        
+        <!-- Help Section -->
+        <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Why am I seeing this?</h3>
+            <ul class="text-left text-gray-600 space-y-2 mb-4">
+                <li class="flex items-start gap-2">
+                    <svg class="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>You may need to <strong>log in</strong> to access this page</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <svg class="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Your account may not have the required <strong>permissions</strong></span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <svg class="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>You're trying to access a <strong>company-only</strong> or <strong>seeker-only</strong> page</span>
+                </li>
+            </ul>
+            
+            <div class="border-t border-gray-200 pt-4">
+                <p class="text-gray-600 mb-2">Need help? Contact our support team:</p>
+                <a href="mailto:support@cameroontechjobs.com" class="text-green-600 hover:text-green-700 font-medium">
+                    support@cameroontechjobs.com
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Page Not Found - CameroonTechJobs{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4 py-16">
+    <div class="max-w-2xl w-full text-center">
+        <!-- 404 Icon -->
+        <div class="mb-8">
+            <svg class="mx-auto h-32 w-32 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+        
+        <!-- Error Code -->
+        <h1 class="text-8xl font-bold text-green-600 mb-4">404</h1>
+        
+        <!-- Error Message -->
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Oops! Page Not Found</h2>
+        
+        <p class="text-lg text-gray-600 mb-8">
+            The page you're looking for doesn't exist or has been moved. Don't worry, you can find what you need below.
+        </p>
+        
+        <!-- Search Bar -->
+        <div class="mb-8 max-w-md mx-auto">
+            <form action="{% url 'job_list' %}" method="GET" class="flex gap-2">
+                <input 
+                    type="text" 
+                    name="q" 
+                    placeholder="Search for jobs..." 
+                    class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                >
+                <button type="submit" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                    Search
+                </button>
+            </form>
+        </div>
+        
+        <!-- Quick Links -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            <a href="{% url 'home' %}" class="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200">
+                <svg class="mx-auto h-8 w-8 text-green-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span class="text-sm font-medium text-gray-900">Homepage</span>
+            </a>
+            
+            <a href="{% url 'job_list' %}" class="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200">
+                <svg class="mx-auto h-8 w-8 text-green-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <span class="text-sm font-medium text-gray-900">Browse Jobs</span>
+            </a>
+            
+            <a href="{% url 'contact' %}" class="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200">
+                <svg class="mx-auto h-8 w-8 text-green-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <span class="text-sm font-medium text-gray-900">Contact Us</span>
+            </a>
+        </div>
+        
+        <!-- Contact Info -->
+        <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
+            <p class="text-gray-600 mb-2">Need help? Reach out to us:</p>
+            <a href="mailto:support@cameroontechjobs.com" class="text-green-600 hover:text-green-700 font-medium">
+                support@cameroontechjobs.com
+            </a>
+            <span class="text-gray-400 mx-2">|</span>
+            <a href="https://wa.me/237XXXXXXXXX" class="text-green-600 hover:text-green-700 font-medium" target="_blank">
+                WhatsApp
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

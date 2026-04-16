@@ -1,0 +1,346 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:'CameroonTechJobs Admin' }}{% endblock %}
+
+{% block extrastyle %}
+<style>
+    .analytics-header {
+        background: linear-gradient(135deg, #0b724d 0%, #0a5f3f 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+    
+    .metric-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+        border-left: 4px solid #0b724d;
+    }
+    
+    .metric-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #0b724d;
+        margin: 0.5rem 0;
+    }
+    
+    .metric-label {
+        color: #666;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .metric-change {
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+    }
+    
+    .metric-change.positive {
+        color: #198754;
+    }
+    
+    .metric-change.negative {
+        color: #dc3545;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #333;
+        margin: 2rem 0 1rem 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #0b724d;
+    }
+    
+    .data-table {
+        width: 100%;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .data-table th {
+        background: #0b724d;
+        color: white;
+        padding: 0.75rem;
+        text-align: left;
+        font-weight: 600;
+    }
+    
+    .data-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .data-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .badge-success {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .badge-warning {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .badge-danger {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .activity-item {
+        padding: 0.75rem;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+    
+    .activity-time {
+        font-size: 0.8rem;
+        color: #999;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="analytics-header">
+    <h1>📊 Analytics Dashboard</h1>
+    <p>Track your platform's performance and growth</p>
+</div>
+
+<!-- Revenue Metrics -->
+<div class="section-title">💰 Revenue Overview</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <div class="metric-card">
+        <div class="metric-label">Total Revenue</div>
+        <div class="metric-value">{{ total_revenue|floatformat:0 }} XAF</div>
+        <div class="metric-change">All time earnings</div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-label">Today's Revenue</div>
+        <div class="metric-value">{{ revenue_today|floatformat:0 }} XAF</div>
+        <div class="metric-change">Today's earnings</div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-label">This Week</div>
+        <div class="metric-value">{{ revenue_week|floatformat:0 }} XAF</div>
+        <div class="metric-change">Last 7 days</div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-label">This Month</div>
+        <div class="metric-value">{{ revenue_month|floatformat:0 }} XAF</div>
+        <div class="metric-change">Last 30 days</div>
+    </div>
+</div>
+
+<!-- User & Job Metrics -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+    <!-- User Growth -->
+    <div>
+        <div class="section-title">👥 User Growth</div>
+        <div class="metric-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div class="metric-label">Total Companies</div>
+                    <div class="metric-value">{{ total_companies }}</div>
+                </div>
+                <div class="metric-change positive">+{{ companies_this_month }} this month</div>
+            </div>
+        </div>
+        
+        <div class="metric-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div class="metric-label">Total Seekers</div>
+                    <div class="metric-value">{{ total_seekers }}</div>
+                </div>
+                <div class="metric-change positive">+{{ seekers_this_month }} this month</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Job Statistics -->
+    <div>
+        <div class="section-title">📋 Job Statistics</div>
+        <div class="metric-card">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span>Total Jobs</span>
+                <strong>{{ total_jobs }}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span class="badge badge-success">Active</span>
+                <strong>{{ active_jobs }}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span class="badge badge-warning">Pending</span>
+                <strong>{{ pending_jobs }}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span class="badge badge-danger">Expired</span>
+                <strong>{{ expired_jobs }}</strong>
+            </div>
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-label">New Jobs This Month</div>
+            <div class="metric-value">{{ jobs_this_month }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Applications & Conversion -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+    <!-- Applications -->
+    <div>
+        <div class="section-title">📝 Applications</div>
+        <div class="metric-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div class="metric-label">Total Applications</div>
+                    <div class="metric-value">{{ total_applications }}</div>
+                </div>
+                <div class="metric-change positive">+{{ applications_this_month }} this month</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Conversion Rate -->
+    <div>
+        <div class="section-title">📈 Conversion Rate</div>
+        <div class="metric-card">
+            <div class="metric-label">Payment Success Rate</div>
+            <div class="metric-value">{{ conversion_rate }}%</div>
+            <div class="metric-change">{{ completed_payments }} of {{ total_payments }} payments completed</div>
+        </div>
+    </div>
+</div>
+
+<!-- Popular Categories -->
+<div class="section-title"> Most Popular Job Categories</div>
+<table class="data-table" style="margin-bottom: 2rem;">
+    <thead>
+        <tr>
+            <th>Category</th>
+            <th>Active Jobs</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for category in popular_categories %}
+        <tr>
+            <td><strong>{{ category.name }}</strong></td>
+            <td>{{ category.job_count }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="2" style="text-align: center; color: #999;">No data available</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Top Spending Companies -->
+<div class="section-title">💎 Top Spending Companies</div>
+<table class="data-table" style="margin-bottom: 2rem;">
+    <thead>
+        <tr>
+            <th>Company</th>
+            <th>Total Spent</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for company in top_companies %}
+        <tr>
+            <td><strong>{{ company.company_name }}</strong></td>
+            <td>{{ company.total_spent|floatformat:0 }} XAF</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="2" style="text-align: center; color: #999;">No payment data available</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Recent Activity -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+    <!-- Recent Payments -->
+    <div>
+        <div class="section-title">💳 Recent Payments</div>
+        <div class="metric-card" style="padding: 0;">
+            {% for payment in recent_payments %}
+            <div class="activity-item">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>{{ payment.job.title|truncatechars:30 }}</strong>
+                        <div class="activity-time">{{ payment.job.company.company_name }}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 600; color: #0b724d;">{{ payment.amount|floatformat:0 }} XAF</div>
+                        <div class="activity-time">{{ payment.created_at|timesince }} ago</div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="activity-item" style="text-align: center; color: #999;">No payments yet</div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Recent Jobs -->
+    <div>
+        <div class="section-title">📋 Recent Jobs</div>
+        <div class="metric-card" style="padding: 0;">
+            {% for job in recent_jobs %}
+            <div class="activity-item">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>{{ job.title|truncatechars:30 }}</strong>
+                        <div class="activity-time">{{ job.company.company_name }}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="badge {% if job.status == 'active' %}badge-success{% elif job.status == 'pending' %}badge-warning{% else %}badge-danger{% endif %}">
+                            {{ job.get_status_display }}
+                        </span>
+                        <div class="activity-time">{{ job.date_posted|timesince }} ago</div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="activity-item" style="text-align: center; color: #999;">No jobs posted yet</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="section-title">⚡ Quick Actions</div>
+<div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+    <a href="{% url 'admin:jobs_job_changelist' %}" class="button" style="padding: 0.75rem 1.5rem; background: #0b724d; color: white; text-decoration: none; border-radius: 4px;">Manage Jobs</a>
+    <a href="{% url 'admin:companies_company_changelist' %}" class="button" style="padding: 0.75rem 1.5rem; background: #198754; color: white; text-decoration: none; border-radius: 4px;">Manage Companies</a>
+    <a href="{% url 'admin:payments_payment_changelist' %}" class="button" style="padding: 0.75rem 1.5rem; background: #ffc107; color: #333; text-decoration: none; border-radius: 4px;">View Payments</a>
+    <a href="{% url 'admin:index' %}" class="button" style="padding: 0.75rem 1.5rem; background: #6c757d; color: white; text-decoration: none; border-radius: 4px;">Back to Admin</a>
+</div>
+{% endblock %}
