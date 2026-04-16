@@ -19,6 +19,12 @@ def register(request):
     form = CompanyRegistrationForm()
     if request.method == 'POST':
         form = CompanyRegistrationForm(request.POST, request.FILES)
+        # Validate terms acceptance
+        accept_terms = request.POST.get('accept_terms')
+        if not accept_terms:
+            messages.error(request, 'You must accept the Terms of Service, Privacy Policy, and Refund Policy to create an account.')
+            return render(request, 'companies/register.html', {'form': form})
+        
         if form.is_valid():
             company = form.save()
             login(request, company, backend='django.contrib.auth.backends.ModelBackend')

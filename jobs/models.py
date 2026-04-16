@@ -1,5 +1,92 @@
 from django.db import models
 from django.utils import timezone
+from datetime import timedelta
+
+
+class Job(models.Model):
+    PLAN_CHOICES = [
+        ('free', 'Free'),
+        ('basic', 'Basic'),
+        ('featured', 'Featured'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pending Approval'),
+        ('active', 'Active'),
+        ('expired', 'Expired'),
+        ('rejected', 'Rejected'),
+    ]
+    
+    company = models.ForeignKey('companies.Company', on_delete=models.CASCADE, related_name='jobs')
+    category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True, related_name='jobs')
+    tech_stacks = models.ManyToManyField('TechStack', blank=True, related_name='jobs')
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    requirements = models.TextField(blank=True)
+    experience_level = models.CharField(max_length=50, choices=[
+        ('entry', 'Entry Level'),
+        ('mid', 'Mid Level'),
+        ('senior', 'Senior Level'),
+        ('lead', 'Lead/Manager'),
+    ])
+    location = models.CharField(max_length=100)
+    job_type = models.CharField(max_length=50, choices=[
+        ('full-time', 'Full-time'),
+        ('part-time', 'Part-time'),
+        ('contract', 'Contract'),
+        ('internship', 'Internship'),
+        ('remote', 'Remote'),
+    ])
+    salary_range = models.CharField(max_length=100, blank=True)
+    apply_link = models.URLField(blank=True)
+    apply_email = models.EmailField(blank=True)
+    plan = models.CharField(max_length=20, choices=PLAN_CHOICES, default='free')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    is_featured = models.BooleanField(default=False)
+    views_count = models.PositiveIntegerField(default=0)
+    date_posted = models.DateTimeField(auto_now_add=True)
+    date_expires = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-is_featured', '-date_posted']
+    
+    def __str__(self):
+        return self.title
+    
+    @property
+    def days_until_expiry(self):
+        """Calculate days remaining until job expires"""
+        if not self.date_expires:
+            return None
+        delta = self.date_expires - timezone.now()
+        return max(0, delta.days)
+    
+    @property
+    def is_expiring_soon(self):
+        """Check if job expires within 7 days"""
+        if not self.date_expires:
+            return False
+        return 0 < self.days_until_expiry <= 7
+    
+    @property
+    def has_expired(self):
+        """Check if job has expired"""
+        if not self.date_expires:
+            return False
+        return timezone.now() > self.date_expires
+    
+    def renew_job(self, plan=None, duration_days=None):
+        """Renew job with new expiration date"""
+        if plan:
+            self.plan = plan
+            self.is_featured = (plan == 'featured')
+        
+        if duration_days is None:
+            duration_days = 60 if self.plan == 'featured' else 30
+        
+        self.status = 'active'
+        self.date_expires = timezone.now() + timedelta(days=duration_days)
+        self.save(update_fields=['plan', 'is_featured', 'status', 'date_expires'])
 
 
 class Category(models.Model):
@@ -21,108 +108,6 @@ class TechStack(models.Model):
 
     class Meta:
         ordering = ['name']
-
-
-class Job(models.Model):
-    JOB_TYPE_CHOICES = [
-        ('full_time', 'Full Time'),
-        ('part_time', 'Part Time'),
-        ('contract', 'Contract'),
-        ('internship', 'Internship'),
-        ('remote', 'Remote'),
-    ]
-
-    LOCATION_CHOICES = [
-        ('douala', 'Douala'),
-        ('yaounde', 'Yaounde'),
-        ('bafoussam', 'Bafoussam'),
-        ('bamenda', 'Bamenda'),
-        ('buea', 'Buea'),
-        ('remote', 'Remote'),
-        ('other', 'Other'),
-    ]
-
-    STATUS_CHOICES = [
-        ('pending', 'Pending Approval'),
-        ('active', 'Active'),
-        ('expired', 'Expired'),
-        ('rejected', 'Rejected'),
-    ]
-
-    PLAN_CHOICES = [
-        ('free', 'Free'),
-        ('basic', 'Basic - 5,000 XAF'),
-        ('featured', 'Featured - 15,000 XAF'),
-    ]
-
-    EXPERIENCE_CHOICES = [
-        ('entry', 'Entry Level (0-2 years)'),
-        ('mid', 'Mid Level (2-5 years)'),
-        ('senior', 'Senior Level (5+ years)'),
-        ('any', 'Any Level'),
-    ]
-
-    company = models.ForeignKey(
-        'companies.Company',
-        on_delete=models.CASCADE,
-        related_name='jobs',
-    )
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='jobs',
-    )
-    tech_stacks = models.ManyToManyField(
-        TechStack,
-        blank=True,
-        related_name='jobs',
-    )
-
-    title = models.CharField(max_length=200)
-    description = models.TextField()
-    requirements = models.TextField()
-    experience_level = models.CharField(
-        max_length=20,
-        choices=EXPERIENCE_CHOICES,
-        default='any',
-    )
-    location = models.CharField(max_length=50, choices=LOCATION_CHOICES)
-    job_type = models.CharField(max_length=20, choices=JOB_TYPE_CHOICES)
-    salary_range = models.CharField(max_length=100, blank=True)
-    apply_link = models.URLField(blank=True)
-    apply_email = models.EmailField(blank=True)
-
-    plan = models.CharField(max_length=20, choices=PLAN_CHOICES, default='free')
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    is_featured = models.BooleanField(default=False)
-
-    views_count = models.PositiveIntegerField(default=0)
-    date_posted = models.DateTimeField(auto_now_add=True)
-    date_expires = models.DateTimeField(null=True, blank=True)
-
-    def save(self, *args, **kwargs):
-        if not self.date_expires:
-            self.date_expires = timezone.now() + timezone.timedelta(days=30)
-        super().save(*args, **kwargs)
-
-    def is_expired(self):
-        return timezone.now() > self.date_expires
-
-    def days_ago(self):
-        delta = timezone.now() - self.date_posted
-        if delta.days == 0:
-            return 'Today'
-        if delta.days == 1:
-            return '1 day ago'
-        return f'{delta.days} days ago'
-
-    def __str__(self):
-        return f'{self.title} - {self.company.company_name}'
-
-    class Meta:
-        ordering = ['-is_featured', '-date_posted']
-
 
 class JobApplication(models.Model):
     STATUS_CHOICES = [

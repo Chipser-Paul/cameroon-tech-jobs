@@ -18,6 +18,12 @@ def seeker_register(request):
     form = SeekerRegistrationForm()
     if request.method == 'POST':
         form = SeekerRegistrationForm(request.POST)
+        # Validate terms acceptance
+        accept_terms = request.POST.get('accept_terms')
+        if not accept_terms:
+            messages.error(request, 'You must accept the Terms of Service, Privacy Policy, and Refund Policy to create an account.')
+            return render(request, 'seekers/register.html', {'form': form})
+        
         if form.is_valid():
             seeker = form.save()
             login(request, seeker, backend='seekers.backends.SeekerBackend')

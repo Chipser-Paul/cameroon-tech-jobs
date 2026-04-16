@@ -102,6 +102,19 @@
                                         <input type="file" name="logo" class="form-control" accept="image/*">
                                         <div style="font-size:0.82rem;color:var(--gray);margin-top:0.3rem;">Optional. PNG or JPG, max 2MB.</div>
                                     </div>
+                                    <div class="col-12">
+                                        <div class="form-check" style="padding-left: 2.5rem;">
+                                            <input class="form-check-input" type="checkbox" name="accept_terms" id="accept_terms_company" required {% if form.accept_terms.value %}checked{% endif %}>
+                                            <label class="form-check-label" for="accept_terms_company" style="font-size:0.92rem;color:var(--gray);line-height:1.6;">
+                                                I agree to the <a href="{% url 'terms' %}" target="_blank" style="color:var(--green);font-weight:600;">Terms of Service</a>, 
+                                                <a href="{% url 'privacy' %}" target="_blank" style="color:var(--green);font-weight:600;">Privacy Policy</a>, and 
+                                                <a href="{% url 'refunds' %}" target="_blank" style="color:var(--green);font-weight:600;">Refund Policy</a> *
+                                            </label>
+                                            {% if form.accept_terms.errors %}
+                                            <div class="invalid-feedback d-block" style="font-size:0.85rem;">{{ form.accept_terms.errors|join:", " }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
                                     <div class="col-12 mt-2">
                                         <button type="submit" class="btn-green w-100" style="padding:0.95rem;"><i class="fas fa-building me-2"></i>Create Company Account</button>
                                     </div>

@@ -2,23 +2,155 @@ from django.contrib import admin
 from django.contrib import messages as admin_messages
 from django.utils.html import format_html
 from django.urls import reverse, path
-from django.shortcuts import redirect
+from django.shortcuts import render, redirect
+from django.db.models import Sum, Count, Q
+from django.utils import timezone
+from datetime import timedelta
 from .models import Job, JobApplication, ApplicationMessage, ApplicationInterview, Notification, Category, TechStack
+from companies.models import Company
+from seekers.models import Seeker
+from payments.models import Payment
 
 
-@admin.register(Category)
+class CameroonTechJobsAdminSite(admin.AdminSite):
+    site_header = 'CameroonTechJobs Administration'
+    site_title = 'CameroonTechJobs Admin'
+    index_title = 'Dashboard'
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('analytics/', self.admin_view(self.analytics_view), name='analytics'),
+        ]
+        return custom_urls + urls
+
+    def analytics_view(self, request):
+        """Custom analytics dashboard view"""
+        now = timezone.now()
+        
+        # Time periods
+        today = now.date()
+        yesterday = today - timedelta(days=1)
+        week_ago = today - timedelta(days=7)
+        month_ago = today - timedelta(days=30)
+        
+        # Revenue metrics
+        total_revenue = Payment.objects.filter(status='completed').aggregate(
+            total=Sum('amount')
+        )['total'] or 0
+        
+        revenue_today = Payment.objects.filter(
+            status='completed',
+            created_at__date=today
+        ).aggregate(total=Sum('amount'))['total'] or 0
+        
+        revenue_week = Payment.objects.filter(
+            status='completed',
+            created_at__date__gte=week_ago
+        ).aggregate(total=Sum('amount'))['total'] or 0
+        
+        revenue_month = Payment.objects.filter(
+            status='completed',
+            created_at__date__gte=month_ago
+        ).aggregate(total=Sum('amount'))['total'] or 0
+        
+        # Conversion rates
+        total_payments = Payment.objects.count()
+        completed_payments = Payment.objects.filter(status='completed').count()
+        conversion_rate = (completed_payments / total_payments * 100) if total_payments > 0 else 0
+        
+        # User metrics
+        total_companies = Company.objects.exclude(company_name='Admin').count()
+        companies_this_month = Company.objects.filter(
+            date_joined__date__gte=month_ago
+        ).exclude(company_name='Admin').count()
+        
+        total_seekers = Seeker.objects.count()
+        seekers_this_month = Seeker.objects.filter(
+            date_joined__date__gte=month_ago
+        ).count()
+        
+        # Job metrics
+        total_jobs = Job.objects.count()
+        active_jobs = Job.objects.filter(status='active').count()
+        pending_jobs = Job.objects.filter(status='pending').count()
+        expired_jobs = Job.objects.filter(status='expired').count()
+        jobs_this_month = Job.objects.filter(date_posted__date__gte=month_ago).count()
+        
+        # Applications
+        total_applications = JobApplication.objects.count()
+        applications_this_month = JobApplication.objects.filter(
+            date_applied__date__gte=month_ago
+        ).count()
+        
+        # Popular categories
+        popular_categories = Category.objects.annotate(
+            job_count=Count('job', filter=Q(job__status='active'))
+        ).order_by('-job_count')[:5]
+        
+        # Top spending companies
+        top_companies = Company.objects.annotate(
+            total_spent=Sum('payment__amount', filter=Q(payment__status='completed'))
+        ).filter(total_spent__isnull=False).order_by('-total_spent')[:5]
+        
+        # Recent activity
+        recent_payments = Payment.objects.select_related('job', 'job__company').order_by('-created_at')[:10]
+        recent_jobs = Job.objects.select_related('company').order_by('-date_posted')[:10]
+        
+        context = {
+            **self.each_context(request),
+            'title': 'Analytics Dashboard',
+            # Revenue
+            'total_revenue': total_revenue,
+            'revenue_today': revenue_today,
+            'revenue_week': revenue_week,
+            'revenue_month': revenue_month,
+            # Conversions
+            'total_payments': total_payments,
+            'completed_payments': completed_payments,
+            'conversion_rate': round(conversion_rate, 2),
+            # Users
+            'total_companies': total_companies,
+            'companies_this_month': companies_this_month,
+            'total_seekers': total_seekers,
+            'seekers_this_month': seekers_this_month,
+            # Jobs
+            'total_jobs': total_jobs,
+            'active_jobs': active_jobs,
+            'pending_jobs': pending_jobs,
+            'expired_jobs': expired_jobs,
+            'jobs_this_month': jobs_this_month,
+            # Applications
+            'total_applications': total_applications,
+            'applications_this_month': applications_this_month,
+            # Categories & Companies
+            'popular_categories': popular_categories,
+            'top_companies': top_companies,
+            # Recent activity
+            'recent_payments': recent_payments,
+            'recent_jobs': recent_jobs,
+        }
+        
+        return render(request, 'admin/analytics_dashboard.html', context)
+
+
+# Create custom admin site
+custom_admin_site = CameroonTechJobsAdminSite(name='custom_admin')
+
+# Register all models with custom admin site
+@admin.register(Category, site=custom_admin_site)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug')
     prepopulated_fields = {'slug': ('name',)}
 
 
-@admin.register(TechStack)
+@admin.register(TechStack, site=custom_admin_site)
 class TechStackAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
 
 
-@admin.register(Job)
+@admin.register(Job, site=custom_admin_site)
 class JobAdmin(admin.ModelAdmin):
     list_display = (
         'title',
@@ -129,7 +261,7 @@ class JobAdmin(admin.ModelAdmin):
         return super().get_queryset(request).prefetch_related('applications')
 
 
-@admin.register(JobApplication)
+@admin.register(JobApplication, site=custom_admin_site)
 class JobApplicationAdmin(admin.ModelAdmin):
     list_display = (
         'seeker',
@@ -148,10 +280,10 @@ class JobApplicationAdmin(admin.ModelAdmin):
         return obj.job.company.company_name
 
 
-@admin.register(ApplicationMessage)
+@admin.register(ApplicationMessage, site=custom_admin_site)
 class ApplicationMessageAdmin(admin.ModelAdmin):
     list_display = ('application', 'sender_name', 'sender_role_display', 'created_at')
-    list_filter = ('created_at',)  # Removed 'sender_role' - it's a property, not a field
+    list_filter = ('created_at',)
     search_fields = ('body', 'application__job__title', 'sender_company__company_name', 'sender_seeker__full_name')
     list_select_related = ('application', 'application__job', 'sender_company', 'sender_seeker')
     ordering = ('-created_at',)
@@ -161,7 +293,7 @@ class ApplicationMessageAdmin(admin.ModelAdmin):
         return obj.sender_role.title()
 
 
-@admin.register(ApplicationInterview)
+@admin.register(ApplicationInterview, site=custom_admin_site)
 class ApplicationInterviewAdmin(admin.ModelAdmin):
     list_display = (
         'application',
@@ -176,7 +308,7 @@ class ApplicationInterviewAdmin(admin.ModelAdmin):
     ordering = ('-scheduled_for',)
 
 
-@admin.register(Notification)
+@admin.register(Notification, site=custom_admin_site)
 class NotificationAdmin(admin.ModelAdmin):
     list_display = (
         'title',
@@ -206,3 +338,26 @@ class NotificationAdmin(admin.ModelAdmin):
     def mark_as_unread(self, request, queryset):
         updated = queryset.update(is_read=False)
         self.message_user(request, f'{updated} notification(s) marked as unread.')
+
+
+@admin.register(Payment, site=custom_admin_site)
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = (
+        'mch_transaction_ref',
+        'job',
+        'company',
+        'tier',
+        'amount',
+        'currency',
+        'status',
+        'created_at',
+    )
+    list_filter = ('status', 'tier', 'created_at')
+    search_fields = ('mch_transaction_ref', 'job__title', 'job__company__company_name')
+    list_select_related = ('job', 'job__company')
+    ordering = ('-created_at',)
+    readonly_fields = ('created_at', 'updated_at')
+
+    @admin.display(description='Company')
+    def company(self, obj):
+        return obj.job.company.company_name if obj.job else 'N/A'
