@@ -150,11 +150,15 @@ class JobApplicationAdmin(admin.ModelAdmin):
 
 @admin.register(ApplicationMessage)
 class ApplicationMessageAdmin(admin.ModelAdmin):
-    list_display = ('application', 'sender_name', 'sender_role', 'created_at')
-    list_filter = ('sender_role', 'created_at')
-    search_fields = ('body', 'application__job__title')
+    list_display = ('application', 'sender_name', 'sender_role_display', 'created_at')
+    list_filter = ('created_at',)  # Removed 'sender_role' - it's a property, not a field
+    search_fields = ('body', 'application__job__title', 'sender_company__company_name', 'sender_seeker__full_name')
     list_select_related = ('application', 'application__job', 'sender_company', 'sender_seeker')
     ordering = ('-created_at',)
+
+    @admin.display(description='Sender Role')
+    def sender_role_display(self, obj):
+        return obj.sender_role.title()
 
 
 @admin.register(ApplicationInterview)
