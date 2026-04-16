@@ -80,7 +80,7 @@ def analytics_view(request):
         
         # Top spending companies
         top_companies = Company.objects.annotate(
-            total_spent=Sum('payment__amount', filter=Q(payment__status='completed'))
+            total_spent=Sum('payments__amount', filter=Q(payments__status='completed'))
         ).filter(total_spent__isnull=False).order_by('-total_spent')[:5]
         
         # Recent activity
