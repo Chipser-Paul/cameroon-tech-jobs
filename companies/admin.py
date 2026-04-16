@@ -25,4 +25,5 @@ class CompanyAdmin(UserAdmin):
     )
 
 
+admin.site.register(Company, CompanyAdmin)
 admin.site.register(CompanyVerificationToken)
