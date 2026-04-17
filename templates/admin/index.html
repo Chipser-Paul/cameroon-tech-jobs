@@ -1,4 +1,31 @@
+{% extends "admin/base_site.html" %}
 {% load i18n static %}
+
+{% block content %}
+<!-- Analytics Dashboard Card -->
+<div style="margin-bottom: 2rem;">
+    <a href="{% url 'admin_analytics' %}" style="text-decoration: none; display: block;">
+        <div style="background: linear-gradient(135deg, #1a2b1f 0%, #2d3f33 100%); 
+                    border-radius: 12px; 
+                    padding: 2rem; 
+                    color: white; 
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                    display: flex; 
+                    align-items: center; 
+                    gap: 1.5rem;">
+            <div style="font-size: 3rem;">📊</div>
+            <div style="flex: 1;">
+                <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem; font-weight: 600;">Analytics Dashboard</h2>
+                <p style="margin: 0; opacity: 0.8; font-size: 14px;">Track revenue, user growth, job stats, platform performance</p>
+            </div>
+            <div style="font-size: 2rem; opacity: 0.6;">→</div>
+        </div>
+    </a>
+</div>
+
+<!-- Original Admin Content -->
+{{ block.super }}
+{% endblock %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
