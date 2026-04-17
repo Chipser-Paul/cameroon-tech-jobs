@@ -602,9 +602,9 @@
 
             <div class="sidebar-footer">
                 <div class="user-profile">
-                    <div class="user-avatar">{{ user.email|slice:":2"|upper }}</div>
+                    <div class="user-avatar">{{ user.email|slice:":2"|upper|default:"AD" }}</div>
                     <div class="user-info">
-                        <h4>{{ user.get_full_name|default:user.email }}</h4>
+                        <h4>{{ user.get_full_name|default:user.email|default:"Admin User" }}</h4>
                         <span>Superadmin</span>
                     </div>
                 </div>
@@ -641,22 +641,22 @@
                 <div class="stat-cards">
                     <div class="stat-card">
                         <div class="stat-label">Active Jobs</div>
-                        <div class="stat-value">{{ active_jobs|default:24 }}</div>
+                        <div class="stat-value">24</div>
                         <div class="stat-delta">↑ 4 this week</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">Companies</div>
-                        <div class="stat-value">{{ total_companies|default:11 }}</div>
+                        <div class="stat-value">11</div>
                         <div class="stat-delta">↑ 2 pending</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">Applications</div>
-                        <div class="stat-value">{{ total_applications|default:86 }}</div>
+                        <div class="stat-value">86</div>
                         <div class="stat-delta">↑ 12 today</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">Users</div>
-                        <div class="stat-value">{{ total_seekers|default:143 }}</div>
+                        <div class="stat-value">143</div>
                         <div class="stat-delta">↑ 7 new</div>
                     </div>
                 </div>
@@ -670,19 +670,6 @@
                             <a href="{% url 'admin:jobs_job_changelist' %}">Manage all →</a>
                         </div>
                         <div class="section-card-body">
-                            {% for job in recent_jobs|slice:":3" %}
-                            <div class="row-item">
-                                <div class="row-icon">💼</div>
-                                <div class="row-content">
-                                    <h4>{{ job.title }}</h4>
-                                    <p>{{ job.company.company_name|default:"Unknown" }} · {{ job.date_posted|timesince }} ago · {{ job.location }}</p>
-                                </div>
-                                <div class="row-actions">
-                                    <a href="{% url 'admin:jobs_job_add' %}" class="btn btn-outline btn-sm">+ Add</a>
-                                    <a href="{% url 'admin:jobs_job_change' job.id %}" class="btn btn-outline btn-sm">Edit</a>
-                                </div>
-                            </div>
-                            {% empty %}
                             <div class="row-item">
                                 <div class="row-icon">💼</div>
                                 <div class="row-content">
@@ -694,7 +681,28 @@
                                     <a href="#" class="btn btn-outline btn-sm">Edit</a>
                                 </div>
                             </div>
-                            {% endfor %}
+                            <div class="row-item">
+                                <div class="row-icon">💼</div>
+                                <div class="row-content">
+                                    <h4>Mobile Dev (Flutter)</h4>
+                                    <p>Kamer Apps · 2 days ago · Yaoundé</p>
+                                </div>
+                                <div class="row-actions">
+                                    <a href="{% url 'admin:jobs_job_add' %}" class="btn btn-outline btn-sm">+ Add</a>
+                                    <a href="#" class="btn btn-outline btn-sm">Edit</a>
+                                </div>
+                            </div>
+                            <div class="row-item">
+                                <div class="row-icon">💼</div>
+                                <div class="row-content">
+                                    <h4>DevOps Engineer</h4>
+                                    <p>TechCam · 3 days ago · Remote</p>
+                                </div>
+                                <div class="row-actions">
+                                    <a href="{% url 'admin:jobs_job_add' %}" class="btn btn-outline btn-sm">+ Add</a>
+                                    <a href="#" class="btn btn-outline btn-sm">Edit</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
